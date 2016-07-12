@@ -37,9 +37,25 @@ namespace Tomado {
 		public override void OnFinish() {
 			Finish();
 		}
+
+		public static class TimerLengths {
+			private const int minuteInMillis = 1000 * 60;
+			public const double 
+				/*
+				Work =		25 * minuteInMillis, 
+				ShortBreak = 5 * minuteInMillis, 
+				LongBreak = 10 * minuteInMillis;
+				 */
+				Work = 4000,
+				ShortBreak = 2000,
+				LongBreak = 3000;
+			public const double Test = 5000; //5000 ms; 5 seconds
+		}
 	}
 
 	public enum TimerType {
 		Work, ShortBreak, LongBreak, Pause
 	}
+
+	
 }

@@ -3,4 +3,5 @@
     <string name="ApplicationName">Tomado</string>
   <string name="ButtonText_pause">Pause</string>
   <string name="ButtonText_work">Work</string>
+  <string name="Finished">Finished</string>
 </resources>

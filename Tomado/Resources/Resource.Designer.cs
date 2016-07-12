@@ -119,6 +119,9 @@ namespace Tomado
 			// aapt resource value: 0x7f040002
 			public const int ButtonText_work = 2130968578;
 			
+			// aapt resource value: 0x7f040003
+			public const int Finished = 2130968579;
+			
 			static String()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
