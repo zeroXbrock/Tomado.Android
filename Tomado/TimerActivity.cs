@@ -26,20 +26,40 @@ namespace Tomado {
 		TextView timerTextView, typeTextView;
 		Button pauseButton, workButton;
 
-		protected override void OnCreate(Bundle bundle) {
-			base.OnCreate(bundle);
 
+		///helper functions to thin OnCreate out
+		private void GetBundleInfo(Bundle bundle) {
+			remainingTimeInMillis = bundle.GetLong("remainingTimeInMillis");
+			shortBreaks = bundle.GetInt("shortBreaks");
+			isPaused = bundle.GetBoolean("isPaused");
+			isTimerRunning = bundle.GetBoolean("isTimerRunning", isTimerRunning);
+			lastTimerTypeInt = bundle.GetInt("lastTimerTypeInt");
+			firstRun = bundle.GetBoolean("firstRun");
+		}
+
+		private void SetTimerTypeFromInt() {
+			switch (lastTimerTypeInt) {
+				case -1:
+					lastTimerType = TimerType.Pause;
+					break;
+				case 0:
+					lastTimerType = TimerType.Work;
+					break;
+				case 1:
+					lastTimerType = TimerType.ShortBreak;
+					break;
+				case 2:
+					lastTimerType = TimerType.LongBreak;
+					break;
+				default:
+					lastTimerType = TimerType.Work;
+					break;
+			}
+		}
+
+		// Initializes timer variables and sets textviews, gets state info from bundle when applicable
+		private void Init(Bundle bundle){
 			interval = 500; //interval set to 500 to prevent last-second "error" with CountDownTimer
-
-			// Set our view from the "main" layout resource
-			SetContentView(Resource.Layout.Timer);
-
-			//get references to our layout items
-			timerTextView = FindViewById<TextView>(Resource.Id.textViewTimer);
-			typeTextView = FindViewById<TextView>(Resource.Id.textViewTimerType);
-			pauseButton = FindViewById<Button>(Resource.Id.buttonPause);
-			workButton = FindViewById<Button>(Resource.Id.buttonWork);
-
 			if (bundle == null) { // just started app
 				//initialize timer vars
 				duration = (long)CTimer.TimerLengths.Test;
@@ -49,30 +69,9 @@ namespace Tomado {
 				timerTextView.SetText(getClockTimeLeft(duration), TextView.BufferType.Normal);
 			}
 			else {
-				remainingTimeInMillis = bundle.GetLong("remainingTimeInMillis");
-				shortBreaks = bundle.GetInt("shortBreaks");
-				isPaused = bundle.GetBoolean("isPaused");
-				isTimerRunning = bundle.GetBoolean("isTimerRunning", isTimerRunning);
-				lastTimerTypeInt = bundle.GetInt("lastTimerTypeInt");
-				firstRun = bundle.GetBoolean("firstRun");
+				GetBundleInfo(bundle);
 
-				switch (lastTimerTypeInt) {
-					case -1:
-						lastTimerType = TimerType.Pause;
-						break;
-					case 0:
-						lastTimerType = TimerType.Work;
-						break;
-					case 1:
-						lastTimerType = TimerType.ShortBreak;
-						break;
-					case 2:
-						lastTimerType = TimerType.LongBreak;
-						break;
-					default:
-						lastTimerType = TimerType.Work;
-						break;
-				}
+				SetTimerTypeFromInt();
 
 				if (isPaused)
 					timerTextView.SetText(getClockTimeLeft(remainingTimeInMillis), TextView.BufferType.Normal);
@@ -84,13 +83,32 @@ namespace Tomado {
 					timerTextView.SetText(Resource.String.Finished, TextView.BufferType.Normal);
 				}
 				typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
-				
+
 			}
 
 			if (firstRun) {
 				typeTextView.SetText(TimerType.Work.ToString(), TextView.BufferType.Normal);
 				timerTextView.SetText(getClockTimeLeft(CTimer.TimerLengths.Work), TextView.BufferType.Normal);
 			}
+		}
+
+
+		protected override void OnCreate(Bundle bundle) {
+			base.OnCreate(bundle);
+
+			
+
+			// Set our view from the "main" layout resource
+			SetContentView(Resource.Layout.Timer);
+
+			//get references to our layout items
+			timerTextView = FindViewById<TextView>(Resource.Id.textViewTimer);
+			typeTextView = FindViewById<TextView>(Resource.Id.textViewTimerType);
+			pauseButton = FindViewById<Button>(Resource.Id.buttonPause);
+			workButton = FindViewById<Button>(Resource.Id.buttonWork);
+
+			//initialize timer
+			Init(bundle);
 			
 			
 
@@ -117,13 +135,15 @@ namespace Tomado {
 			#endregion
 		}
 
-		protected override void OnSaveInstanceState(Bundle outState) {
+
+		//helper functions to condense OnSaveInstanceState
+		private void SetBundleInfo(Bundle outState) {
 			outState.PutLong("remainingTimeInMillis", remainingTimeInMillis);
 			outState.PutInt("shortBreaks", shortBreaks);
 			outState.PutBoolean("isPaused", isPaused);
 			outState.PutBoolean("isTimerRunning", isTimerRunning);
 			outState.PutBoolean("firstRun", firstRun);
-			
+
 			switch (lastTimerType) {
 				case TimerType.LongBreak:
 					lastTimerTypeInt = 2;
@@ -143,13 +163,14 @@ namespace Tomado {
 			}
 
 			outState.PutInt("lastTimerTypeInt", lastTimerTypeInt);
+		}
+
+		protected override void OnSaveInstanceState(Bundle outState) {
+			SetBundleInfo(outState);
 			
 			base.OnSaveInstanceState(outState);
 		}
-		
 
-
-		//helper function to start timer
 		private void startTimer(long durationInMillis) {
 			isTimerRunning = true;
 
@@ -164,12 +185,10 @@ namespace Tomado {
 		public void OnTick(long millisUntilFinished) {
 			remainingTimeInMillis = millisUntilFinished;
 
-			//update time every whole second
-			if (millisUntilFinished % 1000 > interval || millisUntilFinished > (duration - interval)) {
-				//format output time to seconds
-				string outputTime = getClockTimeLeft(millisUntilFinished);
-
-				timerTextView.SetText(outputTime, TextView.BufferType.Normal);
+			//update timer textview every whole second
+			if (millisUntilFinished % 1000 > interval || millisUntilFinished == duration) {
+				//set timer textview, format output time to seconds
+				timerTextView.SetText(getClockTimeLeft(millisUntilFinished), TextView.BufferType.Normal);
 			}
 		}
 
@@ -195,15 +214,16 @@ namespace Tomado {
 		}
 		private string getClockTimeLeft(double minutes, double seconds) {
 			string outputSecs;
+
 			//check for last minute
 			if (minutes > 0)
 				seconds = seconds % (minutes * 60);
+
 			//check for last 10 seconds
 			if (seconds < 10)
 				outputSecs = "0" + seconds.ToString();
 			else
 				outputSecs = seconds.ToString();
-			
 			
 			return minutes.ToString() + ":" + outputSecs;
 			
