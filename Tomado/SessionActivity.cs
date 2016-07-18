@@ -12,7 +12,7 @@ using Android.Widget;
 
 namespace Tomado {
 	[Activity(Label = "Sessions")]
-	public class SessionAcivity : Activity {
+	public class SessionActivity : Activity {
 		protected override void OnCreate(Bundle savedInstanceState) {
 			base.OnCreate(savedInstanceState);
 
