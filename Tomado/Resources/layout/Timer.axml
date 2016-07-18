@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:minWidth="25px"
     android:minHeight="25px">
+  <!--TextView LinearLayout section begin-->
     <LinearLayout
         android:id="@+id/textViewTimerLinearLayout"
         android:layout_width="match_parent"
@@ -25,6 +26,9 @@
             android:id="@+id/textViewTimer"
             android:text="time" />
     </LinearLayout>
+  <!--TextView LinearLayout section end-->
+
+  <!--Button RelativeLayout section begin-->
     <RelativeLayout
         android:minWidth="25px"
         android:minHeight="25px"
@@ -49,4 +53,5 @@
                 android:text="@string/ButtonText_pause" />
         </LinearLayout>
     </RelativeLayout>
+  <!--Button RelativeLayout section end-->
 </RelativeLayout>
