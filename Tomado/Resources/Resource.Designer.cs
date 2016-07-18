@@ -66,6 +66,9 @@ namespace Tomado
 			// aapt resource value: 0x7f050006
 			public const int buttonPause = 2131034118;
 			
+			// aapt resource value: 0x7f050007
+			public const int buttonSchedule = 2131034119;
+			
 			// aapt resource value: 0x7f050005
 			public const int buttonWork = 2131034117;
 			
