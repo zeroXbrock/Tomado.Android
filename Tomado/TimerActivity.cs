@@ -7,7 +7,7 @@ using Android.Widget;
 using Android.OS;
 
 namespace Tomado {
-	[Activity(Label = "Tomado", MainLauncher = true, Icon = "@drawable/icon")]
+	[Activity(Label = "Timer", MainLauncher = true, Icon = "@drawable/icon")]
 	public class MainActivity : Activity {
 		
 		//timer logic vars
@@ -24,10 +24,56 @@ namespace Tomado {
 
 		//view instances
 		TextView timerTextView, typeTextView;
-		Button pauseButton, workButton;
+		Button pauseButton, workButton, scheduleButton;
 
+
+		protected override void OnCreate(Bundle bundle) {
+			base.OnCreate(bundle);
+
+
+
+			// Set our view from the "main" layout resource
+			SetContentView(Resource.Layout.Timer);
+
+			//get references to our layout items
+			timerTextView = FindViewById<TextView>(Resource.Id.textViewTimer);
+			typeTextView = FindViewById<TextView>(Resource.Id.textViewTimerType);
+			pauseButton = FindViewById<Button>(Resource.Id.buttonPause);
+			workButton = FindViewById<Button>(Resource.Id.buttonWork);
+			scheduleButton = FindViewById<Button>(Resource.Id.buttonSchedule);
+
+			//initialize timer
+			Init(bundle);
+
+
+			#region button clicks
+
+			workButton.Click += delegate {
+				if (firstRun)
+					firstRun = false;
+				if (isPaused) {
+					duration = remainingTimeInMillis;
+					isPaused = false;
+				}
+				if (!isTimerRunning) {
+					updateTimer();
+					typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
+				}
+				startTimer(duration);
+			};
+			pauseButton.Click += delegate {
+				isPaused = true;
+				countDownTimer.Cancel();
+			};
+			scheduleButton.Click += delegate {
+				StartActivity(typeof(SessionActivity));
+			};
+
+			#endregion
+		}
 
 		///helper functions to thin OnCreate out
+		//sets local vars to bundle data
 		private void GetBundleInfo(Bundle bundle) {
 			remainingTimeInMillis = bundle.GetLong("remainingTimeInMillis");
 			shortBreaks = bundle.GetInt("shortBreaks");
@@ -36,7 +82,7 @@ namespace Tomado {
 			lastTimerTypeInt = bundle.GetInt("lastTimerTypeInt");
 			firstRun = bundle.GetBoolean("firstRun");
 		}
-
+		//converts int to TimerType enum
 		private void SetTimerTypeFromInt() {
 			switch (lastTimerTypeInt) {
 				case -1:
@@ -56,8 +102,7 @@ namespace Tomado {
 					break;
 			}
 		}
-
-		// Initializes timer variables and sets textviews, gets state info from bundle when applicable
+		//Initializes timer variables and sets textviews, gets state info from bundle when applicable
 		private void Init(Bundle bundle){
 			interval = 500; //interval set to 500 to prevent last-second "error" with CountDownTimer
 			if (bundle == null) { // just started app
@@ -93,50 +138,7 @@ namespace Tomado {
 		}
 
 
-		protected override void OnCreate(Bundle bundle) {
-			base.OnCreate(bundle);
-
-			
-
-			// Set our view from the "main" layout resource
-			SetContentView(Resource.Layout.Timer);
-
-			//get references to our layout items
-			timerTextView = FindViewById<TextView>(Resource.Id.textViewTimer);
-			typeTextView = FindViewById<TextView>(Resource.Id.textViewTimerType);
-			pauseButton = FindViewById<Button>(Resource.Id.buttonPause);
-			workButton = FindViewById<Button>(Resource.Id.buttonWork);
-
-			//initialize timer
-			Init(bundle);
-			
-			
-
-			#region button clicks
-
-			workButton.Click += delegate {
-				if (firstRun)
-					firstRun = false;
-				if (isPaused) {
-					duration = remainingTimeInMillis;
-					isPaused = false;
-				}
-				if (!isTimerRunning) {
-					updateTimer();
-					typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
-				}
-				startTimer(duration);
-			};
-			pauseButton.Click += delegate {
-				isPaused = true;
-				countDownTimer.Cancel();
-			};
-
-			#endregion
-		}
-
-
-		//helper functions to condense OnSaveInstanceState
+		//puts data in bundle
 		private void SetBundleInfo(Bundle outState) {
 			outState.PutLong("remainingTimeInMillis", remainingTimeInMillis);
 			outState.PutInt("shortBreaks", shortBreaks);
@@ -202,7 +204,7 @@ namespace Tomado {
 		}
 		#endregion
 
-		//helper functions to convert time
+		///helper functions to convert time
 		private double getMinutesFromMillis(double millisUntilFinished) {
 			double secsUntilFinished = getSecondsFromMillis(millisUntilFinished);
 			double outputMins = (secsUntilFinished / 60) - (secsUntilFinished / 60) % 1;

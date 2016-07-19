@@ -50,15 +50,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CTimer.cs" />
+    <Compile Include="Session.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="SessionActivity.cs" />
+    <Compile Include="SessionAdapter.cs" />
     <Compile Include="TimerActivity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
-    <AndroidResource Include="Resources\layout\Schedule.axml" />
+    <AndroidResource Include="Resources\layout\Schedule.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\Timer.axml">
