@@ -39,7 +39,8 @@ namespace Tomado {
 			}
 
 			view.FindViewById<TextView>(Android.Resource.Id.Text1).Text = sessions[position].Title;
-			view.FindViewById<TextView>(Android.Resource.Id.Text2).Text = (sessions[position].Start + " - " + sessions[position].End);
+			view.FindViewById<TextView>(Android.Resource.Id.Text2).Text = (sessions[position].StartHour + ":" + sessions[position].StartMinute 
+				+ " - " + sessions[position].EndHour + ":" + sessions[position].EndMinute);
 
 			return view;
 		}

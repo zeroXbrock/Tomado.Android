@@ -66,7 +66,7 @@ namespace Tomado {
 				countDownTimer.Cancel();
 			};
 			scheduleButton.Click += delegate {
-				StartActivity(typeof(SessionActivity));
+				StartActivity(typeof(SessionsActivity));
 			};
 
 			#endregion

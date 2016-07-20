@@ -12,22 +12,32 @@ using Android.Widget;
 
 namespace Tomado {
 	public class Session {
-		double start, end;
+		int startHour, endHour, startMinute, endMinute;
 		string title;
 
-		public Session(double start, double end, string title) {
-			this.start = start;
-			this.end = end;
+		public Session(int startHour, int startMinute, int endHour, int endMinute, string title) {
+			this.startHour = startHour;
+			this.startMinute = startMinute;
+			this.endHour = endHour;
+			this.endMinute = endMinute;
 			this.title = title;
 		}
 
-		public double Start {
-			get { return start; }
-			set { start = value; }
+		public int StartHour {
+			get { return startHour; }
+			set { startHour = value; }
 		}
-		public double End {
-			get { return end; }
-			set { end = value; }
+		public int StartMinute {
+			get { return startMinute; }
+			set { startMinute = value; }
+		}
+		public int EndHour {
+			get { return endHour; }
+			set { endHour = value; }
+		}
+		public int EndMinute {
+			get { return endMinute; }
+			set { endMinute = value; }
 		}
 		public string Title {
 			get { return title; }
