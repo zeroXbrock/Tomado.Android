@@ -7,7 +7,7 @@ using Android.Widget;
 using Android.OS;
 
 namespace Tomado {
-	[Activity(Label = "Timer", MainLauncher = true, Icon = "@drawable/icon")]
+	[Activity(Label = "Tomado", MainLauncher = true, Icon = "@drawable/icon")]
 	public class MainActivity : Activity {
 		
 		//timer logic vars
@@ -20,17 +20,15 @@ namespace Tomado {
 		long minuteInMillis = 60000;
 		int shortBreaks = 0;
 		bool isPaused = false;
-		bool firstRun = true;
 
 		//view instances
 		TextView timerTextView, typeTextView;
-		Button pauseButton, workButton, scheduleButton;
-
+		Button pauseButton, workButton;
 
 		protected override void OnCreate(Bundle bundle) {
 			base.OnCreate(bundle);
 
-
+			interval = 500; //interval set to 500 to prevent last-second "error" with CountDownTimer
 
 			// Set our view from the "main" layout resource
 			SetContentView(Resource.Layout.Timer);
@@ -40,71 +38,7 @@ namespace Tomado {
 			typeTextView = FindViewById<TextView>(Resource.Id.textViewTimerType);
 			pauseButton = FindViewById<Button>(Resource.Id.buttonPause);
 			workButton = FindViewById<Button>(Resource.Id.buttonWork);
-			scheduleButton = FindViewById<Button>(Resource.Id.buttonSchedule);
 
-			//initialize timer
-			Init(bundle);
-
-
-			#region button clicks
-
-			workButton.Click += delegate {
-				if (firstRun)
-					firstRun = false;
-				if (isPaused) {
-					duration = remainingTimeInMillis;
-					isPaused = false;
-				}
-				if (!isTimerRunning) {
-					updateTimer();
-					typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
-				}
-				startTimer(duration);
-			};
-			pauseButton.Click += delegate {
-				isPaused = true;
-				countDownTimer.Cancel();
-			};
-			scheduleButton.Click += delegate {
-				StartActivity(typeof(SessionsActivity));
-			};
-
-			#endregion
-		}
-
-		///helper functions to thin OnCreate out
-		//sets local vars to bundle data
-		private void GetBundleInfo(Bundle bundle) {
-			remainingTimeInMillis = bundle.GetLong("remainingTimeInMillis");
-			shortBreaks = bundle.GetInt("shortBreaks");
-			isPaused = bundle.GetBoolean("isPaused");
-			isTimerRunning = bundle.GetBoolean("isTimerRunning", isTimerRunning);
-			lastTimerTypeInt = bundle.GetInt("lastTimerTypeInt");
-			firstRun = bundle.GetBoolean("firstRun");
-		}
-		//converts int to TimerType enum
-		private void SetTimerTypeFromInt() {
-			switch (lastTimerTypeInt) {
-				case -1:
-					lastTimerType = TimerType.Pause;
-					break;
-				case 0:
-					lastTimerType = TimerType.Work;
-					break;
-				case 1:
-					lastTimerType = TimerType.ShortBreak;
-					break;
-				case 2:
-					lastTimerType = TimerType.LongBreak;
-					break;
-				default:
-					lastTimerType = TimerType.Work;
-					break;
-			}
-		}
-		//Initializes timer variables and sets textviews, gets state info from bundle when applicable
-		private void Init(Bundle bundle){
-			interval = 500; //interval set to 500 to prevent last-second "error" with CountDownTimer
 			if (bundle == null) { // just started app
 				//initialize timer vars
 				duration = (long)CTimer.TimerLengths.Test;
@@ -114,38 +48,72 @@ namespace Tomado {
 				timerTextView.SetText(getClockTimeLeft(duration), TextView.BufferType.Normal);
 			}
 			else {
-				GetBundleInfo(bundle);
+				remainingTimeInMillis = bundle.GetLong("remainingTimeInMillis");
+				shortBreaks = bundle.GetInt("shortBreaks");
+				isPaused = bundle.GetBoolean("isPaused");
+				isTimerRunning = bundle.GetBoolean("isTimerRunning");
+				
+				lastTimerTypeInt = bundle.GetInt("lastTimerTypeInt");
 
-				SetTimerTypeFromInt();
-
-				if (isPaused)
-					timerTextView.SetText(getClockTimeLeft(remainingTimeInMillis), TextView.BufferType.Normal);
+				switch (lastTimerTypeInt) {
+					case -1:
+						lastTimerType = TimerType.Pause;
+						break;
+					case 0:
+						lastTimerType = TimerType.Work;
+						break;
+					case 1:
+						lastTimerType = TimerType.ShortBreak;
+						break;
+					case 2:
+						lastTimerType = TimerType.LongBreak;
+						break;
+					default:
+						lastTimerType = TimerType.Work;
+						break;
+				}
 
 				if (remainingTimeInMillis > 0 && !isPaused) {
 					startTimer(remainingTimeInMillis);
 				}
-				else if (!isTimerRunning || remainingTimeInMillis < interval) {
+				else if (!isTimerRunning) {
 					timerTextView.SetText(Resource.String.Finished, TextView.BufferType.Normal);
 				}
 				typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
-
 			}
 
-			if (firstRun) {
-				typeTextView.SetText(TimerType.Work.ToString(), TextView.BufferType.Normal);
-				timerTextView.SetText(getClockTimeLeft(CTimer.TimerLengths.Work), TextView.BufferType.Normal);
-			}
+			
+			
+			
+
+			#region button clicks
+
+			workButton.Click += delegate {
+				if (isPaused) {
+					duration = remainingTimeInMillis;
+					isPaused = false;
+				}
+				//else if (!isTimerRunning)
+					updateTimer();
+
+				typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
+
+				startTimer(duration);
+			};
+			pauseButton.Click += delegate {
+				isPaused = true;
+				countDownTimer.Cancel();
+			};
+
+			#endregion
 		}
 
-
-		//puts data in bundle
-		private void SetBundleInfo(Bundle outState) {
+		protected override void OnSaveInstanceState(Bundle outState) {
 			outState.PutLong("remainingTimeInMillis", remainingTimeInMillis);
 			outState.PutInt("shortBreaks", shortBreaks);
 			outState.PutBoolean("isPaused", isPaused);
 			outState.PutBoolean("isTimerRunning", isTimerRunning);
-			outState.PutBoolean("firstRun", firstRun);
-
+			
 			switch (lastTimerType) {
 				case TimerType.LongBreak:
 					lastTimerTypeInt = 2;
@@ -165,20 +133,22 @@ namespace Tomado {
 			}
 
 			outState.PutInt("lastTimerTypeInt", lastTimerTypeInt);
-		}
-
-		protected override void OnSaveInstanceState(Bundle outState) {
-			SetBundleInfo(outState);
 			
 			base.OnSaveInstanceState(outState);
 		}
+		
 
+
+		//helper function to start timer
 		private void startTimer(long durationInMillis) {
-			isTimerRunning = true;
+			if (!isTimerRunning) {
+				isTimerRunning = true;
 
-			// make a new timer object
-			countDownTimer = new CTimer(durationInMillis, interval, OnTick, OnFinish);
-			countDownTimer.Start();
+				// make a new timer object
+				countDownTimer = new CTimer(durationInMillis, interval, OnTick, OnFinish);
+				countDownTimer.Start();
+				
+			}
 		}
 
 
@@ -187,10 +157,12 @@ namespace Tomado {
 		public void OnTick(long millisUntilFinished) {
 			remainingTimeInMillis = millisUntilFinished;
 
-			//update timer textview every whole second
-			if (millisUntilFinished % 1000 > interval || millisUntilFinished == duration) {
-				//set timer textview, format output time to seconds
-				timerTextView.SetText(getClockTimeLeft(millisUntilFinished), TextView.BufferType.Normal);
+			//update time every whole second
+			if (millisUntilFinished % 1000 > interval || millisUntilFinished > (duration - interval)) {
+				//format output time to seconds
+				string outputTime = getClockTimeLeft(millisUntilFinished);
+
+				timerTextView.SetText(outputTime, TextView.BufferType.Normal);
 			}
 		}
 
@@ -204,39 +176,35 @@ namespace Tomado {
 		}
 		#endregion
 
-		///helper functions to convert time
+		//helper functions to convert time
 		private double getMinutesFromMillis(double millisUntilFinished) {
 			double secsUntilFinished = getSecondsFromMillis(millisUntilFinished);
 			double outputMins = (secsUntilFinished / 60) - (secsUntilFinished / 60) % 1;
 			return outputMins;
 		}
 		private double getSecondsFromMillis(double millisUntilFinished) {
-			
-			return Math.Round(Math.Ceiling(millisUntilFinished/1000)*1000 * 0.001);
-		}
-		private string getClockTimeLeft(double minutes, double seconds) {
-			string outputSecs;
-
-			//check for last minute
-			if (minutes > 0)
-				seconds = seconds % (minutes * 60);
-
-			//check for last 10 seconds
-			if (seconds < 10)
-				outputSecs = "0" + seconds.ToString();
-			else
-				outputSecs = seconds.ToString();
-			
-			return minutes.ToString() + ":" + outputSecs;
-			
+			return Math.Round(millisUntilFinished * 0.001);
 		}
 		private string getClockTimeLeft(double millisUntilFinished) {
 			double secsUntilFinished, minsUntilFinished;
+			string outputMins, outputSecs;
 
 			minsUntilFinished = getMinutesFromMillis(millisUntilFinished);
+			outputMins = minsUntilFinished.ToString();
+
 			secsUntilFinished = getSecondsFromMillis(millisUntilFinished);
 
-			string outputTime = getClockTimeLeft(minsUntilFinished, secsUntilFinished);
+			//check for last minute
+			if (minsUntilFinished > 0)
+				secsUntilFinished = secsUntilFinished % (minsUntilFinished * 60);
+			
+			//check for last 10 seconds
+			if (secsUntilFinished < 10)
+				outputSecs = "0" + secsUntilFinished.ToString();
+			else
+				outputSecs = secsUntilFinished.ToString();
+
+			string outputTime = outputMins + ":" + outputSecs;
 
 			return outputTime;
 		}
