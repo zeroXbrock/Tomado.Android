@@ -1,3 +1,4 @@
+///DELETE THIS FILE
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace Tomado {
 			SetContentView(Resource.Layout.Sessions);
 
 			//get ListView instance
-			listViewFreetime = FindViewById<ListView>(Resource.Id.listViewFreetime);
+			listViewFreetime = FindViewById<ListView>(Resource.Id.listViewSessions);
 
 			newSessionButton = FindViewById<Button>(Resource.Id.buttonNewSession);
 			newSessionButton.Click += delegate {

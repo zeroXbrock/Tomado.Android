@@ -11,6 +11,7 @@ using Android.Views;
 using Android.Widget;
 
 namespace Tomado {
+	//adapter to populate sessions list
 	public class SessionAdapter : BaseAdapter<Session> {
 		List<Session> sessions;
 		Activity context;
