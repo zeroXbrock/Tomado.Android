@@ -25,9 +25,6 @@ namespace Tomado {
 			SetContentView(Resource.Layout.NewSession);
 
 			//instantiate views
-			startTimePicker = FindViewById<TimePicker>(Resource.Id.timePickerStart_NewSession);
-			endTimePicker = FindViewById<TimePicker>(Resource.Id.timePickerEnd_NewSession);
-			datePicker = FindViewById<DatePicker>(Resource.Id.datePicker_NewSession);
 			titleEditText = FindViewById<EditText>(Resource.Id.editTextTitle_NewSession);
 			saveButton = FindViewById<Button>(Resource.Id.buttonSave_NewSession);
 
@@ -39,7 +36,7 @@ namespace Tomado {
 			saveButton.Click += delegate {
 				/// send info back to SessionsActivity
 				//create intent to go to SessionsActivity
-				Intent intent = new Intent(this, typeof(SessionsActivity));
+				Intent intent = new Intent(this, typeof(SwipeActivity));
 				//populate intent with data
 				intent.PutExtras(getExtras());
 				//successful intent transaction

@@ -39,9 +39,11 @@ namespace Tomado {
 				view = context.LayoutInflater.Inflate(Android.Resource.Layout.SimpleListItem2, null);
 			}
 
-			view.FindViewById<TextView>(Android.Resource.Id.Text1).Text = sessions[position].Title;
-			view.FindViewById<TextView>(Android.Resource.Id.Text2).Text = (sessions[position].StartHour + ":" + sessions[position].StartMinute 
-				+ " - " + sessions[position].EndHour + ":" + sessions[position].EndMinute);
+			Session session = sessions[position];
+			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
+
+			view.FindViewById<TextView>(Android.Resource.Id.Text1).Text = session.Title;
+			view.FindViewById<TextView>(Android.Resource.Id.Text2).Text = (dateTime.ToShortTimeString() + "\t" + session.MonthOfYear + "/" + session.DayOfMonth);
 
 			return view;
 		}

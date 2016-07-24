@@ -55,15 +55,15 @@
   <ItemGroup>
     <Compile Include="CTimer.cs" />
     <Compile Include="FragmentAdapter.cs" />
+    <Compile Include="NewSessionFragment.cs" />
     <Compile Include="NewSessionActivity.cs" />
     <Compile Include="Session.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
-    <Compile Include="SessionsActivity.cs" />
     <Compile Include="SessionAdapter.cs" />
+    <Compile Include="SessionsFragment.cs" />
     <Compile Include="SwipeActivity.cs" />
-    <Compile Include="TimerActivity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TomadoFragments.cs" />
+    <Compile Include="TimerFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -76,6 +76,9 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\SwipeLayout.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\SessionListItem.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
