@@ -8,33 +8,20 @@
         android:layout_height="wrap_content"
         android:id="@+id/editTextTitle_NewSession"
         android:hint="Event name" />
-    <ScrollView
-        android:minWidth="25px"
-        android:minHeight="25px"
+    <EditText
+        android:inputType="date"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:id="@+id/scrollView_NewSession">
-        <LinearLayout
-            android:orientation="vertical"
-            android:minWidth="25px"
-            android:minHeight="25px"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/linearLayout_NewSession">
-            <DatePicker
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/datePicker_NewSession" />
-            <TimePicker
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/timePickerStart_NewSession" />
-            <TimePicker
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/timePickerEnd_NewSession" />
-        </LinearLayout>
-    </ScrollView>
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextDate_NewSession"
+        android:hint="Date"
+        android:focusable="false" />
+    <EditText
+        android:inputType="time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextTime_NewSession"
+        android:hint="Time"
+        android:focusable="false" />
     <Button
         android:text="Save"
         android:layout_width="match_parent"

@@ -1,15 +1,21 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
 using Android.App;
 using Android.Content;
+using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using Android.OS;
 
 namespace Tomado {
-	[Activity(Label = "Timer", MainLauncher = true, Icon = "@drawable/icon")]
-	public class MainActivity : Activity {
-		
+	public class TimerFragment : Android.Support.V4.App.Fragment {
+		//view instances
+		TextView timerTextView, typeTextView;
+		Button workButton, pauseButton;
+
 		//timer logic vars
 		CountDownTimer countDownTimer;
 		TimerType lastTimerType;
@@ -22,29 +28,21 @@ namespace Tomado {
 		bool isPaused = false;
 		bool firstRun = true;
 
-		//view instances
-		TextView timerTextView, typeTextView;
-		Button pauseButton, workButton, scheduleButton;
+		public TimerFragment() {
 
+		}
 
-		protected override void OnCreate(Bundle bundle) {
-			base.OnCreate(bundle);
+		public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			//return base.OnCreateView(inflater, container, savedInstanceState);
 
+			View rootView = inflater.Inflate(Resource.Layout.Timer, container, false);
 
+			timerTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimer);
+			typeTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimerType);
+			workButton = rootView.FindViewById<Button>(Resource.Id.buttonWork);
+			pauseButton = rootView.FindViewById<Button>(Resource.Id.buttonPause);
 
-			// Set our view from the "main" layout resource
-			SetContentView(Resource.Layout.Timer);
-
-			//get references to our layout items
-			timerTextView = FindViewById<TextView>(Resource.Id.textViewTimer);
-			typeTextView = FindViewById<TextView>(Resource.Id.textViewTimerType);
-			pauseButton = FindViewById<Button>(Resource.Id.buttonPause);
-			workButton = FindViewById<Button>(Resource.Id.buttonWork);
-			scheduleButton = FindViewById<Button>(Resource.Id.buttonSchedule);
-
-			//initialize timer
-			Init(bundle);
-
+			Init(savedInstanceState);
 
 			#region button clicks
 
@@ -65,14 +63,13 @@ namespace Tomado {
 				isPaused = true;
 				countDownTimer.Cancel();
 			};
-			scheduleButton.Click += delegate {
-				StartActivity(typeof(SessionsActivity));
-			};
 
 			#endregion
+
+			return rootView;
 		}
 
-		///helper functions to thin OnCreate out
+		///helper functions to thin OnCreateView out -- copied from TimerActivity.cs; soon to be deprecated
 		//sets local vars to bundle data
 		private void GetBundleInfo(Bundle bundle) {
 			remainingTimeInMillis = bundle.GetLong("remainingTimeInMillis");
@@ -103,7 +100,7 @@ namespace Tomado {
 			}
 		}
 		//Initializes timer variables and sets textviews, gets state info from bundle when applicable
-		private void Init(Bundle bundle){
+		private void Init(Bundle bundle) {
 			interval = 500; //interval set to 500 to prevent last-second "error" with CountDownTimer
 			if (bundle == null) { // just started app
 				//initialize timer vars
@@ -167,9 +164,9 @@ namespace Tomado {
 			outState.PutInt("lastTimerTypeInt", lastTimerTypeInt);
 		}
 
-		protected override void OnSaveInstanceState(Bundle outState) {
+		public override void OnSaveInstanceState(Bundle outState) {
 			SetBundleInfo(outState);
-			
+
 			base.OnSaveInstanceState(outState);
 		}
 
@@ -211,8 +208,8 @@ namespace Tomado {
 			return outputMins;
 		}
 		private double getSecondsFromMillis(double millisUntilFinished) {
-			
-			return Math.Round(Math.Ceiling(millisUntilFinished/1000)*1000 * 0.001);
+
+			return Math.Round(Math.Ceiling(millisUntilFinished / 1000) * 1000 * 0.001);
 		}
 		private string getClockTimeLeft(double minutes, double seconds) {
 			string outputSecs;
@@ -226,9 +223,9 @@ namespace Tomado {
 				outputSecs = "0" + seconds.ToString();
 			else
 				outputSecs = seconds.ToString();
-			
+
 			return minutes.ToString() + ":" + outputSecs;
-			
+
 		}
 		private string getClockTimeLeft(double millisUntilFinished) {
 			double secsUntilFinished, minsUntilFinished;
@@ -270,4 +267,3 @@ namespace Tomado {
 		}
 	}
 }
-
