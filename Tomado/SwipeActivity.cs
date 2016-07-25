@@ -13,7 +13,7 @@ using Android.Support.V4.App;
 using Android.Support.V4.View;
 
 namespace Tomado {
-	[Activity(Label = "", MainLauncher = true, Icon = "@drawable/icon")]
+	[Activity(MainLauncher = true, Icon = "@drawable/icon")]
 	class SwipeActivity : FragmentActivity {
 		protected override void OnCreate(Bundle savedInstanceState) {
 			base.OnCreate(savedInstanceState);

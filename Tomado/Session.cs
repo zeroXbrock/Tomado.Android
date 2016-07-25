@@ -10,12 +10,18 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 
+using SQLite;
+
 namespace Tomado {
 	public class Session {
+		[PrimaryKey, AutoIncrement, Unique]
+		public int ID { get; set; }
+
 		int startHour, startMinute, year, monthOfYear, dayOfMonth;
 		string title;
 
-		public Session(int startHour, int startMinute, int year, int monthOfYear, int dayOfMonth, string title) {
+		public Session(int ID, int startHour, int startMinute, int year, int monthOfYear, int dayOfMonth, string title) {
+			this.ID = ID;
 			StartHour = startHour;
 			StartMinute = startMinute;
 			Year = year;
@@ -24,7 +30,8 @@ namespace Tomado {
 			Title = title;
 		}
 
-		public Session(DateTime dateTime, string title) {
+		public Session(int ID, DateTime dateTime, string title) {
+			this.ID = ID;
 			StartHour = dateTime.Hour;
 			StartMinute = dateTime.Minute;
 			Year = dateTime.Year;
@@ -32,6 +39,8 @@ namespace Tomado {
 			DayOfMonth = dateTime.Day;
 			Title = title;
 		}
+
+		public Session() { }
 
 		public int StartHour {
 			get { return startHour; }
