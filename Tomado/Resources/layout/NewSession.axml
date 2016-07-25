@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="4dp"
+    android:paddingRight="4dp">
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,9 +24,26 @@
         android:id="@+id/editTextTime_NewSession"
         android:hint="Time"
         android:focusable="false" />
-    <Button
-        android:text="Save"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:minWidth="25px"
+        android:minHeight="25px"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/buttonSave_NewSession" />
+        android:id="@+id/linearLayout1"
+        android:gravity="right"
+        android:layout_marginTop="18dip">
+        <Button
+            android:text="Cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonCancel_NewSession"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless" />
+        <Button
+            android:text="Save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonSave_NewSession"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless" />
+    </LinearLayout>
 </LinearLayout>

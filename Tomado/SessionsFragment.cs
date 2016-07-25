@@ -16,6 +16,8 @@ using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Util;
 
+using Clans.Fab; //floating buttons
+
 using Java.Lang;
 using SQLite;
 
@@ -24,7 +26,9 @@ namespace Tomado {
 	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.OnGetNewSessionListener {
 		//view instasnces
 		ListView listViewSessions;
-		Button newSessionButton;
+		//Button newSessionButton;
+		FloatingActionButton newSessionButton;
+
 
 		Android.Net.Uri calendarsUri;
 		
@@ -63,7 +67,10 @@ namespace Tomado {
 
 			//get view instances
 			listViewSessions = rootView.FindViewById<ListView>(Resource.Id.listViewSessions);
-			newSessionButton = rootView.FindViewById<Button>(Resource.Id.buttonNewSession);
+			newSessionButton = rootView.FindViewById<FloatingActionButton>(Resource.Id.buttonNewSession);
+			
+			//add plus icon to button
+			newSessionButton.SetImageResource(Resource.Drawable.ic_add_black_24dp);
 
 			newSessionButton.Click += delegate {
 				//open new session dialog fragment (TODO: implement dialog fragment)
