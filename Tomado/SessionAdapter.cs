@@ -22,6 +22,7 @@ namespace Tomado {
 		List<Session> sessions;
 		Activity context;
 		private DeleteSessionListener deleteSessionListener;
+		private SessionClickListener sessionClickListener;
 
 		/// <summary>
 		/// Interface to provide callback for deleting sessions.
@@ -35,10 +36,22 @@ namespace Tomado {
 			void OnDeleteSession(Session session);
 		}
 
-		public SessionAdapter(Activity context, List<Session> sessions, DeleteSessionListener deleteSessionListener) {
+		/// <summary>
+		/// Interface to provide callback for clicking a session item in the list.
+		/// </summary>
+		public interface SessionClickListener {
+			/// <summary>
+			/// Implement in containing class to lauch when session is clicked.
+			/// </summary>
+			/// <param name="session"></param>
+			void OnSessionClick(Session session);
+		}
+
+		public SessionAdapter(Activity context, List<Session> sessions, DeleteSessionListener deleteSessionListener, SessionClickListener sessionClickListener) {
 			this.context = context;
 			this.sessions = sessions;
 			this.deleteSessionListener = deleteSessionListener;
+			this.sessionClickListener = sessionClickListener;
 		}
 
 		public override long GetItemId(int position) {
@@ -78,6 +91,13 @@ namespace Tomado {
 					//context.RunOnUiThread(() => { Toast.MakeText(context, "Delete " + session.Title, ToastLength.Short).Show(); });
 					sessions.Remove(session);
 					deleteSessionListener.OnDeleteSession(session);
+				};
+			}
+
+			var sessionLayout = view.FindViewById<LinearLayout>(Resource.Id.SessionsListItemLayout);
+			if (!sessionLayout.HasOnClickListeners) {
+				sessionLayout.Click += delegate {
+					sessionClickListener.OnSessionClick(session);
 				};
 			}
 

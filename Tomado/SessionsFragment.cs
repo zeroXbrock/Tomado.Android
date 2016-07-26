@@ -26,7 +26,7 @@ namespace Tomado {
 	/// <summary>
 	/// Fragment that display a list of Sessions.
 	/// </summary>
-	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.OnGetNewSessionListener, SessionAdapter.DeleteSessionListener {
+	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.OnGetNewSessionListener, SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener {
 		//view instasnces
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton;
@@ -82,7 +82,6 @@ namespace Tomado {
 			};
 
 			//modify layout views
-			
 			LoadSessionsFromDatabase(pathToDatabase).ContinueWith(t => {
 				Activity.RunOnUiThread(() => { ResetListViewAdapter(); });
 			});
@@ -104,7 +103,10 @@ namespace Tomado {
 			DeleteSession(session);
 		}
 
-		//event handler for NewSessionFragment
+		public void OnSessionClick(Session session) {
+			Toast.MakeText(Activity, session.Title, ToastLength.Short).Show();
+		}
+
 		/// <summary>
 		/// Event handler for NewSessionFragment result
 		/// </summary>
@@ -147,7 +149,7 @@ namespace Tomado {
 		/// Populate class listview with sessions.
 		/// </summary>
 		private void ResetListViewAdapter() {
-			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this);
+			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this);
 		}
 
 
@@ -203,7 +205,15 @@ namespace Tomado {
 			//remove session from class sessions list
 			_sessions.Remove(session);
 			//remove session from database
-			DeleteSessionFromDatabase(pathToDatabase, session);
+			DeleteSessionFromDatabase(pathToDatabase, session).ContinueWith(t => {
+				Activity.RunOnUiThread(() => {
+					//Toast.MakeText(Activity.ApplicationContext, t.Result + "\n[" + session.ID + "] " + session.Title, ToastLength.Short).Show();
+					if (t.Status == TaskStatus.RanToCompletion)
+						Log.Debug("delete session", t.Result + "\n[" + session.ID + "] " + session.Title);
+					else
+						Log.Debug("delete session", "Failed");
+				});
+			});
 			
 			
 			ResetListViewAdapter();
@@ -259,14 +269,15 @@ namespace Tomado {
 		/// <param name="pathToDatabase"></param>
 		/// <param name="session"></param>
 		/// <returns></returns>
-		private async Task<string> DeleteSessionFromDatabase(string pathToDatabase, Session session) {
+		private async Task<int> DeleteSessionFromDatabase(string pathToDatabase, Session session) {
 			try {
 				var connection = new SQLiteAsyncConnection(pathToDatabase);
-				await connection.DeleteAsync(session);
-				return "Session deleted";
+
+				var result = await connection.DeleteAsync(session);
+				return result;
 			}
 			catch (SQLiteException ex) {
-				return ex.Message;
+				return -1;
 			}
 		}
 
