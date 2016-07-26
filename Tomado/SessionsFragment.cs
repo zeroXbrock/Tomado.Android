@@ -203,12 +203,9 @@ namespace Tomado {
 			//remove session from class sessions list
 			_sessions.Remove(session);
 			//remove session from database
-			/*
-			DeleteSessionFromDatabase(pathToDatabase, session).ContinueWith(t => {
-				//update adapter
-				ResetListViewAdapter();
-			});
-			*/
+			DeleteSessionFromDatabase(pathToDatabase, session);
+			
+			
 			ResetListViewAdapter();
 		}
 
@@ -256,6 +253,12 @@ namespace Tomado {
 			var result = await insertUpdateData(session, pathToDatabase);
 		}
 
+		/// <summary>
+		/// Deletes a session from the database
+		/// </summary>
+		/// <param name="pathToDatabase"></param>
+		/// <param name="session"></param>
+		/// <returns></returns>
 		private async Task<string> DeleteSessionFromDatabase(string pathToDatabase, Session session) {
 			try {
 				var connection = new SQLiteAsyncConnection(pathToDatabase);
