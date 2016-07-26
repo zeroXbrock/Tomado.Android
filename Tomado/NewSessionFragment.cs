@@ -14,11 +14,14 @@ using Android.Support.V4.App;
 using Android.Support.V4.View;
 
 namespace Tomado {
+	/// <summary>
+	/// Fragment that contains dialogs for user to create a new Session.
+	/// </summary>
 	public class NewSessionFragment :  Android.Support.V4.App.DialogFragment, DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener {
 		private OnGetNewSessionListener onGetNewSessionListener;
 		
 		//view instances
-		Button saveButton;
+		Button saveButton, cancelButton;
 		EditText timeEditText, dateEditText, titleEditText;
 
 		//session vars
@@ -46,13 +49,17 @@ namespace Tomado {
 			// Use this to return your custom view for this Fragment
 			// return inflater.Inflate(Resource.Layout.YourFragment, container, false);
 
+			Dialog.SetTitle("New session");
+			
 			View view = inflater.Inflate(Resource.Layout.NewSession, container, false);
 
 			saveButton = view.FindViewById<Button>(Resource.Id.buttonSave_NewSession);
+			cancelButton = view.FindViewById<Button>(Resource.Id.buttonCancel_NewSession);
 			timeEditText = view.FindViewById<EditText>(Resource.Id.editTextTime_NewSession);
 			dateEditText = view.FindViewById<EditText>(Resource.Id.editTextDate_NewSession);
 			titleEditText = view.FindViewById<EditText>(Resource.Id.editTextTitle_NewSession);
 
+			
 			//set default values
 			SetDefaultTimeValues();
 
@@ -69,6 +76,9 @@ namespace Tomado {
 				onGetNewSessionListener.OnAddNewSession(sessionDateTime, _title);
 
 				//close fragment
+				Dismiss();
+			};
+			cancelButton.Click += delegate {
 				Dismiss();
 			};
 			timeEditText.Click += delegate {

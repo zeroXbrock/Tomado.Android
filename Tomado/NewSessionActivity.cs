@@ -9,8 +9,11 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-
+/*
 namespace Tomado {
+	/// <summary>
+	/// Deprecated.
+	/// </summary>
 	[Activity(Label = "NewSessionActivity")]
 	public class NewSessionActivity : Activity {
 		TimePicker startTimePicker, endTimePicker;
@@ -98,3 +101,4 @@ namespace Tomado {
 		}
 	}
 }
+*/

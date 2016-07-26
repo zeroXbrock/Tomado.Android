@@ -12,7 +12,11 @@ using Android.Widget;
 using Android.Support.V4.View;
 using Android.Support.V4.App;
 
+
 namespace Tomado {
+	/// <summary>
+	/// Generic fragment adapter; holds list of fragments;
+	/// </summary>
 	public class FragmentAdapter : FragmentPagerAdapter {
 		//list to hold fragments
 		private List<Android.Support.V4.App.Fragment> _fragmentList = new List<Android.Support.V4.App.Fragment>();
