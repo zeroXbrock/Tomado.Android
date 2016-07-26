@@ -38,12 +38,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/buttonCancel_NewSession"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless" />
+            style="@android:style/Widget.Material.Button.Borderless" />
         <Button
             android:text="Save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/buttonSave_NewSession"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless" />
+            style="@android:style/Widget.Material.Button.Borderless" />
     </LinearLayout>
 </LinearLayout>

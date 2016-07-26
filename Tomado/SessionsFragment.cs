@@ -26,13 +26,12 @@ namespace Tomado {
 	/// <summary>
 	/// Fragment that display a list of Sessions.
 	/// </summary>
-	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.OnGetNewSessionListener {
+	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.OnGetNewSessionListener, SessionAdapter.DeleteSessionListener {
 		//view instasnces
 		ListView listViewSessions;
-		//Button newSessionButton;
 		FloatingActionButton newSessionButton;
 
-
+		//calendar location
 		Android.Net.Uri calendarsUri;
 		
 		//private sessions list for listview
@@ -74,7 +73,7 @@ namespace Tomado {
 			newSessionButton = rootView.FindViewById<FloatingActionButton>(Resource.Id.buttonNewSession);
 			
 			//add plus icon to button
-			newSessionButton.SetImageResource(Resource.Drawable.ic_add_black_24dp);
+			newSessionButton.SetImageResource(Resource.Drawable.ic_add_white_24dp);
 
 			newSessionButton.Click += delegate {
 				//open new session dialog fragment (TODO: implement dialog fragment)
@@ -94,6 +93,17 @@ namespace Tomado {
 			return rootView;
 		}
 
+		/// <summary>
+		/// Called when user clicks delete button on a session in the list; implementation of method from OnDeleteSessionListener.
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="ID"></param>
+		public void OnDeleteSession(Session session) {
+			//Toast.MakeText(Application.Context, "delete " + position.ToString(), ToastLength.Short).Show();
+
+			DeleteSession(session);
+		}
+
 		//event handler for NewSessionFragment
 		/// <summary>
 		/// Event handler for NewSessionFragment result
@@ -110,7 +120,7 @@ namespace Tomado {
 			//update the database
 			SaveSessionToDatabase(pathToDatabase, session);
 		}
-
+		
 		/// <summary>
 		/// Shows a NewSessionDialog fragment above the current view.
 		/// </summary>
@@ -137,7 +147,7 @@ namespace Tomado {
 		/// Populate class listview with sessions.
 		/// </summary>
 		private void ResetListViewAdapter() {
-			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions);
+			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this);
 		}
 
 
@@ -185,6 +195,24 @@ namespace Tomado {
 		}
 
 		/// <summary>
+		/// Deletes a session from the class session list (& listview) and the database
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="ID"></param>
+		void DeleteSession(Session session) {
+			//remove session from class sessions list
+			_sessions.Remove(session);
+			//remove session from database
+			/*
+			DeleteSessionFromDatabase(pathToDatabase, session).ContinueWith(t => {
+				//update adapter
+				ResetListViewAdapter();
+			});
+			*/
+			ResetListViewAdapter();
+		}
+
+		/// <summary>
 		/// Returns cursor made to browse calendar events.
 		/// </summary>
 		/// <returns></returns>
@@ -209,8 +237,7 @@ namespace Tomado {
 			//list the views you're gonna display your info with
 			int[] targetResources = {
 										Resource.Id.evTitle,
-										Resource.Id.evStart,
-										Resource.Id.evEnd
+										Resource.Id.evTime
 									};
 
 			//get a cursor to browse calendar events
@@ -227,6 +254,17 @@ namespace Tomado {
 		/// <param name="session"></param>
 		private async void SaveSessionToDatabase(string pathToDatabase, Session session) {
 			var result = await insertUpdateData(session, pathToDatabase);
+		}
+
+		private async Task<string> DeleteSessionFromDatabase(string pathToDatabase, Session session) {
+			try {
+				var connection = new SQLiteAsyncConnection(pathToDatabase);
+				await connection.DeleteAsync(session);
+				return "Session deleted";
+			}
+			catch (SQLiteException ex) {
+				return ex.Message;
+			}
 		}
 
 		/// <summary>

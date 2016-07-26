@@ -281,7 +281,13 @@ namespace Tomado
 			public const int ic_add_black_24dp = 2130837505;
 			
 			// aapt resource value: 0x7f020002
-			public const int Icon = 2130837506;
+			public const int ic_add_white_24dp = 2130837506;
+			
+			// aapt resource value: 0x7f020003
+			public const int ic_delete_white_24dp = 2130837507;
+			
+			// aapt resource value: 0x7f020004
+			public const int Icon = 2130837508;
 			
 			static Drawable()
 			{
@@ -301,6 +307,9 @@ namespace Tomado
 			
 			// aapt resource value: 0x7f060010
 			public const int buttonCancel_NewSession = 2131099664;
+			
+			// aapt resource value: 0x7f060014
+			public const int buttonDeleteSession = 2131099668;
 			
 			// aapt resource value: 0x7f060016
 			public const int buttonNewSession = 2131099670;
@@ -330,10 +339,7 @@ namespace Tomado
 			public const int end = 2131099653;
 			
 			// aapt resource value: 0x7f060013
-			public const int evEnd = 2131099667;
-			
-			// aapt resource value: 0x7f060014
-			public const int evStart = 2131099668;
+			public const int evTime = 2131099667;
 			
 			// aapt resource value: 0x7f060012
 			public const int evTitle = 2131099666;
