@@ -13,6 +13,9 @@ using Android.Support.V4.App;
 using Android.Support.V4.View;
 
 namespace Tomado {
+	/// <summary>
+	/// Activity that holds multiple fragments that can be swiped through.
+	/// </summary>
 	[Activity(MainLauncher = true, Icon = "@drawable/icon")]
 	class SwipeActivity : FragmentActivity {
 		protected override void OnCreate(Bundle savedInstanceState) {

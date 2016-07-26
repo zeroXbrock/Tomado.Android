@@ -23,6 +23,9 @@ using SQLite;
 
 
 namespace Tomado {
+	/// <summary>
+	/// Fragment that display a list of Sessions.
+	/// </summary>
 	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.OnGetNewSessionListener {
 		//view instasnces
 		ListView listViewSessions;
@@ -41,6 +44,7 @@ namespace Tomado {
 
 		}
 
+		//database path info
 		private string docsFolder;
 		string pathToDatabase;
 
@@ -107,6 +111,9 @@ namespace Tomado {
 			SaveSessionToDatabase(pathToDatabase, session);
 		}
 
+		/// <summary>
+		/// Shows a NewSessionDialog fragment above the current view.
+		/// </summary>
 		void ShowNewSessionDialog() {
 			Android.Support.V4.App.FragmentTransaction ft = FragmentManager.BeginTransaction();
 			
@@ -126,13 +133,19 @@ namespace Tomado {
 			dialog.Show(FragmentManager, "dialog");
 		}
 
-		//populate listview with sessions
+		/// <summary>
+		/// Populate class listview with sessions.
+		/// </summary>
 		private void ResetListViewAdapter() {
 			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions);
 		}
 
 
 		//TODO: Implement me
+		/// <summary>
+		/// Returns a list of sessions gathered from a free time analysis of the calendar.
+		/// </summary>
+		/// <returns></returns>
 		private List<Session> GetFreeTimeSessions() {
 			List<Session> freeTimeSessions = new List<Session>();
 			var cursor = getCalendarICursor();
@@ -145,9 +158,8 @@ namespace Tomado {
 			return freeTimeSessions;
 		}
 
-		//add session to sessions list and returns the session it created
 		/// <summary>
-		/// Adds a session to the _sessions list.
+		/// Adds a session to the class sessions list and returns the session it created.
 		/// </summary>
 		/// <param name="dateTime"></param>
 		/// <param name="title"></param>
@@ -160,7 +172,7 @@ namespace Tomado {
 			return session;
 		}
 		/// <summary>
-		/// Adds a session to the _sessions list.
+		/// Adds a session to the class sessions list and returns the session it created.
 		/// </summary>
 		/// <param name="session"></param>
 		/// <returns></returns>
@@ -172,7 +184,10 @@ namespace Tomado {
 			return AddSession(ID, datetime, title);
 		}
 
-		//get cursor to browse calendar events
+		/// <summary>
+		/// Returns cursor made to browse calendar events.
+		/// </summary>
+		/// <returns></returns>
 		private ICursor getCalendarICursor() {
 			// Get calendar contract
 			calendarsUri = CalendarContract.Events.ContentUri;
@@ -205,22 +220,20 @@ namespace Tomado {
 			return cursor;
 		}
 
-		//DEPRECATED
-		//asynchronously saves session list items to database; either adding new items or updating new values on existing items
-		private async void SaveSessionsToDatabase(string pathToDatabase) {
-			//for each session in our sessions list, do an insert/update on the DB
-
-			foreach (var s in _sessions) {
-				var result = await insertUpdateData(s, pathToDatabase);
-				//Log.Debug("SaveSessionsToDatabase result", result.ToString());
-			}
-		}
-
+		/// <summary>
+		/// Asynchronously saves a new session to the database.
+		/// </summary>
+		/// <param name="pathToDatabase"></param>
+		/// <param name="session"></param>
 		private async void SaveSessionToDatabase(string pathToDatabase, Session session) {
 			var result = await insertUpdateData(session, pathToDatabase);
 		}
 
-		//asynchronously loads sessions from database to sessions list
+		/// <summary>
+		/// Asynchronously loads sessions from database to class sessions list. Result should be obtained with [result].ContinueWith(...).
+		/// </summary>
+		/// <param name="pathToDatabase"></param>
+		/// <returns></returns>
 		private async Task<string> LoadSessionsFromDatabase(string pathToDatabase) {
 			//clear sessions list
 			_sessions = new List<Session>();
@@ -242,6 +255,11 @@ namespace Tomado {
 			}
 		}
 
+		/// <summary>
+		/// Creates a database at the given folder path if one doesn't exist. Returns query result string.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
 		private async Task<string> createDatabase(string path) {
 			try {
 				var connection = new SQLiteAsyncConnection(path);
@@ -253,6 +271,12 @@ namespace Tomado {
 			}
 		}
 
+		/// <summary>
+		/// Inserts a Session object into the databse or updates if matching object is already present.
+		/// </summary>
+		/// <param name="data"></param>
+		/// <param name="path"></param>
+		/// <returns></returns>
 		private async Task<string> insertUpdateData(Session data, string path) {
 			try {
 				var db = new SQLiteAsyncConnection(path);
@@ -265,10 +289,15 @@ namespace Tomado {
 			}
 		}
 
+		/// <summary>
+		/// Returns a (task) list of Sessions retrieved from database. Must be run asynchronously.
+		/// Result should be retrieved with [result].ContinueWith(...).
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
 		private async Task<List<Session>> getRecords(string path) {
 			try {
 				var db = new SQLiteAsyncConnection(path);
-				//var records = await db.ExecuteAsync("SELECT * FROM Person");
 
 				var query = db.Table<Session>();
 

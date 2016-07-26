@@ -13,6 +13,9 @@ using Android.Widget;
 using SQLite;
 
 namespace Tomado {
+	/// <summary>
+	/// Session class; holds all info about a session.
+	/// </summary>
 	public class Session {
 		[PrimaryKey, AutoIncrement, Unique]
 		public int ID { get; set; }

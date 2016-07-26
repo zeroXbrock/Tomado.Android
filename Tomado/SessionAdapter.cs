@@ -11,7 +11,9 @@ using Android.Views;
 using Android.Widget;
 
 namespace Tomado {
-	//adapter to populate sessions list
+	/// <summary>
+	/// Adapter to populate Sessions list.
+	/// </summary>
 	public class SessionAdapter : BaseAdapter<Session> {
 		List<Session> sessions;
 		Activity context;
@@ -42,7 +44,7 @@ namespace Tomado {
 			Session session = sessions[position];
 			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 
-			view.FindViewById<TextView>(Android.Resource.Id.Text1).Text = session.Title + "(" + session.ID + ")";
+			view.FindViewById<TextView>(Android.Resource.Id.Text1).Text = session.Title;
 			view.FindViewById<TextView>(Android.Resource.Id.Text2).Text = (dateTime.ToShortTimeString() + "\t" + dateTime.ToShortDateString());
 
 			return view;

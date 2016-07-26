@@ -11,6 +11,10 @@ using Android.Views;
 using Android.Widget;
 
 namespace Tomado {
+
+	/// <summary>
+	/// Fragment to display and contain timer views & code, respectively.
+	/// </summary>
 	public class TimerFragment : Android.Support.V4.App.Fragment {
 		//view instances
 		TextView timerTextView, typeTextView;
@@ -70,7 +74,12 @@ namespace Tomado {
 		}
 
 		///helper functions to thin OnCreateView out -- copied from TimerActivity.cs; soon to be deprecated
-		//sets local vars to bundle data
+		
+		//
+		/// <summary>
+		/// Sets local vars to bundle data.
+		/// </summary>
+		/// <param name="bundle"></param>
 		private void GetBundleInfo(Bundle bundle) {
 			remainingTimeInMillis = bundle.GetLong("remainingTimeInMillis");
 			shortBreaks = bundle.GetInt("shortBreaks");
@@ -79,7 +88,10 @@ namespace Tomado {
 			lastTimerTypeInt = bundle.GetInt("lastTimerTypeInt");
 			firstRun = bundle.GetBoolean("firstRun");
 		}
-		//converts int to TimerType enum
+
+		/// <summary>
+		/// Converts int to TimerType enum.
+		/// </summary>
 		private void SetTimerTypeFromInt() {
 			switch (lastTimerTypeInt) {
 				case -1:
@@ -99,7 +111,11 @@ namespace Tomado {
 					break;
 			}
 		}
-		//Initializes timer variables and sets textviews, gets state info from bundle when applicable
+
+		/// <summary>
+		/// Initializes timer variables and sets textviews, gets state info from bundle when applicable.
+		/// </summary>
+		/// <param name="bundle">Bundle received from a fragment method override, typically OnCreate.</param>
 		private void Init(Bundle bundle) {
 			interval = 500; //interval set to 500 to prevent last-second "error" with CountDownTimer
 			if (bundle == null) { // just started app
@@ -135,7 +151,10 @@ namespace Tomado {
 		}
 
 
-		//puts data in bundle
+		/// <summary>
+		/// Puts timer data in bundle.
+		/// </summary>
+		/// <param name="outState">Bundle to populate</param>
 		private void SetBundleInfo(Bundle outState) {
 			outState.PutLong("remainingTimeInMillis", remainingTimeInMillis);
 			outState.PutInt("shortBreaks", shortBreaks);
@@ -170,6 +189,10 @@ namespace Tomado {
 			base.OnSaveInstanceState(outState);
 		}
 
+		/// <summary>
+		/// Initializes and starts the class timer.
+		/// </summary>
+		/// <param name="durationInMillis"></param>
 		private void startTimer(long durationInMillis) {
 			isTimerRunning = true;
 
@@ -179,8 +202,7 @@ namespace Tomado {
 		}
 
 
-		#region timer event functions
-		//(delegated) event methods for timer to update UI
+		#region timer event handlers
 		public void OnTick(long millisUntilFinished) {
 			remainingTimeInMillis = millisUntilFinished;
 
@@ -201,16 +223,33 @@ namespace Tomado {
 		}
 		#endregion
 
-		///helper functions to convert time
+		#region helper functions to convert time
+		
+		/// <summary>
+		/// Returns a number of minutes given a number of milliseconds.
+		/// </summary>
+		/// <param name="millisUntilFinished"></param>
+		/// <returns></returns>
 		private double getMinutesFromMillis(double millisUntilFinished) {
 			double secsUntilFinished = getSecondsFromMillis(millisUntilFinished);
 			double outputMins = (secsUntilFinished / 60) - (secsUntilFinished / 60) % 1;
 			return outputMins;
 		}
+		/// <summary>
+		/// Returns a number of seconds given a number of milliseconds.
+		/// </summary>
+		/// <param name="millisUntilFinished"></param>
+		/// <returns></returns>
 		private double getSecondsFromMillis(double millisUntilFinished) {
 
 			return Math.Round(Math.Ceiling(millisUntilFinished / 1000) * 1000 * 0.001);
 		}
+		/// <summary>
+		/// Returns a string containing how much time is left in m:ss format;
+		/// </summary>
+		/// <param name="minutes"></param>
+		/// <param name="seconds"></param>
+		/// <returns></returns>
 		private string getClockTimeLeft(double minutes, double seconds) {
 			string outputSecs;
 
@@ -227,6 +266,12 @@ namespace Tomado {
 			return minutes.ToString() + ":" + outputSecs;
 
 		}
+		/// <summary>
+		/// Returns a string containing how much time is left in m:ss format;
+		/// </summary>
+		/// <param name="minutes"></param>
+		/// <param name="seconds"></param>
+		/// <returns></returns>
 		private string getClockTimeLeft(double millisUntilFinished) {
 			double secsUntilFinished, minsUntilFinished;
 
@@ -237,9 +282,11 @@ namespace Tomado {
 
 			return outputTime;
 		}
+		#endregion
 
-		//updates break info, session type, and duration
-		//iterates lastTimerType through pomodoro cycle
+		/// <summary>
+		/// Updates break info, session type, and duration; iterates lastTimerType through pomodoro cycle.
+		/// </summary>
 		private void updateTimer() {
 			//if you just worked, start a break
 			if (lastTimerType == TimerType.Work) {
@@ -247,23 +294,39 @@ namespace Tomado {
 				if (shortBreaks < 2) {
 					shortBreaks++;
 					//short break
-					duration = (long)CTimer.TimerLengths.ShortBreak;
-					lastTimerType = TimerType.ShortBreak;
+					setDuration((long)CTimer.TimerLengths.ShortBreak);
+					setTimerType(TimerType.ShortBreak);
 				}
 				else {
 					//long break
 					shortBreaks = 0;
-					duration = (long)CTimer.TimerLengths.LongBreak;
-					lastTimerType = TimerType.LongBreak;
+					setDuration((long)CTimer.TimerLengths.LongBreak);
+					setTimerType(TimerType.LongBreak);
 				}
 			}
 
 			//if you just took a break, work
 			else {
 				//work
-				duration = (long)CTimer.TimerLengths.Work;
-				lastTimerType = TimerType.Work;
+				setDuration((long)CTimer.TimerLengths.Work);
+				setTimerType(TimerType.Work);
 			}
+		}
+
+		/// <summary>
+		/// Sets the class timer's type.
+		/// </summary>
+		/// <param name="type"></param>
+		private void setTimerType(TimerType type) {
+			lastTimerType = type;
+		}
+
+		/// <summary>
+		/// Sets the class timer duration.
+		/// </summary>
+		/// <param name="duration"></param>
+		private void setDuration(long duration) {
+			this.duration = duration;
 		}
 	}
 }

@@ -14,6 +14,9 @@ using Android.Support.V4.App;
 using Android.Support.V4.View;
 
 namespace Tomado {
+	/// <summary>
+	/// Fragment that contains dialogs for user to create a new Session.
+	/// </summary>
 	public class NewSessionFragment :  Android.Support.V4.App.DialogFragment, DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener {
 		private OnGetNewSessionListener onGetNewSessionListener;
 		

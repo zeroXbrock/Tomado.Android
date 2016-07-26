@@ -11,7 +11,9 @@ using Android.Views;
 using Android.Widget;
 
 namespace Tomado {
-	//instantiate an instance of this class to get a CTimer object that calls your events on tick and finish
+	/// <summary>
+	/// Class to get a modified CountDownTimer object that calls your events on tick and finish.
+	/// </summary>
 	public class CTimer : CountDownTimer {
 
 		//delegates to communicate with UI from timer code
