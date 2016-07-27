@@ -31,6 +31,9 @@ namespace Tomado {
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton;
 
+		//listener to send click event back to activity
+		SessionAdapter.SessionClickListener sessionClickListener;
+
 		//calendar location
 		Android.Net.Uri calendarsUri;
 		
@@ -43,9 +46,17 @@ namespace Tomado {
 
 		}
 
-		//database path info
+		//database info
 		private string docsFolder;
 		string pathToDatabase;
+		SQLiteAsyncConnection connection;
+
+		//constructors
+		public SessionsFragment(SessionAdapter.SessionClickListener sessionClickListener){
+			this.sessionClickListener = sessionClickListener;
+		}
+		public SessionsFragment() { /*u fuckin wot m8*/ }
+
 
 		public override void OnCreate(Bundle savedInstanceState) {
 			base.OnCreate(savedInstanceState);
@@ -82,7 +93,7 @@ namespace Tomado {
 			};
 
 			//modify layout views
-			LoadSessionsFromDatabase(pathToDatabase).ContinueWith(t => {
+			LoadSessionsFromDatabase().ContinueWith(t => {
 				Activity.RunOnUiThread(() => { ResetListViewAdapter(); });
 			});
 			
@@ -98,13 +109,20 @@ namespace Tomado {
 		/// <param name="position"></param>
 		/// <param name="ID"></param>
 		public void OnDeleteSession(Session session) {
-			//Toast.MakeText(Application.Context, "delete " + position.ToString(), ToastLength.Short).Show();
-
+			DeleteSessionFromDatabase(session);
 			DeleteSession(session);
+			ResetListViewAdapter();
 		}
 
+		/// <summary>
+		/// Event handler; called when session item from list is clicked.
+		/// </summary>
+		/// <param name="session"></param>
 		public void OnSessionClick(Session session) {
 			Toast.MakeText(Activity, session.Title, ToastLength.Short).Show();
+
+			//send event back to activity; to load timer
+			sessionClickListener.OnSessionClick(session);
 		}
 
 		/// <summary>
@@ -120,7 +138,7 @@ namespace Tomado {
 			ResetListViewAdapter();
 
 			//update the database
-			SaveSessionToDatabase(pathToDatabase, session);
+			SaveSessionToDatabase(session);
 		}
 		
 		/// <summary>
@@ -192,32 +210,28 @@ namespace Tomado {
 			DateTime datetime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 			string title = session.Title;
 
-			int ID = _sessions.Count+1;
+			int ID = session.ID;
 			return AddSession(ID, datetime, title);
 		}
 
 		/// <summary>
 		/// Deletes a session from the class session list (& listview) and the database
 		/// </summary>
-		/// <param name="position"></param>
-		/// <param name="ID"></param>
+		private async void DeleteSessionFromDatabase(Session session) {
+			//remove session from database
+			await connection.DeleteAsync(session);
+		}
+
+		/// <summary>
+		/// Remove session from class sessions list
+		/// </summary>
+		/// <param name="session"></param>
 		void DeleteSession(Session session) {
 			//remove session from class sessions list
 			_sessions.Remove(session);
-			//remove session from database
-			DeleteSessionFromDatabase(pathToDatabase, session).ContinueWith(t => {
-				Activity.RunOnUiThread(() => {
-					//Toast.MakeText(Activity.ApplicationContext, t.Result + "\n[" + session.ID + "] " + session.Title, ToastLength.Short).Show();
-					if (t.Status == TaskStatus.RanToCompletion)
-						Log.Debug("delete session", t.Result + "\n[" + session.ID + "] " + session.Title);
-					else
-						Log.Debug("delete session", "Failed");
-				});
-			});
-			
-			
-			ResetListViewAdapter();
 		}
+
+
 
 		/// <summary>
 		/// Returns cursor made to browse calendar events.
@@ -259,40 +273,23 @@ namespace Tomado {
 		/// </summary>
 		/// <param name="pathToDatabase"></param>
 		/// <param name="session"></param>
-		private async void SaveSessionToDatabase(string pathToDatabase, Session session) {
-			var result = await insertUpdateData(session, pathToDatabase);
+		private async void SaveSessionToDatabase(Session session) {
+			var result = await insertUpdateData(session);
 		}
 
-		/// <summary>
-		/// Deletes a session from the database
-		/// </summary>
-		/// <param name="pathToDatabase"></param>
-		/// <param name="session"></param>
-		/// <returns></returns>
-		private async Task<int> DeleteSessionFromDatabase(string pathToDatabase, Session session) {
-			try {
-				var connection = new SQLiteAsyncConnection(pathToDatabase);
-
-				var result = await connection.DeleteAsync(session);
-				return result;
-			}
-			catch (SQLiteException ex) {
-				return -1;
-			}
-		}
 
 		/// <summary>
 		/// Asynchronously loads sessions from database to class sessions list. Result should be obtained with [result].ContinueWith(...).
 		/// </summary>
 		/// <param name="pathToDatabase"></param>
 		/// <returns></returns>
-		private async Task<string> LoadSessionsFromDatabase(string pathToDatabase) {
+		private async Task<string> LoadSessionsFromDatabase() {
 			//clear sessions list
 			_sessions = new List<Session>();
 
 			///for each item in the database, add it to the sessions list
 			//create/run query
-			var records = getRecords(pathToDatabase);
+			var records = getRecords();
 
 			try {
 				await records.ContinueWith(t => {
@@ -314,7 +311,7 @@ namespace Tomado {
 		/// <returns></returns>
 		private async Task<string> createDatabase(string path) {
 			try {
-				var connection = new SQLiteAsyncConnection(path);
+				connection = new SQLiteAsyncConnection(path);
 				await connection.CreateTableAsync<Session>();
 				return "Database created";
 			}
@@ -329,11 +326,10 @@ namespace Tomado {
 		/// <param name="data"></param>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		private async Task<string> insertUpdateData(Session data, string path) {
+		private async Task<string> insertUpdateData(Session data) {
 			try {
-				var db = new SQLiteAsyncConnection(path);
-				if (await db.InsertAsync(data) != 0)
-					await db.UpdateAsync(data);
+				if (await connection.InsertAsync(data) != 0)
+					await connection.UpdateAsync(data);
 				return "Single data file inserted or updated";
 			}
 			catch (SQLiteException ex) {
@@ -347,11 +343,9 @@ namespace Tomado {
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		private async Task<List<Session>> getRecords(string path) {
+		private async Task<List<Session>> getRecords() {
 			try {
-				var db = new SQLiteAsyncConnection(path);
-
-				var query = db.Table<Session>();
+				var query = connection.Table<Session>();
 
 				var records = await query.ToListAsync();
 

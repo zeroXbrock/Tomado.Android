@@ -31,8 +31,6 @@ namespace Tomado {
 			/// <summary>
 			/// Implement in containing class to delete session from list and database.
 			/// </summary>
-			/// <param name="position">Index of item in listview</param>
-			/// <param name="ID">Item's databse ID</param>
 			void OnDeleteSession(Session session);
 		}
 
@@ -85,12 +83,11 @@ namespace Tomado {
 			var deleteButton = view.FindViewById<Button>(Resource.Id.buttonDeleteSession);
 			//only set button click events once; prevent 'first button deleting everything' issue
 			if (!deleteButton.HasOnClickListeners) {
-
 				//set delete button click
 				view.FindViewById<Button>(Resource.Id.buttonDeleteSession).Click += delegate {
 					//context.RunOnUiThread(() => { Toast.MakeText(context, "Delete " + session.Title, ToastLength.Short).Show(); });
-					sessions.Remove(session);
 					deleteSessionListener.OnDeleteSession(session);
+					sessions.Remove(session);
 				};
 			}
 
