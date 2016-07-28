@@ -52,9 +52,9 @@ namespace Tomado {
 			workButton = rootView.FindViewById<Button>(Resource.Id.buttonWork);
 			pauseButton = rootView.FindViewById<Button>(Resource.Id.buttonPause);
 
-			if (fragmentSession == null)
+			if (fragmentSession == null) //lone timer
 				Init(savedInstanceState);
-			else {
+			else { //use info from session item
 				//Init(sessionFromList);
 				Bundle bundle = new Bundle();
 				string title = fragmentSession.Title;
@@ -318,6 +318,8 @@ namespace Tomado {
 		/// Updates break info, session type, and duration; iterates lastTimerType through pomodoro cycle.
 		/// </summary>
 		private void UpdateTimer() {
+			if (fragmentSession != null)
+				fragmentSession.Pomodoros++;
 			//if you just worked, start a break
 			if (lastTimerType == TimerType.Work) {
 				//set appropriate break time
@@ -359,6 +361,10 @@ namespace Tomado {
 			this.duration = duration;
 		}
 
+		/// <summary>
+		/// Sets class session variable; for starting timer from session list item.
+		/// </summary>
+		/// <param name="session"></param>
 		public void SetFragmentSession(Session session) {
 			fragmentSession = session;
 		}
