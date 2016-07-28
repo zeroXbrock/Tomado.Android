@@ -49,6 +49,11 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/buttonPause"
                 android:text="@string/ButtonText_pause" />
+            <Button
+                android:text="Finish"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/buttonFinish" />
         </LinearLayout>
     </RelativeLayout>
 <!--Button RelativeLayout section end-->

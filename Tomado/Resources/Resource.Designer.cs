@@ -314,6 +314,9 @@ namespace Tomado
 			// aapt resource value: 0x7f060015
 			public const int buttonDeleteSession = 2131099669;
 			
+			// aapt resource value: 0x7f06001f
+			public const int buttonFinish = 2131099679;
+			
 			// aapt resource value: 0x7f060017
 			public const int buttonNewSession = 2131099671;
 			

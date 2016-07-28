@@ -18,7 +18,7 @@ namespace Tomado {
 	public class TimerFragment : Android.Support.V4.App.Fragment {
 		//view instances
 		TextView timerTextView, typeTextView;
-		Button workButton, pauseButton;
+		Button workButton, pauseButton, finishButton;
 
 		//timer logic vars
 		CountDownTimer countDownTimer;
@@ -32,7 +32,7 @@ namespace Tomado {
 		bool isPaused = true; //it starts off paused, technically
 		bool firstRun = true;
 		
-		Session fragmentSession; //var we'll use if we launch a timer from the sessions list
+		Session fragmentSession; //keeps track of this timer's session info
 
 		public TimerFragment() {
 
@@ -51,9 +51,12 @@ namespace Tomado {
 			typeTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimerType);
 			workButton = rootView.FindViewById<Button>(Resource.Id.buttonWork);
 			pauseButton = rootView.FindViewById<Button>(Resource.Id.buttonPause);
+			finishButton = rootView.FindViewById<Button>(Resource.Id.buttonFinish);
 
-			if (fragmentSession == null) //lone timer
+			if (fragmentSession == null) { //lone timer
 				Init(savedInstanceState);
+				fragmentSession = new Session(-1, DateTime.Now, "Task");
+			}
 			else { //use info from session item
 				//Init(sessionFromList);
 				Bundle bundle = new Bundle();
@@ -74,22 +77,33 @@ namespace Tomado {
 				if (isPaused) {
 					duration = remainingTimeInMillis;
 					isPaused = false;
-					startTimer(duration);
+					StartTimer(duration);
 				}
 				else {
 					if (!isTimerRunning) {
 						UpdateTimer();
 						typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
-						startTimer(duration);
+						StartTimer(duration);
 					}
 				}
 			};
 			pauseButton.Click += delegate {
 				isPaused = true;
 				isTimerRunning = false;
-				countDownTimer.Cancel();
+				if (countDownTimer != null)
+					countDownTimer.Cancel();
 			};
+			finishButton.Click += delegate {
+				//stop timer
+				pauseButton.CallOnClick();
+				isPaused = false;
 
+				ResetTimer();
+
+
+				//gather info for congrats dialog
+
+			};
 			#endregion
 
 			return rootView;
@@ -158,7 +172,7 @@ namespace Tomado {
 					timerTextView.SetText(getClockTimeLeft(remainingTimeInMillis), TextView.BufferType.Normal);
 				
 				if (remainingTimeInMillis > 0 && !isPaused) {
-					startTimer(remainingTimeInMillis);
+					StartTimer(remainingTimeInMillis);
 				}
 				else if (!isTimerRunning || remainingTimeInMillis < interval)
 					timerTextView.Text = Resource.String.Finished.ToString();
@@ -218,7 +232,7 @@ namespace Tomado {
 		/// Initializes and starts the class timer.
 		/// </summary>
 		/// <param name="durationInMillis"></param>
-		private void startTimer(long durationInMillis) {
+		private void StartTimer(long durationInMillis) {
 			isTimerRunning = true;
 
 			// make a new timer object
@@ -226,6 +240,16 @@ namespace Tomado {
 			countDownTimer.Start();
 		}
 
+		private void ResetTimer() {
+			//reset timer vars to work mode
+			SetDuration((long)CTimer.TimerLengths.Work);
+			SetTimerType(TimerType.LongBreak);
+
+			shortBreaks = 0;
+
+			//update text view
+			OnFinish();
+		}
 
 		#region timer event handlers
 		public void OnTick(long millisUntilFinished) {
