@@ -29,7 +29,7 @@ namespace Tomado {
 		long remainingTimeInMillis = 0;
 		long minuteInMillis = 60000;
 		int shortBreaks = 0;
-		bool isPaused = false;
+		bool isPaused = true; //it starts off paused, technically
 		bool firstRun = true;
 		
 		Session fragmentSession; //var we'll use if we launch a timer from the sessions list
@@ -66,20 +66,27 @@ namespace Tomado {
 			#region button clicks
 
 			workButton.Click += delegate {
-				if (firstRun)
+				if (firstRun) {
+					remainingTimeInMillis = (long)CTimer.TimerLengths.Work;
+					UpdateTimer();
 					firstRun = false;
+				}
 				if (isPaused) {
 					duration = remainingTimeInMillis;
 					isPaused = false;
+					startTimer(duration);
 				}
-				if (!isTimerRunning) {
-					UpdateTimer();
-					typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
+				else {
+					if (!isTimerRunning) {
+						UpdateTimer();
+						typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
+						startTimer(duration);
+					}
 				}
-				startTimer(duration);
 			};
 			pauseButton.Click += delegate {
 				isPaused = true;
+				isTimerRunning = false;
 				countDownTimer.Cancel();
 			};
 
@@ -135,7 +142,7 @@ namespace Tomado {
 			interval = 500; //interval set to 500 to prevent last-second "error" with CountDownTimer
 			if (bundle == null) { // just started app
 				//initialize timer vars
-				duration = (long)CTimer.TimerLengths.Test;
+				duration = (long)CTimer.TimerLengths.Work;
 				lastTimerType = TimerType.LongBreak;//set last type to long break so that we start on work //TODO: remove this line, probably
 
 				typeTextView.SetText(TimerType.Work.ToString(), TextView.BufferType.Normal); //work is default
@@ -241,8 +248,8 @@ namespace Tomado {
 		}
 
 		public void OnNewTimer(Session session) {
+			SetFragmentSession(session); 
 			typeTextView.Text = session.Title;
-			//SetFragmentSession(session);
 		}
 		#endregion
 

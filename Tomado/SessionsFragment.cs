@@ -97,7 +97,6 @@ namespace Tomado {
 				Activity.RunOnUiThread(() => { ResetListViewAdapter(); });
 			});
 			
-			
 
 			//return the inflated/modified base layout
 			return rootView;
