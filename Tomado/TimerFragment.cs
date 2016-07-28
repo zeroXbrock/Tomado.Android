@@ -251,6 +251,25 @@ namespace Tomado {
 			OnFinish();
 		}
 
+		private void ShowCongratsDialog() {
+			Android.Support.V4.App.FragmentTransaction ft = FragmentManager.BeginTransaction();
+
+			//some code to remove any existing dialogs
+			Android.Support.V4.App.Fragment prev = FragmentManager.FindFragmentByTag("dialog");
+			if (prev != null) {
+				ft.Remove(prev);
+			}
+
+			ft.AddToBackStack(null);
+
+			//create and show dialog
+			var dialog = new CongratulationsFragment();
+
+			dialog.SetTargetFragment(this, 0);
+
+			dialog.Show(FragmentManager, "dialog");
+		}
+
 		#region timer event handlers
 		public void OnTick(long millisUntilFinished) {
 			remainingTimeInMillis = millisUntilFinished;
@@ -269,6 +288,8 @@ namespace Tomado {
 
 			isTimerRunning = false;
 
+			//open congrats dialog
+			ShowCongratsDialog();
 		}
 
 		public void OnNewTimer(Session session) {
