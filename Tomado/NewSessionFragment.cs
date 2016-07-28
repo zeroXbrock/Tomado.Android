@@ -32,7 +32,14 @@ namespace Tomado {
 		public interface OnGetNewSessionListener{
 			void OnAddNewSession(DateTime dateTime, string title);
 		}
-		
+
+		public override void OnActivityCreated(Bundle savedInstanceState) {
+			base.OnActivityCreated(savedInstanceState);
+
+			//open keyboard automatically when dialog opens
+			Dialog.Window.SetSoftInputMode(SoftInput.StateVisible);
+		}
+
 		public override void OnCreate(Bundle savedInstanceState) {
 			base.OnCreate(savedInstanceState);
 
@@ -59,7 +66,7 @@ namespace Tomado {
 			dateEditText = view.FindViewById<EditText>(Resource.Id.editTextDate_NewSession);
 			titleEditText = view.FindViewById<EditText>(Resource.Id.editTextTitle_NewSession);
 
-			
+						
 			//set default values
 			SetDefaultTimeValues();
 
