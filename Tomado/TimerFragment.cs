@@ -29,11 +29,17 @@ namespace Tomado {
 		long remainingTimeInMillis = 0;
 		long minuteInMillis = 60000;
 		int shortBreaks = 0;
-		bool isPaused = false;
+		bool isPaused = true; //it starts off paused, technically
 		bool firstRun = true;
+		
+		Session fragmentSession; //var we'll use if we launch a timer from the sessions list
 
 		public TimerFragment() {
 
+		}
+
+		public override void OnResume() {
+			base.OnResume();
 		}
 
 		public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,25 +52,41 @@ namespace Tomado {
 			workButton = rootView.FindViewById<Button>(Resource.Id.buttonWork);
 			pauseButton = rootView.FindViewById<Button>(Resource.Id.buttonPause);
 
-			Init(savedInstanceState);
+			if (fragmentSession == null)
+				Init(savedInstanceState);
+			else {
+				//Init(sessionFromList);
+				Bundle bundle = new Bundle();
+				string title = fragmentSession.Title;
+				bundle.PutString("title", title);
+
+				Init(bundle);
+			}
 
 			#region button clicks
 
 			workButton.Click += delegate {
-				if (firstRun)
+				if (firstRun) {
+					remainingTimeInMillis = (long)CTimer.TimerLengths.Work;
+					UpdateTimer();
 					firstRun = false;
+				}
 				if (isPaused) {
 					duration = remainingTimeInMillis;
 					isPaused = false;
+					startTimer(duration);
 				}
-				if (!isTimerRunning) {
-					updateTimer();
-					typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
+				else {
+					if (!isTimerRunning) {
+						UpdateTimer();
+						typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
+						startTimer(duration);
+					}
 				}
-				startTimer(duration);
 			};
 			pauseButton.Click += delegate {
 				isPaused = true;
+				isTimerRunning = false;
 				countDownTimer.Cancel();
 			};
 
@@ -73,14 +95,14 @@ namespace Tomado {
 			return rootView;
 		}
 
-		///helper functions to thin OnCreateView out -- copied from TimerActivity.cs; soon to be deprecated
+		///helper functions to thin OnCreateView out
 		
 		//
 		/// <summary>
 		/// Sets local vars to bundle data.
 		/// </summary>
 		/// <param name="bundle"></param>
-		private void GetBundleInfo(Bundle bundle) {
+		private void SetTimerInfo(Bundle bundle) {
 			remainingTimeInMillis = bundle.GetLong("remainingTimeInMillis");
 			shortBreaks = bundle.GetInt("shortBreaks");
 			isPaused = bundle.GetBoolean("isPaused");
@@ -120,28 +142,31 @@ namespace Tomado {
 			interval = 500; //interval set to 500 to prevent last-second "error" with CountDownTimer
 			if (bundle == null) { // just started app
 				//initialize timer vars
-				duration = (long)CTimer.TimerLengths.Test;
-				lastTimerType = TimerType.LongBreak;
+				duration = (long)CTimer.TimerLengths.Work;
+				lastTimerType = TimerType.LongBreak;//set last type to long break so that we start on work //TODO: remove this line, probably
 
-				typeTextView.SetText(TimerType.Work.ToString(), TextView.BufferType.Normal);
+				typeTextView.SetText(TimerType.Work.ToString(), TextView.BufferType.Normal); //work is default
 				timerTextView.SetText(getClockTimeLeft(duration), TextView.BufferType.Normal);
 			}
 			else {
-				GetBundleInfo(bundle);
+				SetTimerInfo(bundle);
 
 				SetTimerTypeFromInt();
-
+				
+				///starts timer on activity resume
 				if (isPaused)
 					timerTextView.SetText(getClockTimeLeft(remainingTimeInMillis), TextView.BufferType.Normal);
-
+				
 				if (remainingTimeInMillis > 0 && !isPaused) {
 					startTimer(remainingTimeInMillis);
 				}
-				else if (!isTimerRunning || remainingTimeInMillis < interval) {
-					timerTextView.SetText(Resource.String.Finished, TextView.BufferType.Normal);
-				}
-				typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
+				else if (!isTimerRunning || remainingTimeInMillis < interval)
+					timerTextView.Text = Resource.String.Finished.ToString();
 
+				if (fragmentSession == null)
+					typeTextView.Text = lastTimerType.ToString();
+				else
+					typeTextView.Text = fragmentSession.Title;
 			}
 
 			if (firstRun) {
@@ -221,6 +246,11 @@ namespace Tomado {
 			isTimerRunning = false;
 
 		}
+
+		public void OnNewTimer(Session session) {
+			SetFragmentSession(session); 
+			typeTextView.Text = session.Title;
+		}
 		#endregion
 
 		#region helper functions to convert time
@@ -287,29 +317,29 @@ namespace Tomado {
 		/// <summary>
 		/// Updates break info, session type, and duration; iterates lastTimerType through pomodoro cycle.
 		/// </summary>
-		private void updateTimer() {
+		private void UpdateTimer() {
 			//if you just worked, start a break
 			if (lastTimerType == TimerType.Work) {
 				//set appropriate break time
 				if (shortBreaks < 2) {
 					shortBreaks++;
 					//short break
-					setDuration((long)CTimer.TimerLengths.ShortBreak);
-					setTimerType(TimerType.ShortBreak);
+					SetDuration((long)CTimer.TimerLengths.ShortBreak);
+					SetTimerType(TimerType.ShortBreak);
 				}
 				else {
 					//long break
 					shortBreaks = 0;
-					setDuration((long)CTimer.TimerLengths.LongBreak);
-					setTimerType(TimerType.LongBreak);
+					SetDuration((long)CTimer.TimerLengths.LongBreak);
+					SetTimerType(TimerType.LongBreak);
 				}
 			}
 
 			//if you just took a break, work
 			else {
 				//work
-				setDuration((long)CTimer.TimerLengths.Work);
-				setTimerType(TimerType.Work);
+				SetDuration((long)CTimer.TimerLengths.Work);
+				SetTimerType(TimerType.Work);
 			}
 		}
 
@@ -317,7 +347,7 @@ namespace Tomado {
 		/// Sets the class timer's type.
 		/// </summary>
 		/// <param name="type"></param>
-		private void setTimerType(TimerType type) {
+		private void SetTimerType(TimerType type) {
 			lastTimerType = type;
 		}
 
@@ -325,8 +355,12 @@ namespace Tomado {
 		/// Sets the class timer duration.
 		/// </summary>
 		/// <param name="duration"></param>
-		private void setDuration(long duration) {
+		private void SetDuration(long duration) {
 			this.duration = duration;
+		}
+
+		public void SetFragmentSession(Session session) {
+			fragmentSession = session;
 		}
 	}
 }

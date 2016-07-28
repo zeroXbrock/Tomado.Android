@@ -15,7 +15,7 @@ using Android.Support.V4.App;
 
 namespace Tomado {
 	/// <summary>
-	/// Generic fragment adapter; holds list of fragments;
+	/// Generic fragment adapter; used to populate swipe view with fragments.
 	/// </summary>
 	public class FragmentAdapter : FragmentPagerAdapter {
 		//list to hold fragments
