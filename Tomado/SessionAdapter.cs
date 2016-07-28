@@ -11,6 +11,7 @@ using Android.Views;
 using Android.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.View;
+using Android.Graphics.Drawables;
 
 using Java.Lang;
 
@@ -77,14 +78,17 @@ namespace Tomado {
 			//set text views
 			view.FindViewById<TextView>(Resource.Id.evTitle).Text = session.Title;
 			view.FindViewById<TextView>(Resource.Id.evTime).Text = (dateTime.ToShortTimeString() + "\t" + dateTime.ToShortDateString());
-			view.FindViewById<Button>(Resource.Id.buttonDeleteSession).SetBackgroundResource(Resource.Drawable.ic_delete_white_24dp);
+			view.FindViewById<ImageButton>(Resource.Id.buttonDeleteSession).SetImageResource(Resource.Drawable.ic_delete_white_24dp);
 
 			//get delete button
-			var deleteButton = view.FindViewById<Button>(Resource.Id.buttonDeleteSession);
+			var deleteButton = view.FindViewById<ImageButton>(Resource.Id.buttonDeleteSession);
+
+			deleteButton.Background.Alpha = 128; //0-255
+
 			//only set button click events once; prevent 'first button deleting everything' issue
 			if (!deleteButton.HasOnClickListeners) {
 				//set delete button click
-				view.FindViewById<Button>(Resource.Id.buttonDeleteSession).Click += delegate {
+				deleteButton.Click += delegate {
 					//context.RunOnUiThread(() => { Toast.MakeText(context, "Delete " + session.Title, ToastLength.Short).Show(); });
 					deleteSessionListener.OnDeleteSession(session);
 					sessions.Remove(session);
