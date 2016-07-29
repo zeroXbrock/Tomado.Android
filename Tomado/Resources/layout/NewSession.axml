@@ -27,6 +27,12 @@
         android:hint="Time"
         android:focusable="false"
         style="@style/DialogContentEditText" />
+    <Switch
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/switchRecurring"
+        style="@style/DialogContentEditText"
+        android:text="Recurring" />
     <LinearLayout
         android:orientation="horizontal"
         android:minWidth="25px"

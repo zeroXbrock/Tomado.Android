@@ -15,10 +15,23 @@ using Android.Support.V4.View;
 
 namespace Tomado {
 	public class CongratulationsFragment : Android.Support.V4.App.DialogFragment {
+		string taskName = "";
+		int pomodoros = 0;
+
+		public CongratulationsFragment() { }
+
+		public CongratulationsFragment(Session session) {
+			taskName = session.Title;
+			pomodoros = session.Pomodoros;
+		}
+
 		public override void OnCreate(Bundle savedInstanceState) {
 			base.OnCreate(savedInstanceState);
 
-			// Create your fragment here
+			if (savedInstanceState != null) {
+				pomodoros = savedInstanceState.GetInt("pomodoros");
+				taskName = savedInstanceState.GetString("taskName");
+			}
 		}
 
 		public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,9 +49,16 @@ namespace Tomado {
 			};
 
 			TextView textViewCongratsMessage = view.FindViewById<TextView>(Resource.Id.textViewCongratulationsMessage);
-			
+			textViewCongratsMessage.Text = "Good job! You completed " + taskName + " in " + pomodoros.ToString() + " tomados!";
 
 			return view;
+		}
+
+		public override void OnSaveInstanceState(Bundle outState) {
+			base.OnSaveInstanceState(outState);
+
+			outState.PutString("taskName", taskName);
+			outState.PutInt("pomodoros", pomodoros);
 		}
 	}
 }

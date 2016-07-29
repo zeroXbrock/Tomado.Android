@@ -16,8 +16,8 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textViewTimerType"
-            android:text="type" />
+            android:id="@+id/textViewTimerTitle"
+            android:text="title" />
         <TextView
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_width="wrap_content"

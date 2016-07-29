@@ -21,12 +21,14 @@ namespace Tomado {
 		public int ID { get; set; }
 
 		int startHour, startMinute, year, monthOfYear, dayOfMonth;
+
+		bool recurring;
 		
 		string title;
 
 		int pomodoros = 0;
 
-		public Session(int ID, int startHour, int startMinute, int year, int monthOfYear, int dayOfMonth, string title) {
+		public Session(int ID, int startHour, int startMinute, int year, int monthOfYear, int dayOfMonth, string title, bool recurring) {
 			this.ID = ID;
 			StartHour = startHour;
 			StartMinute = startMinute;
@@ -34,9 +36,10 @@ namespace Tomado {
 			MonthOfYear = monthOfYear;
 			DayOfMonth = dayOfMonth;
 			Title = title;
+			Recurring = recurring;
 		}
 
-		public Session(int ID, DateTime dateTime, string title) {
+		public Session(int ID, DateTime dateTime, string title, bool recurring) {
 			this.ID = ID;
 			StartHour = dateTime.Hour;
 			StartMinute = dateTime.Minute;
@@ -44,6 +47,7 @@ namespace Tomado {
 			MonthOfYear = dateTime.Month;
 			DayOfMonth = dateTime.Day;
 			Title = title;
+			Recurring = recurring;
 		}
 
 		public Session() { }
@@ -67,6 +71,14 @@ namespace Tomado {
 		public int DayOfMonth {
 			get { return dayOfMonth; }
 			set { dayOfMonth = value; }
+		}
+		public bool Recurring {
+			get {
+				return recurring;
+			}
+			set {
+				recurring = value;
+			}
 		}
 		
 		public int Pomodoros {

@@ -127,9 +127,9 @@ namespace Tomado {
 		/// </summary>
 		/// <param name="dateTime"></param>
 		/// <param name="title"></param>
-		public void OnAddNewSession(DateTime dateTime, string title) {
+		public void OnAddNewSession(DateTime dateTime, string title, bool recurring) {
 			//Add the session to _sessions list.
-			Session session = AddSession(1, dateTime, title);
+			Session session = AddSession(1, dateTime, title, recurring);
 
 			//reset the listview adapter
 			ResetListViewAdapter();
@@ -191,9 +191,9 @@ namespace Tomado {
 		/// <param name="dateTime"></param>
 		/// <param name="title"></param>
 		/// <returns></returns>
-		private Session AddSession(int ID, DateTime dateTime, string title) {
+		private Session AddSession(int ID, DateTime dateTime, string title, bool recurring) {
 			//add the new session
-			Session session = new Session(ID, dateTime, title);
+			Session session = new Session(ID, dateTime, title, recurring);
 			_sessions.Add(session);
 
 			return session;
@@ -208,7 +208,10 @@ namespace Tomado {
 			string title = session.Title;
 
 			int ID = session.ID;
-			return AddSession(ID, datetime, title);
+
+			bool recurring = session.Recurring;
+
+			return AddSession(ID, datetime, title, recurring);
 		}
 
 		/// <summary>
