@@ -308,7 +308,8 @@ namespace Tomado {
 		/// <param name="finished"></param>
 		private void UpdateTimerNotification(string info, bool finished) {
 			builder.SetContentText(info)
-				.SetOngoing(!finished);
+				.SetOngoing(!finished)
+				.SetAutoCancel(finished);
 			
 			timerNotification = builder.Build();
 
