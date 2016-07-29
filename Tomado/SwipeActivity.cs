@@ -17,7 +17,7 @@ namespace Tomado {
 	/// Activity that holds multiple fragments that can be swiped through.
 	/// </summary>
 	[Activity(MainLauncher = true, Icon = "@drawable/icon")]
-	class SwipeActivity : FragmentActivity, SessionAdapter.SessionClickListener {
+	class SwipeActivity : FragmentActivity, SessionAdapter.SessionClickListener, TimerFragment.TimerFinishListener {
 		ViewPager viewPager;
 		TimerFragment timerFragment;
 		SessionsFragment sessionsFragment;
@@ -30,7 +30,7 @@ namespace Tomado {
 			viewPager = FindViewById<ViewPager>(Resource.Id.viewPager);
 			var adapter = new FragmentAdapter(SupportFragmentManager);
 
-			timerFragment = new TimerFragment();
+			timerFragment = new TimerFragment(this);
 			sessionsFragment = new SessionsFragment(this);
 			
 			adapter.AddFragment(timerFragment);
@@ -48,16 +48,15 @@ namespace Tomado {
 		}
 
 		public void OnSessionClick(Session session) {
-			//modify timer view contents before switching views
-			var typeView = FindViewById<TextView>(Resource.Id.textViewTimerType);
-			var timeView = FindViewById<TextView>(Resource.Id.textViewTimer);
-
-			//typeView.Text = session.Title;
-			//set timeView to 25:00
 			//set the actual timer
 			timerFragment.OnNewTimer(session);
 			//set the view to timer view
 			SetVisibleFragment(0);
+		}
+
+		public void OnTimerFinish(Session session) {
+			if (!session.Recurring)
+				sessionsFragment.OnDeleteSession(session);
 		}
 	}
 }

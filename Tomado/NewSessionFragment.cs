@@ -23,14 +23,16 @@ namespace Tomado {
 		//view instances
 		Button saveButton, cancelButton;
 		EditText timeEditText, dateEditText, titleEditText;
+		Switch recurringSwitch;
 
 		//session vars
 		int _year, _month, _day, _hour, _minute;
 		DateTime sessionDateTime = DateTime.Now;
 		string _title;
+		bool recurring;
 		
 		public interface OnGetNewSessionListener{
-			void OnAddNewSession(DateTime dateTime, string title);
+			void OnAddNewSession(DateTime dateTime, string title, bool recurring);
 		}
 
 		public override void OnActivityCreated(Bundle savedInstanceState) {
@@ -65,7 +67,7 @@ namespace Tomado {
 			timeEditText = view.FindViewById<EditText>(Resource.Id.editTextTime_NewSession);
 			dateEditText = view.FindViewById<EditText>(Resource.Id.editTextDate_NewSession);
 			titleEditText = view.FindViewById<EditText>(Resource.Id.editTextTitle_NewSession);
-
+			recurringSwitch = view.FindViewById<Switch>(Resource.Id.switchRecurring);
 						
 			//set default values
 			SetDefaultTimeValues();
@@ -78,9 +80,10 @@ namespace Tomado {
 				//get info to save
 				sessionDateTime = new DateTime(_year, _month, _day, _hour, _minute, 0);
 				_title = titleEditText.Text;
+				recurring = recurringSwitch.Checked;
 
 				//send data out
-				onGetNewSessionListener.OnAddNewSession(sessionDateTime, _title);
+				onGetNewSessionListener.OnAddNewSession(sessionDateTime, _title, recurring);
 
 				//close fragment
 				Dismiss();

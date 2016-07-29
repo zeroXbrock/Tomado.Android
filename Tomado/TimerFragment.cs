@@ -17,8 +17,11 @@ namespace Tomado {
 	/// </summary>
 	public class TimerFragment : Android.Support.V4.App.Fragment {
 		//view instances
-		TextView timerTextView, typeTextView;
-		Button workButton, pauseButton;
+		TextView timerTextView, titleTextView;
+		Button workButton, pauseButton, finishButton;
+
+		//listener instance to send events
+		TimerFinishListener timerFinishListener;
 
 		//timer logic vars
 		CountDownTimer countDownTimer;
@@ -31,11 +34,18 @@ namespace Tomado {
 		int shortBreaks = 0;
 		bool isPaused = true; //it starts off paused, technically
 		bool firstRun = true;
+		int pomodoros = 0; //# of work sessions
 		
-		Session fragmentSession; //var we'll use if we launch a timer from the sessions list
+		Session fragmentSession; //keeps track of this timer's session info
 
-		public TimerFragment() {
+		public interface TimerFinishListener {
+			void OnTimerFinish(Session session);
+		}
+		
+		public TimerFragment() { }
 
+		public TimerFragment(TimerFinishListener timerFinishListener) {
+			this.timerFinishListener = timerFinishListener;
 		}
 
 		public override void OnResume() {
@@ -48,13 +58,16 @@ namespace Tomado {
 			View rootView = inflater.Inflate(Resource.Layout.Timer, container, false);
 
 			timerTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimer);
-			typeTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimerType);
+			titleTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimerTitle);
 			workButton = rootView.FindViewById<Button>(Resource.Id.buttonWork);
 			pauseButton = rootView.FindViewById<Button>(Resource.Id.buttonPause);
+			finishButton = rootView.FindViewById<Button>(Resource.Id.buttonFinish);
 
-			if (fragmentSession == null)
+			if (fragmentSession == null) { //lone timer
 				Init(savedInstanceState);
-			else {
+				fragmentSession = new Session(-1, DateTime.Now, "Task", false);
+			}
+			else { //use info from session item
 				//Init(sessionFromList);
 				Bundle bundle = new Bundle();
 				string title = fragmentSession.Title;
@@ -68,28 +81,52 @@ namespace Tomado {
 			workButton.Click += delegate {
 				if (firstRun) {
 					remainingTimeInMillis = (long)CTimer.TimerLengths.Work;
+
 					UpdateTimer();
+
 					firstRun = false;
+
+					fragmentSession.Pomodoros++;
 				}
 				if (isPaused) {
 					duration = remainingTimeInMillis;
+					
 					isPaused = false;
-					startTimer(duration);
+					
+					StartTimer(duration);
 				}
 				else {
 					if (!isTimerRunning) {
+						if (lastTimerType != TimerType.Work)
+							fragmentSession.Pomodoros++;
+
 						UpdateTimer();
-						typeTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
-						startTimer(duration);
+						
+						titleTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
+						
+						StartTimer(duration);
 					}
 				}
 			};
 			pauseButton.Click += delegate {
 				isPaused = true;
 				isTimerRunning = false;
-				countDownTimer.Cancel();
-			};
 
+				if (countDownTimer != null)
+					countDownTimer.Cancel();
+			};
+			finishButton.Click += delegate {
+				//stop timer
+				pauseButton.CallOnClick();
+				isPaused = false;
+
+				//open congrats dialog
+				ShowCongratsDialog(fragmentSession);
+
+				ResetTimer();
+
+				timerFinishListener.OnTimerFinish(fragmentSession);
+			};
 			#endregion
 
 			return rootView;
@@ -145,7 +182,7 @@ namespace Tomado {
 				duration = (long)CTimer.TimerLengths.Work;
 				lastTimerType = TimerType.LongBreak;//set last type to long break so that we start on work //TODO: remove this line, probably
 
-				typeTextView.SetText(TimerType.Work.ToString(), TextView.BufferType.Normal); //work is default
+				titleTextView.SetText(TimerType.Work.ToString(), TextView.BufferType.Normal); //work is default
 				timerTextView.SetText(getClockTimeLeft(duration), TextView.BufferType.Normal);
 			}
 			else {
@@ -158,19 +195,19 @@ namespace Tomado {
 					timerTextView.SetText(getClockTimeLeft(remainingTimeInMillis), TextView.BufferType.Normal);
 				
 				if (remainingTimeInMillis > 0 && !isPaused) {
-					startTimer(remainingTimeInMillis);
+					StartTimer(remainingTimeInMillis);
 				}
 				else if (!isTimerRunning || remainingTimeInMillis < interval)
 					timerTextView.Text = Resource.String.Finished.ToString();
 
 				if (fragmentSession == null)
-					typeTextView.Text = lastTimerType.ToString();
+					titleTextView.Text = lastTimerType.ToString();
 				else
-					typeTextView.Text = fragmentSession.Title;
+					titleTextView.Text = fragmentSession.Title;
 			}
 
 			if (firstRun) {
-				typeTextView.SetText(TimerType.Work.ToString(), TextView.BufferType.Normal);
+				titleTextView.SetText(TimerType.Work.ToString(), TextView.BufferType.Normal);
 				timerTextView.SetText(getClockTimeLeft(CTimer.TimerLengths.Work), TextView.BufferType.Normal);
 			}
 		}
@@ -218,16 +255,48 @@ namespace Tomado {
 		/// Initializes and starts the class timer.
 		/// </summary>
 		/// <param name="durationInMillis"></param>
-		private void startTimer(long durationInMillis) {
+		private void StartTimer(long durationInMillis) {
 			isTimerRunning = true;
 
 			// make a new timer object
 			countDownTimer = new CTimer(durationInMillis, interval, OnTick, OnFinish);
 			countDownTimer.Start();
+			
 		}
 
+		private void ResetTimer() {
+			//reset timer vars to work mode
+			SetDuration((long)CTimer.TimerLengths.Work);
+			SetTimerType(TimerType.LongBreak);
+
+			shortBreaks = 0;
+			fragmentSession.Pomodoros = 0;
+
+			//update text view
+			OnFinish();
+		}
+
+		private void ShowCongratsDialog(Session session) {
+			Android.Support.V4.App.FragmentTransaction ft = FragmentManager.BeginTransaction();
+
+			//some code to remove any existing dialogs
+			Android.Support.V4.App.Fragment prev = FragmentManager.FindFragmentByTag("dialog");
+			if (prev != null) {
+				ft.Remove(prev);
+			}
+
+			ft.AddToBackStack(null);
+
+			//create and show dialog
+			var dialog = new CongratulationsFragment(session);
+
+			dialog.SetTargetFragment(this, 0);
+
+			dialog.Show(FragmentManager, "dialog");
+		}
 
 		#region timer event handlers
+		
 		public void OnTick(long millisUntilFinished) {
 			remainingTimeInMillis = millisUntilFinished;
 
@@ -244,12 +313,11 @@ namespace Tomado {
 			timerTextView.SetText("Finished", TextView.BufferType.Normal);
 
 			isTimerRunning = false;
-
 		}
 
 		public void OnNewTimer(Session session) {
 			SetFragmentSession(session); 
-			typeTextView.Text = session.Title;
+			titleTextView.Text = session.Title;
 		}
 		#endregion
 
@@ -359,6 +427,10 @@ namespace Tomado {
 			this.duration = duration;
 		}
 
+		/// <summary>
+		/// Sets class session variable; for starting timer from session list item.
+		/// </summary>
+		/// <param name="session"></param>
 		public void SetFragmentSession(Session session) {
 			fragmentSession = session;
 		}

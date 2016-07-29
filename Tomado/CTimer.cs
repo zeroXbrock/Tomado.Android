@@ -51,7 +51,6 @@ namespace Tomado {
 				Work = 4000,
 				ShortBreak = 2000,
 				LongBreak = 3000;
-			public const double Test = 5000; //5000 ms; 5 seconds
 		}
 	}
 
