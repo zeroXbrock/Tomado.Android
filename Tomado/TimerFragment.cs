@@ -316,19 +316,25 @@ namespace Tomado {
 		}
 
 		/// <summary>
-		/// Resets duration, timerType, shortBreaks, and fragmentSession.Pomodoros to default value,
-		/// then updates the text view.
+		/// Resets timer variables, then updates the text view.
 		/// </summary>
 		private void ResetTimer() {
-			//reset timer vars to work mode
+			ResetTimerVars();
+
+			//update text view
+			OnFinish();
+		}
+
+		/// <summary>
+		/// Resets duration, timerType, shortBreaks, and fragmentSession.Pomodoros to default value.
+		/// </summary>
+		private void ResetTimerVars() {
+			//reset timer vars to default: work mode
 			SetDuration((long)CTimer.TimerLengths.Work);
 			SetTimerType(TimerType.LongBreak);
 
 			shortBreaks = 0;
 			fragmentSession.Pomodoros = 0;
-
-			//update text view
-			OnFinish();
 		}
 
 		/// <summary>
@@ -380,6 +386,8 @@ namespace Tomado {
 		public void OnNewTimer(Session session) {
 			SetFragmentSession(session); 
 			titleTextView.Text = session.Title;
+			ResetTimerVars();
+			timerTextView.Text = getClockTimeLeft(CTimer.TimerLengths.Work).ToString();
 		}
 		#endregion
 
