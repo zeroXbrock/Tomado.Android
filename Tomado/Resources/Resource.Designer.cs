@@ -454,17 +454,20 @@ namespace Tomado
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f070000
-			public const int ApplicationName = 2131165184;
-			
 			// aapt resource value: 0x7f070001
-			public const int ButtonText_pause = 2131165185;
+			public const int ApplicationName = 2131165185;
 			
 			// aapt resource value: 0x7f070002
-			public const int ButtonText_work = 2131165186;
+			public const int ButtonText_pause = 2131165186;
 			
 			// aapt resource value: 0x7f070003
-			public const int Finished = 2131165187;
+			public const int ButtonText_work = 2131165187;
+			
+			// aapt resource value: 0x7f070004
+			public const int Finished = 2131165188;
+			
+			// aapt resource value: 0x7f070000
+			public const int PackageName = 2131165184;
 			
 			static String()
 			{
