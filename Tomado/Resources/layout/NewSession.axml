@@ -9,24 +9,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/editTextTitle_NewSession"
-        android:hint="Event name"
-        style="@style/DialogContentEditText" />
+        android:hint="Event name" />
     <EditText
         android:inputType="date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/editTextDate_NewSession"
         android:hint="Date"
-        android:focusable="false"
-        style="@style/DialogContentEditText" />
+        android:focusable="false" />
     <EditText
         android:inputType="time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/editTextTime_NewSession"
         android:hint="Time"
-        android:focusable="false"
-        style="@style/DialogContentEditText" />
+        android:focusable="false" />
     <LinearLayout
         android:orientation="horizontal"
         android:minWidth="25px"
