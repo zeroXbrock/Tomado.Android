@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="PackageName">Tomado.Tomado</string>
     <string name="ApplicationName">Tomado</string>
   <string name="ButtonText_pause">Pause</string>
   <string name="ButtonText_work">Work</string>

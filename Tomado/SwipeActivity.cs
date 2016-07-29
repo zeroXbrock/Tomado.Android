@@ -16,7 +16,7 @@ namespace Tomado {
 	/// <summary>
 	/// Activity that holds multiple fragments that can be swiped through.
 	/// </summary>
-	[Activity(MainLauncher = true, Icon = "@drawable/icon")]
+	[Activity(MainLauncher = true, Icon = "@drawable/icon", LaunchMode=Android.Content.PM.LaunchMode.SingleTop)]
 	class SwipeActivity : FragmentActivity, SessionAdapter.SessionClickListener, TimerFragment.TimerFinishListener {
 		ViewPager viewPager;
 		TimerFragment timerFragment;

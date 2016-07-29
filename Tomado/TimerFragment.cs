@@ -20,6 +20,12 @@ namespace Tomado {
 		TextView timerTextView, titleTextView;
 		Button workButton, pauseButton, finishButton;
 
+		//notification vars
+		const int timerNotificationId = 0;
+		NotificationManager notificationManager;
+		Notification.Builder builder;
+		Notification timerNotification;
+
 		//listener instance to send events
 		TimerFinishListener timerFinishListener;
 
@@ -53,8 +59,6 @@ namespace Tomado {
 		}
 
 		public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			//return base.OnCreateView(inflater, container, savedInstanceState);
-
 			View rootView = inflater.Inflate(Resource.Layout.Timer, container, false);
 
 			timerTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimer);
@@ -68,7 +72,6 @@ namespace Tomado {
 				fragmentSession = new Session(-1, DateTime.Now, "Task", false);
 			}
 			else { //use info from session item
-				//Init(sessionFromList);
 				Bundle bundle = new Bundle();
 				string title = fragmentSession.Title;
 				bundle.PutString("title", title);
@@ -139,7 +142,7 @@ namespace Tomado {
 		/// Sets local vars to bundle data.
 		/// </summary>
 		/// <param name="bundle"></param>
-		private void SetTimerInfo(Bundle bundle) {
+		private void SetClassTimerInfo(Bundle bundle) {
 			remainingTimeInMillis = bundle.GetLong("remainingTimeInMillis");
 			shortBreaks = bundle.GetInt("shortBreaks");
 			isPaused = bundle.GetBoolean("isPaused");
@@ -186,7 +189,7 @@ namespace Tomado {
 				timerTextView.SetText(getClockTimeLeft(duration), TextView.BufferType.Normal);
 			}
 			else {
-				SetTimerInfo(bundle);
+				SetClassTimerInfo(bundle);
 
 				SetTimerTypeFromInt();
 				
@@ -217,7 +220,7 @@ namespace Tomado {
 		/// Puts timer data in bundle.
 		/// </summary>
 		/// <param name="outState">Bundle to populate</param>
-		private void SetBundleInfo(Bundle outState) {
+		private Bundle SetPersistentBundleInfo(Bundle outState) {
 			outState.PutLong("remainingTimeInMillis", remainingTimeInMillis);
 			outState.PutInt("shortBreaks", shortBreaks);
 			outState.PutBoolean("isPaused", isPaused);
@@ -243,12 +246,12 @@ namespace Tomado {
 			}
 
 			outState.PutInt("lastTimerTypeInt", lastTimerTypeInt);
+
+			return outState;
 		}
 
 		public override void OnSaveInstanceState(Bundle outState) {
-			SetBundleInfo(outState);
-
-			base.OnSaveInstanceState(outState);
+			base.OnSaveInstanceState(SetPersistentBundleInfo(outState));
 		}
 
 		/// <summary>
@@ -261,21 +264,83 @@ namespace Tomado {
 			// make a new timer object
 			countDownTimer = new CTimer(durationInMillis, interval, OnTick, OnFinish);
 			countDownTimer.Start();
-			
+
+			//make intent for notification
+			Intent intent = new Intent(Activity, typeof(SwipeActivity));
+
+			//initialize notification stuff
+			InitNotificationVars("Tomado timer", "Timer is running", Resource.Drawable.Icon, true, intent);
+
+			//publish notification
+			notificationManager.Notify(timerNotificationId, timerNotification);
 		}
 
-		private void ResetTimer() {
-			//reset timer vars to work mode
-			SetDuration((long)CTimer.TimerLengths.Work);
-			SetTimerType(TimerType.LongBreak);
+		/// <summary>
+		/// Initializes class variables for notification management: builder, timerNotification, & notificationManager
+		/// </summary>
+		/// <param name="title"></param>
+		/// <param name="content"></param>
+		/// <param name="icon"></param>
+		/// <param name="ongoing"></param>
+		private void InitNotificationVars(string title, string content, int icon, bool ongoing, Intent intent) {
+			PendingIntent pendingIntent = PendingIntent.GetActivity(Activity, timerNotificationId, intent, PendingIntentFlags.OneShot, SetPersistentBundleInfo(new Bundle()));
+			
+			//create a notification builder
+			builder = new Notification.Builder(Activity)
+				.SetContentIntent(pendingIntent)
+				.SetContentTitle(title)
+				.SetContentText(content)
+				.SetSmallIcon(icon)
+				.SetOngoing(ongoing)
+				.SetExtras(SetPersistentBundleInfo(new Bundle()));
 
-			shortBreaks = 0;
-			fragmentSession.Pomodoros = 0;
+			//build notification
+			timerNotification = builder.Build();
+			
+			//get notification manager
+			notificationManager = Activity.GetSystemService(Context.NotificationService) as NotificationManager;
+		}
+
+		/// <summary>
+		/// Updates the timer notification text field and changes its persistence.
+		/// </summary>
+		/// <param name="info"></param>
+		/// <param name="finished"></param>
+		private void UpdateTimerNotification(string info, bool finished) {
+			builder.SetContentText(info)
+				.SetOngoing(!finished);
+			
+			timerNotification = builder.Build();
+
+			notificationManager.Notify(timerNotificationId, timerNotification);
+		}
+
+		/// <summary>
+		/// Resets timer variables, then updates the text view.
+		/// </summary>
+		private void ResetTimer() {
+			ResetTimerVars();
 
 			//update text view
 			OnFinish();
 		}
 
+		/// <summary>
+		/// Resets duration, timerType, shortBreaks, and fragmentSession.Pomodoros to default value.
+		/// </summary>
+		private void ResetTimerVars() {
+			//reset timer vars to default: work mode
+			SetDuration((long)CTimer.TimerLengths.Work);
+			SetTimerType(TimerType.LongBreak);
+
+			shortBreaks = 0;
+			fragmentSession.Pomodoros = 0;
+		}
+
+		/// <summary>
+		/// Opens a new CongratulationsDialog.
+		/// </summary>
+		/// <param name="session"></param>
 		private void ShowCongratsDialog(Session session) {
 			Android.Support.V4.App.FragmentTransaction ft = FragmentManager.BeginTransaction();
 
@@ -304,6 +369,7 @@ namespace Tomado {
 			if (millisUntilFinished % 1000 > interval || millisUntilFinished == duration) {
 				//set timer textview, format output time to seconds
 				timerTextView.SetText(getClockTimeLeft(millisUntilFinished), TextView.BufferType.Normal);
+				UpdateTimerNotification(getClockTimeLeft(millisUntilFinished), false);
 			}
 		}
 
@@ -313,11 +379,15 @@ namespace Tomado {
 			timerTextView.SetText("Finished", TextView.BufferType.Normal);
 
 			isTimerRunning = false;
+
+			UpdateTimerNotification("Finished", true);
 		}
 
 		public void OnNewTimer(Session session) {
 			SetFragmentSession(session); 
 			titleTextView.Text = session.Title;
+			ResetTimerVars();
+			timerTextView.Text = getClockTimeLeft(CTimer.TimerLengths.Work).ToString();
 		}
 		#endregion
 

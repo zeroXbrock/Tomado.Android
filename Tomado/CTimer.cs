@@ -15,6 +15,11 @@ namespace Tomado {
 	/// Class to get a modified CountDownTimer object that calls your events on tick and finish.
 	/// </summary>
 	public class CTimer : CountDownTimer {
+		long millisUntilFinished;
+
+		public long MillisUntilFinished {
+			get { return millisUntilFinished; }
+		}
 
 		//delegates to communicate with UI from timer code
 		public delegate void TickEvent(long millisUntilFinished);
@@ -34,6 +39,7 @@ namespace Tomado {
 		public override void OnTick(long millisUntilFinished) {
 			if (Tick != null) {
 				Tick(millisUntilFinished);
+				this.millisUntilFinished = millisUntilFinished;
 			}
 		}
 		public override void OnFinish() {
