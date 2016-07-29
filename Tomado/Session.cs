@@ -21,10 +21,7 @@ namespace Tomado {
 		public int ID { get; set; }
 
 		int startHour, startMinute, year, monthOfYear, dayOfMonth;
-		
 		string title;
-
-		int pomodoros = 0;
 
 		public Session(int ID, int startHour, int startMinute, int year, int monthOfYear, int dayOfMonth, string title) {
 			this.ID = ID;
@@ -68,16 +65,6 @@ namespace Tomado {
 			get { return dayOfMonth; }
 			set { dayOfMonth = value; }
 		}
-		
-		public int Pomodoros {
-			get {
-				return pomodoros;
-			}
-			set {
-				pomodoros = value;
-			}
-		}
-		
 		public string Title {
 			get { return title; }
 			set { title = value; }

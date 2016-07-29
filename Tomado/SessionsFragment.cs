@@ -118,6 +118,8 @@ namespace Tomado {
 		/// </summary>
 		/// <param name="session"></param>
 		public void OnSessionClick(Session session) {
+			Toast.MakeText(Activity, session.Title, ToastLength.Short).Show();
+
 			//send event back to activity; to load timer
 			sessionClickListener.OnSessionClick(session);
 		}
