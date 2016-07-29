@@ -130,6 +130,7 @@ namespace Tomado {
 		public void OnAddNewSession(DateTime dateTime, string title, bool recurring) {
 			//Add the session to _sessions list.
 			Session session = AddSession(1, dateTime, title, recurring);
+			ScheduleSessionNotification(session);
 
 			//reset the listview adapter
 			ResetListViewAdapter();
@@ -215,14 +216,6 @@ namespace Tomado {
 		}
 
 		/// <summary>
-		/// Deletes a session from the class session list (& listview) and the database
-		/// </summary>
-		private async void DeleteSessionFromDatabase(Session session) {
-			//remove session from database
-			await connection.DeleteAsync(session);
-		}
-
-		/// <summary>
 		/// Remove session from class sessions list
 		/// </summary>
 		/// <param name="session"></param>
@@ -230,7 +223,6 @@ namespace Tomado {
 			//remove session from class sessions list
 			_sessions.Remove(session);
 		}
-
 
 
 		/// <summary>
@@ -268,6 +260,7 @@ namespace Tomado {
 			return cursor;
 		}
 
+		#region database methods
 		/// <summary>
 		/// Asynchronously saves a new session to the database.
 		/// </summary>
@@ -277,6 +270,13 @@ namespace Tomado {
 			var result = await insertUpdateData(session);
 		}
 
+		/// <summary>
+		/// Deletes a session from the class session list (& listview) and the database
+		/// </summary>
+		private async void DeleteSessionFromDatabase(Session session) {
+			//remove session from database
+			await connection.DeleteAsync(session);
+		}
 
 		/// <summary>
 		/// Asynchronously loads sessions from database to class sessions list. Result should be obtained with [result].ContinueWith(...).
@@ -354,6 +354,35 @@ namespace Tomado {
 			catch {
 				return null;
 			}
+		}
+		#endregion
+
+		/// <summary>
+		/// Schedules a notification to launch in the future; to open a session from
+		/// </summary>
+		/// <param name="session"></param>
+		public void ScheduleSessionNotification(Session session) {
+			Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
+
+			alarmIntent.PutExtra("ID", session.ID);
+			alarmIntent.PutExtra("title", session.Title);
+			alarmIntent.PutExtra("year", session.Year);
+			alarmIntent.PutExtra("month", session.MonthOfYear);
+			alarmIntent.PutExtra("day", session.DayOfMonth);
+			alarmIntent.PutExtra("hour", session.StartHour);
+			alarmIntent.PutExtra("minute", session.StartMinute);
+
+			if (session.Recurring) {
+
+			}
+			else {
+
+			}
+
+			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 0, alarmIntent, PendingIntentFlags.UpdateCurrent);
+			AlarmManager alarmManager = (AlarmManager)Activity.GetSystemService(Context.AlarmService);
+
+			alarmManager.Set(AlarmType.ElapsedRealtime, SystemClock.ElapsedRealtime() + 5000, pendingIntent);
 		}
 	}
 

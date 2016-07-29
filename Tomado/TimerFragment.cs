@@ -97,6 +97,7 @@ namespace Tomado {
 					isPaused = false;
 					
 					StartTimer(duration);
+					ShowTimerNotification();
 				}
 				else {
 					if (!isTimerRunning) {
@@ -108,6 +109,7 @@ namespace Tomado {
 						titleTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
 						
 						StartTimer(duration);
+						ShowTimerNotification();
 					}
 				}
 			};
@@ -135,9 +137,8 @@ namespace Tomado {
 			return rootView;
 		}
 
-		///helper functions to thin OnCreateView out
+		//helper functions to thin OnCreateView out
 		
-		//
 		/// <summary>
 		/// Sets local vars to bundle data.
 		/// </summary>
@@ -261,9 +262,16 @@ namespace Tomado {
 		private void StartTimer(long durationInMillis) {
 			isTimerRunning = true;
 
-			// make a new timer object
+			// make a new timer object & start timer
 			countDownTimer = new CTimer(durationInMillis, interval, OnTick, OnFinish);
 			countDownTimer.Start();
+		}
+
+		/// <summary>
+		/// Shows a notification telling user that the timer is running; persistent as long
+		/// as timer is running.
+		/// </summary>
+		private void ShowTimerNotification() {
 
 			//make intent for notification
 			Intent intent = new Intent(Activity, typeof(SwipeActivity));
@@ -274,6 +282,8 @@ namespace Tomado {
 			//publish notification
 			notificationManager.Notify(timerNotificationId, timerNotification);
 		}
+
+
 
 		/// <summary>
 		/// Initializes class variables for notification management: builder, timerNotification, & notificationManager

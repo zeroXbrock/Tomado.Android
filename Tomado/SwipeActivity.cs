@@ -22,6 +22,8 @@ namespace Tomado {
 		TimerFragment timerFragment;
 		SessionsFragment sessionsFragment;
 
+		AlarmReceiver alarmReceiver;
+
 		protected override void OnCreate(Bundle savedInstanceState) {
 			base.OnCreate(savedInstanceState);
 
@@ -30,13 +32,20 @@ namespace Tomado {
 			viewPager = FindViewById<ViewPager>(Resource.Id.viewPager);
 			var adapter = new FragmentAdapter(SupportFragmentManager);
 
+			//make fragments for swipe view
 			timerFragment = new TimerFragment(this);
 			sessionsFragment = new SessionsFragment(this);
 			
+			//add fragments to adapter
 			adapter.AddFragment(timerFragment);
 			adapter.AddFragment(sessionsFragment);
 
+			//set adapter
 			viewPager.Adapter = adapter;
+		}
+
+		protected override void OnStart() {
+			base.OnStart();
 		}
 
 		/// <summary>
