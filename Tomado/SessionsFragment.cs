@@ -366,23 +366,22 @@ namespace Tomado {
 
 			alarmIntent.PutExtra("ID", session.ID);
 			alarmIntent.PutExtra("title", session.Title);
-			alarmIntent.PutExtra("year", session.Year);
-			alarmIntent.PutExtra("month", session.MonthOfYear);
-			alarmIntent.PutExtra("day", session.DayOfMonth);
-			alarmIntent.PutExtra("hour", session.StartHour);
-			alarmIntent.PutExtra("minute", session.StartMinute);
-
-			if (session.Recurring) {
-
-			}
-			else {
-
-			}
 
 			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 0, alarmIntent, PendingIntentFlags.UpdateCurrent);
 			AlarmManager alarmManager = (AlarmManager)Activity.GetSystemService(Context.AlarmService);
+			
+			if (session.Recurring) {
+				//set recurring event
+			}
+			else {
+				//set non-recurring event for session date/time
+				DateTime now = DateTime.Now.ToUniversalTime();
+				DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0).ToUniversalTime();
+				long intervalTicks = sessionDateTime.Ticks - now.Ticks;
+				long intervalMillis = intervalTicks / TimeSpan.TicksPerMillisecond;
 
-			alarmManager.Set(AlarmType.ElapsedRealtime, SystemClock.ElapsedRealtime() + 5000, pendingIntent);
+				alarmManager.SetExact(AlarmType.RtcWakeup, Java.Lang.JavaSystem.CurrentTimeMillis() + intervalMillis, pendingIntent);//sessionDateTime.Ticks/TimeSpan.TicksPerMillisecond
+			}
 		}
 	}
 
