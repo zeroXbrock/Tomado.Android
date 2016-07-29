@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:text="Congrats!"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewCongratulationsMessage"
+        style="@style/DialogContentTextView" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout1"
+        android:gravity="right">
+        <Button
+            android:text="OK"
+            android:id="@+id/buttonOK_congrats"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            style="@android:style/Widget.Material.Button.Borderless" />
+    </LinearLayout>
+</LinearLayout>
