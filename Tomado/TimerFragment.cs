@@ -342,9 +342,10 @@ namespace Tomado {
 		/// Resets duration, timerType, shortBreaks, and fragmentSession.Pomodoros to default value.
 		/// </summary>
 		private void ResetTimerVars() {
+			remainingTimeInMillis = 0;
 			//reset timer vars to default: work mode
 			SetDuration((long)CTimer.TimerLengths.Work);
-			SetTimerType(TimerType.LongBreak);
+			SetLastTimerType(TimerType.LongBreak);
 
 			shortBreaks = 0;
 			fragmentSession.Pomodoros = 0;
@@ -387,7 +388,8 @@ namespace Tomado {
 		}
 
 		public void OnFinish() {
-			remainingTimeInMillis = 0;
+			
+			ResetTimerVars();
 
 			timerTextView.SetText("Finished", TextView.BufferType.Normal);
 
@@ -476,13 +478,13 @@ namespace Tomado {
 					shortBreaks++;
 					//short break
 					SetDuration((long)CTimer.TimerLengths.ShortBreak);
-					SetTimerType(TimerType.ShortBreak);
+					SetLastTimerType(TimerType.ShortBreak);
 				}
 				else {
 					//long break
 					shortBreaks = 0;
 					SetDuration((long)CTimer.TimerLengths.LongBreak);
-					SetTimerType(TimerType.LongBreak);
+					SetLastTimerType(TimerType.LongBreak);
 				}
 			}
 
@@ -490,7 +492,7 @@ namespace Tomado {
 			else {
 				//work
 				SetDuration((long)CTimer.TimerLengths.Work);
-				SetTimerType(TimerType.Work);
+				SetLastTimerType(TimerType.Work);
 			}
 		}
 
@@ -498,7 +500,7 @@ namespace Tomado {
 		/// Sets the class timer's type.
 		/// </summary>
 		/// <param name="type"></param>
-		private void SetTimerType(TimerType type) {
+		private void SetLastTimerType(TimerType type) {
 			lastTimerType = type;
 		}
 
