@@ -22,12 +22,30 @@
         android:layout_height="wrap_content"
         android:id="@+id/buttonNewSession" />
   -->
-    <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/buttonNewSession"
+  <RelativeLayout
+	xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_gravity="bottom|right"
+	android:layout_marginBottom="12dp"
+        android:layout_marginRight="16dp">
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/menu_newSession"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
-        android:layout_marginBottom="12dp"
-        android:layout_marginRight="16dp"
-        app:fab_elevationCompat="4dp" />
+        app:fab_elevationCompat="4dp">
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/buttonSearchFreeTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_elevationCompat="4dp" />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/buttonNewSession"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_elevationCompat="4dp" />
+    </com.github.clans.fab.FloatingActionMenu>
+  </RelativeLayout>
 </FrameLayout>

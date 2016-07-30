@@ -29,7 +29,8 @@ namespace Tomado {
 	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.OnGetNewSessionListener, SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener {
 		//view instasnces
 		ListView listViewSessions;
-		FloatingActionButton newSessionButton;
+		FloatingActionButton newSessionButton, searchButton;
+		FloatingActionMenu newSessionMenu;
 
 		//listener to send click event back to activity
 		SessionAdapter.SessionClickListener sessionClickListener;
@@ -82,15 +83,26 @@ namespace Tomado {
 			//get view instances
 			listViewSessions = rootView.FindViewById<ListView>(Resource.Id.listViewSessions);
 			newSessionButton = rootView.FindViewById<FloatingActionButton>(Resource.Id.buttonNewSession);
+			newSessionMenu = rootView.FindViewById<FloatingActionMenu>(Resource.Id.menu_newSession);
+			searchButton = rootView.FindViewById<FloatingActionButton>(Resource.Id.buttonSearchFreeTime);
 			
 			//add plus icon to button
 			newSessionButton.SetImageResource(Resource.Drawable.ic_add_white_24dp);
+			newSessionButton.LabelText = "New Session";
 
 			newSessionButton.Click += delegate {
 				//open new session dialog fragment (TODO: implement dialog fragment)
 				NewSessionFragment fragment = new NewSessionFragment();
 				ShowNewSessionDialog();
 			};
+
+			searchButton.SetImageResource(Resource.Drawable.ic_search_white_24dp);
+			searchButton.LabelText = "Search for free time";
+
+			searchButton.Click += delegate {
+
+			};
+			//newSessionMenu.AddMenuButton(newSessionButton);
 
 			//modify layout views
 			LoadSessionsFromDatabase().ContinueWith(t => {
