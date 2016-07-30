@@ -22,6 +22,8 @@ namespace Tomado {
 		TimerFragment timerFragment;
 		SessionsFragment sessionsFragment;
 
+		AlarmReceiver alarmReceiver;
+
 		protected override void OnCreate(Bundle savedInstanceState) {
 			base.OnCreate(savedInstanceState);
 
@@ -30,13 +32,44 @@ namespace Tomado {
 			viewPager = FindViewById<ViewPager>(Resource.Id.viewPager);
 			var adapter = new FragmentAdapter(SupportFragmentManager);
 
+			//make fragments for swipe view
 			timerFragment = new TimerFragment(this);
 			sessionsFragment = new SessionsFragment(this);
 			
+			//add fragments to adapter
 			adapter.AddFragment(timerFragment);
 			adapter.AddFragment(sessionsFragment);
 
+			//set adapter
 			viewPager.Adapter = adapter;
+		}
+
+		protected override void OnStart() {
+			base.OnStart();
+		}
+
+		protected override void OnNewIntent(Intent intent) {
+			base.OnNewIntent(intent);
+
+			//check for ID; this means the activity is being started from a notification
+			if (intent.GetIntExtra("ID", 0) > 0) {
+				//get ID from extras
+				int ID = intent.GetIntExtra("ID", 0);
+
+				Session _session = new Session();
+
+				//find matching session from list
+				foreach (var session in sessionsFragment.Sessions) {
+					if (session.ID == ID)
+						_session = session;
+				}
+
+				//populate timer vars w/ our session var
+				timerFragment.OnNewTimer(_session);
+
+				//switch view to timer
+				SetVisibleFragment(0);
+			}
 		}
 
 		/// <summary>

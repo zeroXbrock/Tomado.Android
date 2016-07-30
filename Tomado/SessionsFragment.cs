@@ -136,6 +136,14 @@ namespace Tomado {
 
 			//update the database
 			SaveSessionToDatabase(session);
+
+			//get correct database ID for the notification
+			LoadSessionsFromDatabase().ContinueWith(t => {
+				session = _sessions[_sessions.Count - 1];
+
+				//schedule the notification
+				ScheduleSessionNotification(session);
+			});
 		}
 		
 		/// <summary>
@@ -215,14 +223,6 @@ namespace Tomado {
 		}
 
 		/// <summary>
-		/// Deletes a session from the class session list (& listview) and the database
-		/// </summary>
-		private async void DeleteSessionFromDatabase(Session session) {
-			//remove session from database
-			await connection.DeleteAsync(session);
-		}
-
-		/// <summary>
 		/// Remove session from class sessions list
 		/// </summary>
 		/// <param name="session"></param>
@@ -230,7 +230,6 @@ namespace Tomado {
 			//remove session from class sessions list
 			_sessions.Remove(session);
 		}
-
 
 
 		/// <summary>
@@ -268,6 +267,7 @@ namespace Tomado {
 			return cursor;
 		}
 
+		#region database methods
 		/// <summary>
 		/// Asynchronously saves a new session to the database.
 		/// </summary>
@@ -277,6 +277,13 @@ namespace Tomado {
 			var result = await insertUpdateData(session);
 		}
 
+		/// <summary>
+		/// Deletes a session from the class session list (& listview) and the database
+		/// </summary>
+		private async void DeleteSessionFromDatabase(Session session) {
+			//remove session from database
+			await connection.DeleteAsync(session);
+		}
 
 		/// <summary>
 		/// Asynchronously loads sessions from database to class sessions list. Result should be obtained with [result].ContinueWith(...).
@@ -353,6 +360,35 @@ namespace Tomado {
 			}
 			catch {
 				return null;
+			}
+		}
+		#endregion
+
+		/// <summary>
+		/// Schedules a notification to launch in the future; to open a session from
+		/// </summary>
+		/// <param name="session"></param>
+		public async void ScheduleSessionNotification(Session session) {
+			Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
+			
+			alarmIntent.PutExtra("ID", session.ID);
+			alarmIntent.PutExtra("title", "Tomado");
+			alarmIntent.PutExtra("content", session.Title);
+
+			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 0, alarmIntent, PendingIntentFlags.UpdateCurrent);
+			AlarmManager alarmManager = (AlarmManager)Activity.GetSystemService(Context.AlarmService);
+			
+			if (session.Recurring) {
+				//set recurring event
+			}
+			else {
+				//set non-recurring event for session date/time
+				DateTime now = DateTime.Now.ToUniversalTime();
+				DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0).ToUniversalTime();
+				long intervalTicks = sessionDateTime.Ticks - now.Ticks;
+				long intervalMillis = intervalTicks / TimeSpan.TicksPerMillisecond;
+
+				alarmManager.SetExact(AlarmType.RtcWakeup, Java.Lang.JavaSystem.CurrentTimeMillis() + intervalMillis, pendingIntent);//sessionDateTime.Ticks/TimeSpan.TicksPerMillisecond
 			}
 		}
 	}
