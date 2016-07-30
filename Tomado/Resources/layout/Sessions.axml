@@ -36,16 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         app:fab_elevationCompat="4dp">
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/buttonSearchFreeTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fab_elevationCompat="4dp" />
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/buttonNewSession"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fab_elevationCompat="4dp" />
+        
     </com.github.clans.fab.FloatingActionMenu>
   </RelativeLayout>
 </FrameLayout>
