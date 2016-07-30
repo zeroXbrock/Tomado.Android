@@ -314,6 +314,10 @@ namespace Tomado {
 			timerNotification = builder.Build();
 
 			notificationManager.Notify(timerNotificationId, timerNotification);
+
+			if (finished && this.View.IsShown) {
+				notificationManager.Cancel(timerNotificationId);
+			}
 		}
 
 		/// <summary>
