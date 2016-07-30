@@ -130,13 +130,20 @@ namespace Tomado {
 		public void OnAddNewSession(DateTime dateTime, string title, bool recurring) {
 			//Add the session to _sessions list.
 			Session session = AddSession(1, dateTime, title, recurring);
-			ScheduleSessionNotification(session);
 
 			//reset the listview adapter
 			ResetListViewAdapter();
 
 			//update the database
 			SaveSessionToDatabase(session);
+
+			//get correct database ID for the notification
+			LoadSessionsFromDatabase().ContinueWith(t => {
+				session = _sessions[_sessions.Count - 1];
+
+				//schedule the notification
+				ScheduleSessionNotification(session);
+			});
 		}
 		
 		/// <summary>
@@ -363,15 +370,8 @@ namespace Tomado {
 		/// <param name="session"></param>
 		public async void ScheduleSessionNotification(Session session) {
 			Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
-			int ID = 0;
-
-			//reload DB to get real ID
-			await LoadSessionsFromDatabase().ContinueWith(t => {
-				//get the right ID; should be at end of sessions list
-				ID = _sessions[_sessions.Count - 1].ID;
-			});
 			
-			alarmIntent.PutExtra("ID", ID);
+			alarmIntent.PutExtra("ID", session.ID);
 			alarmIntent.PutExtra("title", "Tomado");
 			alarmIntent.PutExtra("content", session.Title);
 

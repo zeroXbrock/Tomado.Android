@@ -53,22 +53,22 @@ namespace Tomado {
 
 			//check for ID; this means the activity is being started from a notification
 			if (intent.GetIntExtra("ID", 0) > 0) {
+				//get ID from extras
 				int ID = intent.GetIntExtra("ID", 0);
 
-				//start timerfragment with this session
-				Session session = new Session();
-				
-				//get session object with matching ID
-				for (int i = 0; i < sessionsFragment.Sessions.Count; i++) {
-					if (sessionsFragment.Sessions[i].ID == ID) {
-						session = sessionsFragment.Sessions[i];
-						break;
-					}
+				Session _session = new Session();
+
+				//find matching session from list
+				foreach (var session in sessionsFragment.Sessions) {
+					if (session.ID == ID)
+						_session = session;
 				}
 
-				//populate timer vars
-				//timerFragment.OnNewTimer(session);
+				//populate timer vars w/ our session var
+				timerFragment.OnNewTimer(_session);
 
+				//switch view to timer
+				SetVisibleFragment(0);
 			}
 		}
 
