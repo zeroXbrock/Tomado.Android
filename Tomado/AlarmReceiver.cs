@@ -20,6 +20,8 @@ namespace Tomado {
 			var content = intent.GetStringExtra("content");
 
 			var appIntent = new Intent(context, typeof(SwipeActivity));
+			appIntent.PutExtra("ID", ID);
+
 			var contentIntent = PendingIntent.GetActivity(context, 0, appIntent, PendingIntentFlags.CancelCurrent);
 			var manager = NotificationManager.FromContext(context);
 

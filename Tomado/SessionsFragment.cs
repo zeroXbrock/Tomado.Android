@@ -361,11 +361,19 @@ namespace Tomado {
 		/// Schedules a notification to launch in the future; to open a session from
 		/// </summary>
 		/// <param name="session"></param>
-		public void ScheduleSessionNotification(Session session) {
+		public async void ScheduleSessionNotification(Session session) {
 			Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
+			int ID = 0;
 
-			alarmIntent.PutExtra("ID", session.ID);
-			alarmIntent.PutExtra("title", session.Title);
+			//reload DB to get real ID
+			await LoadSessionsFromDatabase().ContinueWith(t => {
+				//get the right ID; should be at end of sessions list
+				ID = _sessions[_sessions.Count - 1].ID;
+			});
+			
+			alarmIntent.PutExtra("ID", ID);
+			alarmIntent.PutExtra("title", "Tomado");
+			alarmIntent.PutExtra("content", session.Title);
 
 			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 0, alarmIntent, PendingIntentFlags.UpdateCurrent);
 			AlarmManager alarmManager = (AlarmManager)Activity.GetSystemService(Context.AlarmService);

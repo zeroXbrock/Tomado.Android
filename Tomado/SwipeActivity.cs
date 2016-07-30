@@ -48,6 +48,30 @@ namespace Tomado {
 			base.OnStart();
 		}
 
+		protected override void OnNewIntent(Intent intent) {
+			base.OnNewIntent(intent);
+
+			//check for ID; this means the activity is being started from a notification
+			if (intent.GetIntExtra("ID", 0) > 0) {
+				int ID = intent.GetIntExtra("ID", 0);
+
+				//start timerfragment with this session
+				Session session = new Session();
+				
+				//get session object with matching ID
+				for (int i = 0; i < sessionsFragment.Sessions.Count; i++) {
+					if (sessionsFragment.Sessions[i].ID == ID) {
+						session = sessionsFragment.Sessions[i];
+						break;
+					}
+				}
+
+				//populate timer vars
+				//timerFragment.OnNewTimer(session);
+
+			}
+		}
+
 		/// <summary>
 		/// Sets the visible fragment in the viewpager based on index.
 		/// </summary>

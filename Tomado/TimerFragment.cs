@@ -317,13 +317,15 @@ namespace Tomado {
 		/// <param name="info"></param>
 		/// <param name="finished"></param>
 		private void UpdateTimerNotification(string info, bool finished) {
-			builder.SetContentText(info)
-				.SetOngoing(!finished)
-				.SetAutoCancel(finished);
-			
-			timerNotification = builder.Build();
+			if (builder != null) {
+				builder.SetContentText(info)
+					.SetOngoing(!finished)
+					.SetAutoCancel(finished);
 
-			notificationManager.Notify(timerNotificationId, timerNotification);
+				timerNotification = builder.Build();
+
+				notificationManager.Notify(timerNotificationId, timerNotification);
+			}
 		}
 
 		/// <summary>
