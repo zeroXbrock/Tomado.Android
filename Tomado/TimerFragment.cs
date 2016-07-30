@@ -307,16 +307,18 @@ namespace Tomado {
 		/// <param name="info"></param>
 		/// <param name="finished"></param>
 		private void UpdateTimerNotification(string info, bool finished) {
-			builder.SetContentText(info)
-				.SetOngoing(!finished)
-				.SetAutoCancel(finished);
-			
-			timerNotification = builder.Build();
+			if (builder != null) {
+				builder.SetContentText(info)
+					.SetOngoing(!finished)
+					.SetAutoCancel(finished);
 
-			notificationManager.Notify(timerNotificationId, timerNotification);
+				timerNotification = builder.Build();
 
-			if (finished && this.View.IsShown) {
-				notificationManager.Cancel(timerNotificationId);
+				notificationManager.Notify(timerNotificationId, timerNotification);
+
+				if (finished && this.View.IsShown) {
+					notificationManager.Cancel(timerNotificationId);
+				}
 			}
 		}
 
@@ -386,6 +388,10 @@ namespace Tomado {
 			isTimerRunning = false;
 
 			UpdateTimerNotification("Finished", true);
+
+			Session session = new Session();
+			session.Title = "Task";
+			SetFragmentSession(session);
 		}
 
 		public void OnNewTimer(Session session) {
