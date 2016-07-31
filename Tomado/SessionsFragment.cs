@@ -14,6 +14,7 @@ using Android.Views;
 using Android.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.View;
+using Android.Support.V4.Widget;
 using Android.Util;
 
 using Clans.Fab; //floating buttons
@@ -26,11 +27,12 @@ namespace Tomado {
 	/// <summary>
 	/// Fragment that display a list of Sessions.
 	/// </summary>
-	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.OnGetNewSessionListener, SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener {
+	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.OnGetNewSessionListener, SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener{
 		//view instasnces
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
 		FloatingActionMenu newSessionMenu;
+		SwipeRefreshLayout swipeRefreshLayout;
 
 		//listener to send click event back to activity
 		SessionAdapter.SessionClickListener sessionClickListener;
@@ -83,6 +85,7 @@ namespace Tomado {
 			//get view instances
 			listViewSessions = rootView.FindViewById<ListView>(Resource.Id.listViewSessions);
 			newSessionMenu = rootView.FindViewById<FloatingActionMenu>(Resource.Id.menu_newSession);
+			swipeRefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.SwipeRefreshLayout_Sessions);
 
 			newSessionButton = new FloatingActionButton(Activity);
 			newSessionButton.SetImageResource(Resource.Drawable.ic_add_white_24dp);
@@ -103,8 +106,11 @@ namespace Tomado {
 			};
 			newSessionMenu.AddMenuButton(searchButton);
 			newSessionMenu.AddMenuButton(newSessionButton);
-			
-			//modify layout views
+
+			//swipeRefreshLayout.SetOnRefreshListener(this);
+			swipeRefreshLayout.Refresh += OnRefresh;
+
+			//get sessions from database and update listView
 			LoadSessionsFromDatabase().ContinueWith(t => {
 				Activity.RunOnUiThread(() => { ResetListViewAdapter(); });
 			});
@@ -187,6 +193,12 @@ namespace Tomado {
 			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this);
 		}
 
+		public async void OnRefresh(object sender, EventArgs e) {
+			//load sessions from database
+			await LoadSessionsFromDatabase();
+			Activity.RunOnUiThread(() => { ResetListViewAdapter(); });
+			swipeRefreshLayout.Refreshing = false;
+		}
 
 		//TODO: Implement me
 		/// <summary>
