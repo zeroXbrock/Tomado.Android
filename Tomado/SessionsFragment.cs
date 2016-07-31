@@ -27,7 +27,7 @@ namespace Tomado {
 	/// <summary>
 	/// Fragment that display a list of Sessions.
 	/// </summary>
-	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.OnGetNewSessionListener, SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener{
+	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.GetNewSessionListener, SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, FreeTimeFragment.GetNewFreeTimeListener {
 		//view instasnces
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
@@ -37,8 +37,7 @@ namespace Tomado {
 		//listener to send click event back to activity
 		SessionAdapter.SessionClickListener sessionClickListener;
 
-		//calendar location
-		Android.Net.Uri calendarsUri;
+		
 		
 		//private sessions list for listview
 		List<Session> _sessions;
@@ -96,14 +95,15 @@ namespace Tomado {
 			searchButton.LabelText = "Find free time";
 
 			newSessionButton.Click += delegate {
-				//open new session dialog fragment (TODO: implement dialog fragment)
-				NewSessionFragment fragment = new NewSessionFragment();
+				//open new session dialog fragment
+				//NewSessionFragment fragment = new NewSessionFragment();
 				ShowNewSessionDialog();
 			};
 
 			searchButton.Click += delegate {
-
+				ShowFreeTimeDialog();
 			};
+
 			newSessionMenu.AddMenuButton(searchButton);
 			newSessionMenu.AddMenuButton(newSessionButton);
 
@@ -113,8 +113,7 @@ namespace Tomado {
 			//get sessions from database and update listView
 			LoadSessionsFromDatabase().ContinueWith(t => {
 				Activity.RunOnUiThread(() => { ResetListViewAdapter(); });
-			});
-			
+			});			
 
 			//return the inflated/modified base layout
 			return rootView;
@@ -163,11 +162,19 @@ namespace Tomado {
 				ScheduleSessionNotification(session);
 			});
 		}
+
+		private void OnAddNewSession(Session session) {
+			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
+			string title = session.Title;
+			bool recurring = session.Recurring;
+
+			OnAddNewSession(dateTime, title, recurring);
+		}
 		
 		/// <summary>
 		/// Shows a NewSessionDialog fragment above the current view.
 		/// </summary>
-		void ShowNewSessionDialog() {
+		private void ShowNewSessionDialog() {
 			Android.Support.V4.App.FragmentTransaction ft = FragmentManager.BeginTransaction();
 			
 			//some code to remove any existing dialogs
@@ -187,12 +194,39 @@ namespace Tomado {
 		}
 
 		/// <summary>
+		/// Opens a new free time dialog.
+		/// </summary>
+		private void ShowFreeTimeDialog() {
+			Android.Support.V4.App.FragmentTransaction ft = FragmentManager.BeginTransaction();
+
+			//some code to remove any existing dialogs
+			Android.Support.V4.App.Fragment prev = FragmentManager.FindFragmentByTag("dialog");
+			if (prev != null) {
+				ft.Remove(prev);
+			}
+
+			ft.AddToBackStack(null);
+
+			//create and show dialog
+			FreeTimeFragment dialog = new FreeTimeFragment(this);
+			
+			dialog.SetTargetFragment(this, 0);
+
+			dialog.Show(FragmentManager, "dialog");
+		}
+
+		/// <summary>
 		/// Populate class listview with sessions.
 		/// </summary>
 		private void ResetListViewAdapter() {
 			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this);
 		}
 
+		/// <summary>
+		/// Handler for SwipeRefreshView
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		public async void OnRefresh(object sender, EventArgs e) {
 			//load sessions from database
 			await LoadSessionsFromDatabase();
@@ -200,21 +234,8 @@ namespace Tomado {
 			swipeRefreshLayout.Refreshing = false;
 		}
 
-		//TODO: Implement me
-		/// <summary>
-		/// Returns a list of sessions gathered from a free time analysis of the calendar.
-		/// </summary>
-		/// <returns></returns>
-		private List<Session> GetFreeTimeSessions() {
-			List<Session> freeTimeSessions = new List<Session>();
-			var cursor = getCalendarICursor();
-
-			//iterate through calendar
-
-			//populate list
-
-			//return list
-			return freeTimeSessions;
+		public void OnGetNewFreeTime(Session session) {
+			OnAddNewSession(session);
 		}
 
 		/// <summary>
@@ -253,43 +274,7 @@ namespace Tomado {
 		void DeleteSession(Session session) {
 			//remove session from class sessions list
 			_sessions.Remove(session);
-		}
-
-
-		/// <summary>
-		/// Returns cursor made to browse calendar events.
-		/// </summary>
-		/// <returns></returns>
-		private ICursor getCalendarICursor() {
-			// Get calendar contract
-			calendarsUri = CalendarContract.Events.ContentUri;
-			
-			///This chunk of code displays all calendars on the phone in a list
-			//List the fields you want to use
-			string[] calendarsProjection = {
-											    CalendarContract.Events.InterfaceConsts.Id,
-												CalendarContract.EventsColumns.Title,
-												CalendarContract.Events.InterfaceConsts.Dtstart,
-												CalendarContract.Events.InterfaceConsts.Dtend
-										   };
-			//list the fields you wanna display
-			string[] sourceColumns = {
-										 CalendarContract.EventsColumns.Title,
-										 CalendarContract.Events.InterfaceConsts.Dtstart,
-										 CalendarContract.Events.InterfaceConsts.Dtend
-									 };
-			//list the views you're gonna display your info with
-			int[] targetResources = {
-										Resource.Id.evTitle,
-										Resource.Id.evTime
-									};
-
-			//get a cursor to browse calendar events
-			var loader = new CursorLoader(Activity, calendarsUri, calendarsProjection, null, null, null);
-			var cursor = (ICursor)loader.LoadInBackground(); //runs asynch
-
-			return cursor;
-		}
+		}		
 
 		#region database methods
 		/// <summary>

@@ -69,6 +69,8 @@
     <Compile Include="CongratulationsFragment.cs" />
     <Compile Include="CTimer.cs" />
     <Compile Include="FragmentAdapter.cs" />
+    <Compile Include="FreeTimeAdapter.cs" />
+    <Compile Include="FreeTimeFragment.cs" />
     <Compile Include="NewSessionFragment.cs" />
     <Compile Include="Session.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
@@ -98,6 +100,12 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\CongratulationsDialog.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\FreeTimeDialog.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\FreeTimeListItem.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

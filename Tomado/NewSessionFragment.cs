@@ -18,7 +18,7 @@ namespace Tomado {
 	/// Fragment that contains dialogs for user to create a new Session.
 	/// </summary>
 	public class NewSessionFragment :  Android.Support.V4.App.DialogFragment, DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener {
-		private OnGetNewSessionListener onGetNewSessionListener;
+		private GetNewSessionListener onGetNewSessionListener;
 		
 		//view instances
 		Button saveButton, cancelButton;
@@ -31,7 +31,7 @@ namespace Tomado {
 		string _title;
 		bool recurring;
 		
-		public interface OnGetNewSessionListener{
+		public interface GetNewSessionListener{
 			void OnAddNewSession(DateTime dateTime, string title, bool recurring);
 		}
 
@@ -47,7 +47,7 @@ namespace Tomado {
 
 			//instantiate listener
 			try {
-				onGetNewSessionListener = (OnGetNewSessionListener)TargetFragment;
+				onGetNewSessionListener = (GetNewSessionListener)TargetFragment;
 			}
 			catch (Exception e) {
 				Log.Debug("OnGetNewSessionListener cast exception", e.Message);
