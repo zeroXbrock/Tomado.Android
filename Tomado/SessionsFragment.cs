@@ -27,7 +27,7 @@ namespace Tomado {
 	/// <summary>
 	/// Fragment that display a list of Sessions.
 	/// </summary>
-	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.OnGetNewSessionListener, SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener{
+	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.GetNewSessionListener, SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, FreeTimeFragment.GetNewFreeTimeListener {
 		//view instasnces
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
@@ -162,6 +162,14 @@ namespace Tomado {
 				ScheduleSessionNotification(session);
 			});
 		}
+
+		private void OnAddNewSession(Session session) {
+			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
+			string title = session.Title;
+			bool recurring = session.Recurring;
+
+			OnAddNewSession(dateTime, title, recurring);
+		}
 		
 		/// <summary>
 		/// Shows a NewSessionDialog fragment above the current view.
@@ -200,7 +208,7 @@ namespace Tomado {
 			ft.AddToBackStack(null);
 
 			//create and show dialog
-			FreeTimeFragment dialog = new FreeTimeFragment();
+			FreeTimeFragment dialog = new FreeTimeFragment(this);
 			
 			dialog.SetTargetFragment(this, 0);
 
@@ -224,6 +232,10 @@ namespace Tomado {
 			await LoadSessionsFromDatabase();
 			Activity.RunOnUiThread(() => { ResetListViewAdapter(); });
 			swipeRefreshLayout.Refreshing = false;
+		}
+
+		public void OnGetNewFreeTime(Session session) {
+			OnAddNewSession(session);
 		}
 
 		/// <summary>

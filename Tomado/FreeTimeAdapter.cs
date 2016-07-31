@@ -11,22 +11,22 @@ using Android.Views;
 using Android.Widget;
 
 namespace Tomado {
-	public class FreeTimeAdapter : BaseAdapter<Session> {
+	public class FreeTimeAdapter : BaseAdapter<FreeTime> {
 		SessionAdapter.SessionClickListener sessionClickListener;
 		Activity context;
-		List<Session> freetime;
-		int durationHours, durationMinutes;
+		List<FreeTime> freetime;
+		long durationHours, durationMinutes;
 		LinearLayout freeTimeListItem;
 
 		public FreeTimeAdapter() { }
 
-		public FreeTimeAdapter(Activity context, List<Session> freetime, SessionAdapter.SessionClickListener sessionClickListener) {
+		public FreeTimeAdapter(Activity context, List<FreeTime> freetime, SessionAdapter.SessionClickListener sessionClickListener) {
 			this.sessionClickListener = sessionClickListener;
 			this.freetime = freetime;
 			this.context = context;
 		}
 
-		public override Session this[int position] {
+		public override FreeTime this[int position] {
 			get { return freetime[position]; }
 		}
 
@@ -49,24 +49,45 @@ namespace Tomado {
 			TextView textViewDuration = view.FindViewById<TextView>(Resource.Id.textViewDuration);
 			freeTimeListItem = view.FindViewById<LinearLayout>(Resource.Id.freeTimeListItem);
 
-			Session freeTimeSession = freetime[position];
+			FreeTime ft = freetime[position];
 
-			int year = freeTimeSession.Year;
-			int month = freeTimeSession.MonthOfYear;
-			int day = freeTimeSession.DayOfMonth;
-			int hour = freeTimeSession.StartHour;
-			int minute = freeTimeSession.StartMinute;
+			DateTime time = ft.Start;
+			long durationInTicks = (ft.End.Ticks - ft.Start.Ticks);
+			durationHours = durationInTicks / TimeSpan.TicksPerHour;
+			durationMinutes = (durationInTicks - (durationHours * TimeSpan.TicksPerHour)) / TimeSpan.TicksPerMinute;
 
-			DateTime time = new DateTime(year, month, day, hour, minute, 0);
+			Session freeTimeSession = new Session(1, time, "New Session", false);
 			
 			textViewTime.Text = time.ToShortTimeString();
-			textViewDuration.Text = durationHours + ":" + durationMinutes;
+			textViewDuration.Text = durationHours + " hours and " + durationMinutes + " minutes";
 
 			freeTimeListItem.Click += delegate {
 				sessionClickListener.OnSessionClick(freeTimeSession);
 			};
 
 			return view;
+		}
+	}
+
+	public struct FreeTime {
+		private DateTime start;
+		private DateTime end;
+
+		public DateTime Start {
+			get {
+				return start;
+			}
+			set {
+				start = value;
+			}
+		}
+		public DateTime End {
+			get {
+				return end;
+			}
+			set {
+				end = value;
+			}
 		}
 	}
 }

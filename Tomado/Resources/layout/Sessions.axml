@@ -7,41 +7,31 @@
     android:layout_height="match_parent"
     android:minWidth="25px"
     android:minHeight="25px">
-  <android.support.v4.widget.SwipeRefreshLayout
-	android:id="@+id/SwipeRefreshLayout_Sessions"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content">
-    <ListView
-        android:minWidth="25px"
-        android:minHeight="25px"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/SwipeRefreshLayout_Sessions"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/listViewSessions"
-        android:layout_marginBottom="0.0dp"
-        android:paddingBottom="10dp" />
-  </android.support.v4.widget.SwipeRefreshLayout>
-<!--
-    <Button
-        android:text="New Session"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/buttonNewSession" />
-  -->
-  <RelativeLayout
-	xmlns:fab="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="wrap_content"
-	android:layout_height="wrap_content"
-	android:layout_gravity="bottom|right"
-	android:layout_marginBottom="12dp"
-        android:layout_marginRight="16dp">
-    <com.github.clans.fab.FloatingActionMenu
-        android:id="@+id/menu_newSession"
+        android:layout_height="wrap_content">
+        <ListView
+            android:minWidth="25px"
+            android:minHeight="25px"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/listViewSessions"
+            android:layout_marginBottom="0.0dp"
+            android:paddingBottom="10dp" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
-        app:fab_elevationCompat="4dp">
-        
-    </com.github.clans.fab.FloatingActionMenu>
-  </RelativeLayout>
+        android:layout_marginBottom="12dp"
+        android:layout_marginRight="16dp">
+        <com.github.clans.fab.FloatingActionMenu
+            android:id="@+id/menu_newSession"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            app:fab_elevationCompat="4dp" />
+    </RelativeLayout>
 </FrameLayout>
