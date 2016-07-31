@@ -2,4 +2,5 @@
 
 <resources>
   <color name="base_app_color">#ef5350</color>
+  <color name="base_app_complementary_color">#ff00e676</color>
 </resources>

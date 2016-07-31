@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Database;
+using Android.Graphics.Drawables;
+using Android.Graphics;
 using Android.OS;
 using Android.Provider;
 using Android.Runtime;
@@ -111,6 +113,7 @@ namespace Tomado {
 				ShowFreeTimeDialog();
 			};
 
+			newSessionMenu.SetMenuButtonColorNormalResId(Resource.Color.base_app_complementary_color);
 
 			newSessionMenu.AddMenuButton(searchButton);
 			newSessionMenu.AddMenuButton(newSessionButton);

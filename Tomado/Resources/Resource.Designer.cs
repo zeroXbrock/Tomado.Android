@@ -255,6 +255,9 @@ namespace Tomado
 			// aapt resource value: 0x7f070000
 			public const int base_app_color = 2131165184;
 			
+			// aapt resource value: 0x7f070001
+			public const int base_app_complementary_color = 2131165185;
+			
 			static Color()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
