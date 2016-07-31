@@ -126,9 +126,13 @@ namespace Tomado {
 				//open congrats dialog
 				ShowCongratsDialog(fragmentSession);
 
-				ResetTimer();
-
 				timerFinishListener.OnTimerFinish(fragmentSession);
+
+				Session session = new Session();
+				session.Title = "Task";
+				SetFragmentSession(session);
+
+				ResetTimer();
 			};
 			#endregion
 
@@ -338,6 +342,8 @@ namespace Tomado {
 		private void ResetTimerVars() {
 			//reset timer vars to default: work mode
 			SetDuration((long)CTimer.TimerLengths.Work);
+			remainingTimeInMillis = duration;
+			
 			SetTimerType(TimerType.LongBreak);
 
 			shortBreaks = 0;
@@ -380,6 +386,7 @@ namespace Tomado {
 			}
 		}
 
+		//Called when timer finishes; not when session finishes
 		public void OnFinish() {
 			remainingTimeInMillis = 0;
 
@@ -388,10 +395,6 @@ namespace Tomado {
 			isTimerRunning = false;
 
 			UpdateTimerNotification("Finished", true);
-
-			Session session = new Session();
-			session.Title = "Task";
-			SetFragmentSession(session);
 		}
 
 		public void OnNewTimer(Session session) {

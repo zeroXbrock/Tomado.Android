@@ -11,18 +11,19 @@ using Android.Views;
 using Android.Widget;
 using Android.Support.V4.App;
 using Android.Support.V4.View;
+using Android.Graphics;
+using Android.Graphics.Drawables;
 
 namespace Tomado {
 	/// <summary>
 	/// Activity that holds multiple fragments that can be swiped through.
 	/// </summary>
 	[Activity(MainLauncher = true, Icon = "@drawable/icon", LaunchMode=Android.Content.PM.LaunchMode.SingleTop)]
-	class SwipeActivity : FragmentActivity, SessionAdapter.SessionClickListener, TimerFragment.TimerFinishListener {
+	class SwipeActivity : FragmentActivity, SessionAdapter.SessionClickListener, TimerFragment.TimerFinishListener, View.IOnClickListener {
 		ViewPager viewPager;
 		TimerFragment timerFragment;
 		SessionsFragment sessionsFragment;
-
-		AlarmReceiver alarmReceiver;
+		ActionBar actionBar;
 
 		protected override void OnCreate(Bundle savedInstanceState) {
 			base.OnCreate(savedInstanceState);
@@ -31,11 +32,15 @@ namespace Tomado {
 
 			viewPager = FindViewById<ViewPager>(Resource.Id.viewPager);
 			var adapter = new FragmentAdapter(SupportFragmentManager);
+			ActionBar.SetBackgroundDrawable(new ColorDrawable(Color.ParseColor("#ff00e676")));
 
 			//make fragments for swipe view
 			timerFragment = new TimerFragment(this);
 			sessionsFragment = new SessionsFragment(this);
-			
+
+			//timerFragment.View.SetBackgroundDrawable()
+			//timerFragment.View.SetBackgroundColor(Resource.Color.base_app_color);
+
 			//add fragments to adapter
 			adapter.AddFragment(timerFragment);
 			adapter.AddFragment(sessionsFragment);
@@ -46,6 +51,10 @@ namespace Tomado {
 
 		protected override void OnStart() {
 			base.OnStart();
+		}
+
+		public void OnClick(View v) {
+			sessionsFragment.OnTouch(v);
 		}
 
 		protected override void OnNewIntent(Intent intent) {

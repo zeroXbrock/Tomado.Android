@@ -20,9 +20,6 @@ namespace Tomado {
 
 		List<FreeTime> freeTime;
 
-		int durationHours = 0;
-		int durationMinutes = 0;
-
 		public FreeTimeFragment(GetNewFreeTimeListener getNewFreeTimeListener) {
 			this.getNewFreeTimeListener = getNewFreeTimeListener;
 		}

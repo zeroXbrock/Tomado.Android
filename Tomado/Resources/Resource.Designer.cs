@@ -249,6 +249,22 @@ namespace Tomado
 			}
 		}
 		
+		public partial class Color
+		{
+			
+			// aapt resource value: 0x7f070000
+			public const int base_app_color = 2131165184;
+			
+			static Color()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Color()
+			{
+			}
+		}
+		
 		public partial class Dimension
 		{
 			
@@ -478,20 +494,20 @@ namespace Tomado
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f070001
-			public const int ApplicationName = 2131165185;
+			// aapt resource value: 0x7f080001
+			public const int ApplicationName = 2131230721;
 			
-			// aapt resource value: 0x7f070002
-			public const int ButtonText_pause = 2131165186;
+			// aapt resource value: 0x7f080002
+			public const int ButtonText_pause = 2131230722;
 			
-			// aapt resource value: 0x7f070003
-			public const int ButtonText_work = 2131165187;
+			// aapt resource value: 0x7f080003
+			public const int ButtonText_work = 2131230723;
 			
-			// aapt resource value: 0x7f070004
-			public const int Finished = 2131165188;
+			// aapt resource value: 0x7f080004
+			public const int Finished = 2131230724;
 			
-			// aapt resource value: 0x7f070000
-			public const int PackageName = 2131165184;
+			// aapt resource value: 0x7f080000
+			public const int PackageName = 2131230720;
 			
 			static String()
 			{
@@ -506,11 +522,11 @@ namespace Tomado
 		public partial class Style
 		{
 			
-			// aapt resource value: 0x7f080001
-			public const int DialogContentEditText = 2131230721;
+			// aapt resource value: 0x7f090001
+			public const int DialogContentEditText = 2131296257;
 			
-			// aapt resource value: 0x7f080000
-			public const int DialogContentTextView = 2131230720;
+			// aapt resource value: 0x7f090000
+			public const int DialogContentTextView = 2131296256;
 			
 			static Style()
 			{

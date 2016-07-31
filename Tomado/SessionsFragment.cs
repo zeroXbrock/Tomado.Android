@@ -27,7 +27,8 @@ namespace Tomado {
 	/// <summary>
 	/// Fragment that display a list of Sessions.
 	/// </summary>
-	public class SessionsFragment : Android.Support.V4.App.Fragment, NewSessionFragment.GetNewSessionListener, SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, FreeTimeFragment.GetNewFreeTimeListener {
+	public class SessionsFragment : Android.Support.V4.App.Fragment, FreeTimeFragment.GetNewFreeTimeListener, NewSessionFragment.GetNewSessionListener, 
+									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener {
 		//view instasnces
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
@@ -37,7 +38,6 @@ namespace Tomado {
 		//listener to send click event back to activity
 		SessionAdapter.SessionClickListener sessionClickListener;
 
-		
 		
 		//private sessions list for listview
 		List<Session> _sessions;
@@ -68,7 +68,9 @@ namespace Tomado {
 			pathToDatabase = System.IO.Path.Combine(docsFolder, "sessions.db");
 
 			//create database
-			createDatabase(pathToDatabase);
+			createDatabase(pathToDatabase).ContinueWith(t => {
+				
+			});
 
 			//instantiate sessions list if first run
 			if (_sessions == null)
@@ -83,9 +85,14 @@ namespace Tomado {
 
 			//get view instances
 			listViewSessions = rootView.FindViewById<ListView>(Resource.Id.listViewSessions);
-			newSessionMenu = rootView.FindViewById<FloatingActionMenu>(Resource.Id.menu_newSession);
-			swipeRefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.SwipeRefreshLayout_Sessions);
 
+			swipeRefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.SwipeRefreshLayout_Sessions);
+			
+			newSessionMenu = rootView.FindViewById<FloatingActionMenu>(Resource.Id.menu_newSession);
+
+			//newSessionMenu.SetOnClickListener(this);
+			//newSessionMenu.SetClosedOnTouchOutside(false); //doesn't work
+			
 			newSessionButton = new FloatingActionButton(Activity);
 			newSessionButton.SetImageResource(Resource.Drawable.ic_add_white_24dp);
 			newSessionButton.LabelText = "New Session";
@@ -104,6 +111,7 @@ namespace Tomado {
 				ShowFreeTimeDialog();
 			};
 
+
 			newSessionMenu.AddMenuButton(searchButton);
 			newSessionMenu.AddMenuButton(newSessionButton);
 
@@ -117,6 +125,14 @@ namespace Tomado {
 
 			//return the inflated/modified base layout
 			return rootView;
+		}
+
+		public bool OnTouch(View v) {
+			if (v.Id != Resource.Id.menu_newSession) {
+				newSessionMenu.Close(true);
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -145,6 +161,9 @@ namespace Tomado {
 		/// <param name="dateTime"></param>
 		/// <param name="title"></param>
 		public void OnAddNewSession(DateTime dateTime, string title, bool recurring) {
+			//close fab menu button
+			newSessionMenu.Close(true);
+
 			//Add the session to _sessions list.
 			Session session = AddSession(1, dateTime, title, recurring);
 
