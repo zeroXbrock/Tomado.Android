@@ -30,7 +30,7 @@ namespace Tomado {
 	/// Fragment that display a list of Sessions.
 	/// </summary>
 	public class SessionsFragment : Android.Support.V4.App.Fragment, FreeTimeFragment.GetNewFreeTimeListener, NewSessionFragment.GetNewSessionListener, 
-									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener {
+									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, SessionAdapter.ShowDeleteSessionDialogListener {
 		//view instasnces
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
@@ -185,6 +185,10 @@ namespace Tomado {
 			});
 		}
 
+		public void OnShowDeleteSessionDialog(Session session) {
+			ShowDeleteSessionDialog(session);
+		}
+
 		private void OnAddNewSession(Session session) {
 			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 			string title = session.Title;
@@ -233,6 +237,29 @@ namespace Tomado {
 			FreeTimeFragment dialog = new FreeTimeFragment(this);
 			
 			dialog.SetTargetFragment(this, 0);
+
+			dialog.Show(FragmentManager, "dialog");
+		}
+
+		/// <summary>
+		/// Shows a dialog asking user to delete session
+		/// </summary>
+		private void ShowDeleteSessionDialog(Session session) {
+			Android.Support.V4.App.FragmentTransaction ft = FragmentManager.BeginTransaction();
+
+			//some code to remove any existing dialogs
+			Android.Support.V4.App.Fragment prev = FragmentManager.FindFragmentByTag("dialog");
+			if (prev != null) {
+				ft.Remove(prev);
+			}
+
+			ft.AddToBackStack(null);
+
+			//create and show dialog
+			var dialog = new DeleteSessionFragment(session, this);
+
+			dialog.SetTargetFragment(this, 0);
+			
 
 			dialog.Show(FragmentManager, "dialog");
 		}

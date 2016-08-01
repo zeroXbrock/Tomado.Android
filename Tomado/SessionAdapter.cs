@@ -24,6 +24,7 @@ namespace Tomado {
 		Activity context;
 		private DeleteSessionListener deleteSessionListener;
 		private SessionClickListener sessionClickListener;
+		private ShowDeleteSessionDialogListener showDeleteSessionDialogListener;
 
 		/// <summary>
 		/// Interface to provide callback for deleting sessions.
@@ -46,11 +47,18 @@ namespace Tomado {
 			void OnSessionClick(Session session);
 		}
 
-		public SessionAdapter(Activity context, List<Session> sessions, DeleteSessionListener deleteSessionListener, SessionClickListener sessionClickListener) {
+		/// <summary>
+		/// Listener to handle showing delete session dialog
+		/// </summary>
+		public interface ShowDeleteSessionDialogListener {
+			void OnShowDeleteSessionDialog(Session session);
+		}
+
+		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener) {
 			this.context = context;
 			this.sessions = sessions;
-			this.deleteSessionListener = deleteSessionListener;
 			this.sessionClickListener = sessionClickListener;
+			this.showDeleteSessionDialogListener = showDeleteSessionDialogListener;
 		}
 
 		public override long GetItemId(int position) {
@@ -78,20 +86,13 @@ namespace Tomado {
 			//set text views
 			view.FindViewById<TextView>(Resource.Id.evTitle).Text = session.Title;
 			view.FindViewById<TextView>(Resource.Id.evTime).Text = (dateTime.ToShortTimeString() + "\t" + dateTime.ToShortDateString());
-			view.FindViewById<ImageButton>(Resource.Id.buttonDeleteSession).SetImageResource(Resource.Drawable.ic_delete_white_24dp);
 
-			//get delete button
-			var deleteButton = view.FindViewById<ImageButton>(Resource.Id.buttonDeleteSession);
+			view.LongClickable = true;
 
-			deleteButton.Background.Alpha = 128; //0-255
-
-			//only set button click events once; prevent 'first button deleting everything' issue
-			if (!deleteButton.HasOnClickListeners) {
-				//set delete button click
-				deleteButton.Click += delegate {
-					//context.RunOnUiThread(() => { Toast.MakeText(context, "Delete " + session.Title, ToastLength.Short).Show(); });
-					deleteSessionListener.OnDeleteSession(session);
-					sessions.Remove(session);
+			if (!view.HasOnClickListeners) {
+				view.LongClick += delegate {
+					//show 'delete session' dialog
+					showDeleteSessionDialogListener.OnShowDeleteSessionDialog(session);
 				};
 			}
 

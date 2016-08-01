@@ -68,6 +68,7 @@
     <Compile Include="AlarmReceiver.cs" />
     <Compile Include="CongratulationsFragment.cs" />
     <Compile Include="CTimer.cs" />
+    <Compile Include="DeleteSessionFragment.cs" />
     <Compile Include="FragmentAdapter.cs" />
     <Compile Include="FreeTimeAdapter.cs" />
     <Compile Include="FreeTimeFragment.cs" />
@@ -106,6 +107,9 @@
       <SubType>Designer</SubType>
     </AndroidResource>
     <AndroidResource Include="Resources\layout\FreeTimeListItem.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+    <AndroidResource Include="Resources\layout\DeleteSessionDialog.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
