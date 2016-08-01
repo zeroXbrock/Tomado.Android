@@ -293,11 +293,11 @@ namespace Tomado
 		public partial class Drawable
 		{
 			
-			// aapt resource value: 0x7f020006
-			public const int base_app_color_drawable = 2130837510;
-			
 			// aapt resource value: 0x7f020007
-			public const int base_app_complementary_color_drawable = 2130837511;
+			public const int base_app_color_drawable = 2130837511;
+			
+			// aapt resource value: 0x7f020008
+			public const int base_app_complementary_color_drawable = 2130837512;
 			
 			// aapt resource value: 0x7f020000
 			public const int fab_add = 2130837504;
@@ -309,13 +309,16 @@ namespace Tomado
 			public const int ic_add_white_24dp = 2130837506;
 			
 			// aapt resource value: 0x7f020003
-			public const int ic_delete_white_24dp = 2130837507;
+			public const int ic_arrow_drop_down_circle_white_24dp = 2130837507;
 			
 			// aapt resource value: 0x7f020004
-			public const int ic_search_white_24dp = 2130837508;
+			public const int ic_delete_white_24dp = 2130837508;
 			
 			// aapt resource value: 0x7f020005
-			public const int Icon = 2130837509;
+			public const int ic_search_white_24dp = 2130837509;
+			
+			// aapt resource value: 0x7f020006
+			public const int Icon = 2130837510;
 			
 			static Drawable()
 			{
@@ -330,20 +333,23 @@ namespace Tomado
 		public partial class Id
 		{
 			
+			// aapt resource value: 0x7f060020
+			public const int SessionEditButton = 2131099680;
+			
 			// aapt resource value: 0x7f06001c
 			public const int SessionsListItemLayout = 2131099676;
 			
-			// aapt resource value: 0x7f06001f
-			public const int SwipeRefreshLayout_Sessions = 2131099679;
+			// aapt resource value: 0x7f060021
+			public const int SwipeRefreshLayout_Sessions = 2131099681;
 			
-			// aapt resource value: 0x7f060023
-			public const int Timer_MainLayout = 2131099683;
+			// aapt resource value: 0x7f060025
+			public const int Timer_MainLayout = 2131099685;
 			
 			// aapt resource value: 0x7f06001a
 			public const int buttonCancel_NewSession = 2131099674;
 			
-			// aapt resource value: 0x7f060029
-			public const int buttonFinish = 2131099689;
+			// aapt resource value: 0x7f06002b
+			public const int buttonFinish = 2131099691;
 			
 			// aapt resource value: 0x7f060011
 			public const int buttonNo_DeleteSession = 2131099665;
@@ -351,17 +357,17 @@ namespace Tomado
 			// aapt resource value: 0x7f06000e
 			public const int buttonOK_congrats = 2131099662;
 			
-			// aapt resource value: 0x7f060028
-			public const int buttonPause = 2131099688;
+			// aapt resource value: 0x7f06002a
+			public const int buttonPause = 2131099690;
 			
 			// aapt resource value: 0x7f06001b
 			public const int buttonSave_NewSession = 2131099675;
 			
-			// aapt resource value: 0x7f060027
-			public const int buttonWork = 2131099687;
+			// aapt resource value: 0x7f060029
+			public const int buttonWork = 2131099689;
 			
-			// aapt resource value: 0x7f06000f
-			public const int buttonYes_DeleteSession = 2131099663;
+			// aapt resource value: 0x7f060010
+			public const int buttonYes_DeleteSession = 2131099664;
 			
 			// aapt resource value: 0x7f06000a
 			public const int down = 2131099658;
@@ -399,14 +405,17 @@ namespace Tomado
 			// aapt resource value: 0x7f060012
 			public const int listViewFreeTimeSessions = 2131099666;
 			
-			// aapt resource value: 0x7f060020
-			public const int listViewSessions = 2131099680;
+			// aapt resource value: 0x7f060022
+			public const int listViewSessions = 2131099682;
 			
 			// aapt resource value: 0x7f060006
 			public const int marquee = 2131099654;
 			
-			// aapt resource value: 0x7f060021
-			public const int menu_newSession = 2131099681;
+			// aapt resource value: 0x7f06001f
+			public const int menuButton_EditSession = 2131099679;
+			
+			// aapt resource value: 0x7f060023
+			public const int menu_newSession = 2131099683;
 			
 			// aapt resource value: 0x7f060007
 			public const int middle = 2131099655;
@@ -420,8 +429,8 @@ namespace Tomado
 			// aapt resource value: 0x7f060002
 			public const int normal = 2131099650;
 			
-			// aapt resource value: 0x7f060026
-			public const int relativeLayout1 = 2131099686;
+			// aapt resource value: 0x7f060028
+			public const int relativeLayout1 = 2131099688;
 			
 			// aapt resource value: 0x7f060004
 			public const int right = 2131099652;
@@ -435,8 +444,8 @@ namespace Tomado
 			// aapt resource value: 0x7f06000c
 			public const int textViewCongratulationsMessage = 2131099660;
 			
-			// aapt resource value: 0x7f060010
-			public const int textViewDeleteSession = 2131099664;
+			// aapt resource value: 0x7f06000f
+			public const int textViewDeleteSession = 2131099663;
 			
 			// aapt resource value: 0x7f060015
 			public const int textViewDuration = 2131099669;
@@ -444,17 +453,17 @@ namespace Tomado
 			// aapt resource value: 0x7f060014
 			public const int textViewTime = 2131099668;
 			
-			// aapt resource value: 0x7f060025
-			public const int textViewTimer = 2131099685;
+			// aapt resource value: 0x7f060027
+			public const int textViewTimer = 2131099687;
 			
-			// aapt resource value: 0x7f060024
-			public const int textViewTimerTitle = 2131099684;
+			// aapt resource value: 0x7f060026
+			public const int textViewTimerTitle = 2131099686;
 			
 			// aapt resource value: 0x7f06000b
 			public const int up = 2131099659;
 			
-			// aapt resource value: 0x7f060022
-			public const int viewPager = 2131099682;
+			// aapt resource value: 0x7f060024
+			public const int viewPager = 2131099684;
 			
 			static Id()
 			{
@@ -540,14 +549,11 @@ namespace Tomado
 		public partial class Style
 		{
 			
-			// aapt resource value: 0x7f090002
-			public const int Dialog = 2131296258;
-			
 			// aapt resource value: 0x7f090001
-			public const int DialogContentEditText = 2131296257;
+			public const int DialogGreen = 2131296257;
 			
 			// aapt resource value: 0x7f090000
-			public const int DialogContentTextView = 2131296256;
+			public const int DialogRed = 2131296256;
 			
 			static Style()
 			{

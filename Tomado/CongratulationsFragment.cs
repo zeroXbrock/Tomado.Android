@@ -5,6 +5,8 @@ using System.Text;
 
 using Android.App;
 using Android.Content;
+using Android.Graphics.Drawables;
+using Android.Graphics;
 using Android.OS;
 using Android.Runtime;
 using Android.Util;
@@ -39,7 +41,8 @@ namespace Tomado {
 			// return inflater.Inflate(Resource.Layout.YourFragment, container, false);
 
 			Dialog.SetTitle("Congratulations!");
-
+			Dialog.Window.SetBackgroundDrawableResource(Resource.Drawable.base_app_complementary_color_drawable);
+			
 			View view = inflater.Inflate(Resource.Layout.CongratulationsDialog, container, false);
 
 			Button okButton = view.FindViewById<Button>(Resource.Id.buttonOK_congrats);

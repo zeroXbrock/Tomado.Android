@@ -2,14 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    style="@style/DialogGreen"
+    android:background="@color/base_app_complementary_color">
     <TextView
         android:text="Congrats!"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textViewCongratulationsMessage"
-        style="@style/DialogContentTextView" />
+        android:id="@+id/textViewCongratulationsMessage" />
     <LinearLayout
         android:orientation="horizontal"
         android:minWidth="25px"
@@ -23,6 +24,7 @@
             android:id="@+id/buttonOK_congrats"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            style="@android:style/Widget.Material.Button.Borderless" />
+            style="@android:style/Widget.Material.Button.Borderless"
+            android:gravity="bottom|right" />
     </LinearLayout>
 </LinearLayout>

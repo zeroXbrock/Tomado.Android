@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Android.Animation;
 using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
+using Android.Views.Animations;
 using Android.Widget;
 using Android.Support.V4.App;
+using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Graphics.Drawables;
+
+using Clans.Fab;
 
 using Java.Lang;
 
@@ -73,6 +78,35 @@ namespace Tomado {
 			get { return sessions.Count; }
 		}
 
+		private AnimatorSet CreateCustomAnimationMenuButton(View rootView) {
+			AnimatorSet set = new AnimatorSet();
+			FloatingActionMenu menu = rootView.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
+
+			ObjectAnimator scaleOutX = ObjectAnimator.OfFloat(menu.MenuIconView, "scaleX", 1.0f, 0.2f);
+			ObjectAnimator scaleOutY = ObjectAnimator.OfFloat(menu.MenuIconView, "scaleY", 1.0f, 0.2f);
+
+			ObjectAnimator scaleInX = ObjectAnimator.OfFloat(menu.MenuIconView, "scaleX", 0.2f, 1.0f);
+			ObjectAnimator scaleInY = ObjectAnimator.OfFloat(menu.MenuIconView, "scaleY", 0.2f, 1.0f);
+
+			scaleOutX.SetDuration(50);
+			scaleOutY.SetDuration(50);
+
+			scaleInX.SetDuration(150);
+			scaleInY.SetDuration(150);
+
+			scaleInX.AnimationStart += (object sender, EventArgs e) => {
+				menu.MenuIconView.SetImageResource(menu.IsOpened ? Resource.Drawable.ic_add_white_24dp : Resource.Drawable.ic_arrow_drop_down_circle_white_24dp);
+			};
+
+			set.Play(scaleOutX).With(scaleOutY);
+			set.Play(scaleInX).With(scaleInY).After(scaleOutX);
+			set.SetInterpolator(new OvershootInterpolator(2));
+
+			menu.IconToggleAnimatorSet = set;
+			
+			return set;
+		}
+
 		public override View GetView(int position, View convertView, ViewGroup parent) {
 			View view = convertView;//reuse existing view if available
 			if (view == null) {
@@ -86,6 +120,22 @@ namespace Tomado {
 			//set text views
 			view.FindViewById<TextView>(Resource.Id.evTitle).Text = session.Title;
 			view.FindViewById<TextView>(Resource.Id.evTime).Text = (dateTime.ToShortTimeString() + "\t" + dateTime.ToShortDateString());
+
+			FloatingActionMenu editMenuButton = view.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
+			
+			editMenuButton.IconToggleAnimatorSet = CreateCustomAnimationMenuButton(view);
+			bool toggled = false;
+			editMenuButton.MenuToggle += delegate {
+
+				if (!toggled) {
+					Toast.MakeText(view.Context, "toggle", ToastLength.Short).Show();
+					toggled = true;
+				}
+				else {
+					Toast.MakeText(view.Context, "untoggle", ToastLength.Short).Show();
+					toggled = false;
+				}
+			};
 
 			view.LongClickable = true;
 

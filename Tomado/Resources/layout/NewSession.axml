@@ -3,35 +3,30 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="4dp"
-    android:paddingRight="4dp">
+    android:padding="12dp">
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/editTextTitle_NewSession"
-        android:hint="Event name"
-        style="@style/DialogContentEditText" />
+        android:hint="Event name" />
     <EditText
         android:inputType="date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/editTextDate_NewSession"
         android:hint="Date"
-        android:focusable="false"
-        style="@style/DialogContentEditText" />
+        android:focusable="false" />
     <EditText
         android:inputType="time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/editTextTime_NewSession"
         android:hint="Time"
-        android:focusable="false"
-        style="@style/DialogContentEditText" />
+        android:focusable="false" />
     <Switch
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/switchRecurring"
-        style="@style/DialogContentEditText"
         android:text="Recurring" />
     <LinearLayout
         android:orientation="horizontal"
@@ -47,12 +42,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/buttonCancel_NewSession"
-            style="@android:style/Widget.Material.Button.Borderless" />
+            style="@android:style/Widget.Material.Button.Borderless"
+            android:gravity="bottom|right" />
         <Button
             android:text="Save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/buttonSave_NewSession"
-            style="@android:style/Widget.Material.Button.Borderless" />
+            style="@android:style/Widget.Material.Button.Borderless"
+            android:gravity="bottom|right" />
     </LinearLayout>
 </LinearLayout>
