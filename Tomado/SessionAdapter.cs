@@ -27,9 +27,15 @@ namespace Tomado {
 	public class SessionAdapter : BaseAdapter<Session> {
 		List<Session> sessions;
 		Activity context;
-		private DeleteSessionListener deleteSessionListener;
-		private SessionClickListener sessionClickListener;
-		private ShowDeleteSessionDialogListener showDeleteSessionDialogListener;
+		DeleteSessionListener deleteSessionListener;
+		SessionClickListener sessionClickListener;
+		ShowDeleteSessionDialogListener showDeleteSessionDialogListener;
+		TimePickerDialog.IOnTimeSetListener timeSetListener; 
+		DatePickerDialog.IOnDateSetListener dateSetListener;
+		ShowTimePickerDialogListener timePickerListener;
+		ShowDatePickerDialogListener datePickerListener;
+
+		int editSessionindex = -1;//used to open edit view for a session in list
 
 		/// <summary>
 		/// Interface to provide callback for deleting sessions.
@@ -52,6 +58,10 @@ namespace Tomado {
 			void OnSessionClick(Session session);
 		}
 
+		public interface SetTimeListener {
+			void OnOpenTimeDialog();
+		}
+
 		/// <summary>
 		/// Listener to handle showing delete session dialog
 		/// </summary>
@@ -59,11 +69,24 @@ namespace Tomado {
 			void OnShowDeleteSessionDialog(Session session);
 		}
 
-		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener) {
+		public interface ShowTimePickerDialogListener {
+			void OnShowTimePickerDialog(int sessionIndex);
+		}
+
+		public interface ShowDatePickerDialogListener {
+			void OnShowDatePickerDialog(int sessionIndex);
+		}
+
+		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener, TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener, int editSessionIndex = -1) {
 			this.context = context;
 			this.sessions = sessions;
 			this.sessionClickListener = sessionClickListener;
 			this.showDeleteSessionDialogListener = showDeleteSessionDialogListener;
+			this.timeSetListener = timeSetListener;
+			this.dateSetListener = dateSetListener;
+			this.datePickerListener = datePickerListener;
+			this.timePickerListener = timePickerListener;
+			this.editSessionindex = editSessionIndex;
 		}
 
 		public override long GetItemId(int position) {
@@ -148,9 +171,29 @@ namespace Tomado {
 				};
 			}
 
+			var editTextTitle = view.FindViewById<EditText>(Resource.Id.editText_Title_EditSession);
+			var editTextDate = view.FindViewById<EditText>(Resource.Id.editText_Date_EditSession);
+			var editTextTime = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
+
+			editTextTime.Click += delegate {
+				//open dialog
+				timePickerListener.OnShowTimePickerDialog(position);
+			};
+			editTextDate.Click += delegate {
+				//open dialog
+				datePickerListener.OnShowDatePickerDialog(position);
+			};
+
+			//if we make an adapter with a non-neg editSessionIndex, open the edit dialog on that session
+			if (editSessionindex == position) {
+				editLayout.Visibility = ViewStates.Visible;
+				view.SetBackgroundResource(Resource.Color.base_app_complementary_color);
+				toggled = true;
+			}
 
 			return view;
 		}
+
 
 		/*
 		private AnimatorSet CreateCustomAnimationMenuButton(View rootView) {

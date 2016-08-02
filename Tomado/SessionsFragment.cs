@@ -30,12 +30,17 @@ namespace Tomado {
 	/// Fragment that display a list of Sessions.
 	/// </summary>
 	public class SessionsFragment : Android.Support.V4.App.Fragment, FreeTimeFragment.GetNewFreeTimeListener, NewSessionFragment.GetNewSessionListener, 
-									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, SessionAdapter.ShowDeleteSessionDialogListener {
-		//view instasnces
+									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, SessionAdapter.ShowDeleteSessionDialogListener,
+									DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener,
+									SessionAdapter.ShowTimePickerDialogListener, SessionAdapter.ShowDatePickerDialogListener {
+		//view instances
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
 		FloatingActionMenu newSessionMenu;
 		SwipeRefreshLayout swipeRefreshLayout;
+
+		//keep track of item being edited
+		int editIndex = -1;
 
 		//listener to send click event back to activity
 		SessionAdapter.SessionClickListener sessionClickListener;
@@ -115,8 +120,8 @@ namespace Tomado {
 
 			newSessionMenu.SetMenuButtonColorNormalResId(Resource.Color.base_app_complementary_color);
 
-			newSessionMenu.AddMenuButton(searchButton);
 			newSessionMenu.AddMenuButton(newSessionButton);
+			newSessionMenu.AddMenuButton(searchButton);
 
 			//swipeRefreshLayout.SetOnRefreshListener(this);
 			swipeRefreshLayout.Refresh += OnRefresh;
@@ -130,12 +135,61 @@ namespace Tomado {
 			return rootView;
 		}
 
-		public bool OnTouch(View v) {
-			if (v.Id != Resource.Id.menu_newSession) {
-				newSessionMenu.Close(true);
-			}
+		/// <summary>
+		/// Method to keep track of session being edited
+		/// </summary>
+		/// <param name="index"></param>
+		private void UpdateEditIndex(int index) {
+			editIndex = index;
+		}
 
-			return false;
+		/// <summary>
+		/// Called when datepickerdialog closes w/ OK and was started from this context
+		/// </summary>
+		/// <param name="datePicker"></param>
+		/// <param name="year"></param>
+		/// <param name="month"></param>
+		/// <param name="day"></param>
+		public void OnDateSet(DatePicker datePicker, int year, int month, int day) {
+			//update _sessions
+			_sessions[editIndex].Year = year;
+			_sessions[editIndex].MonthOfYear = month;
+			_sessions[editIndex].DayOfMonth = day;
+
+			//reset adapter
+			ResetListViewAdapter(editIndex);
+
+			//open edit view on session in list
+
+		}
+
+		/// <summary>
+		/// Called when timepickerdialog closes w/ OK and was started from this context
+		/// </summary>
+		/// <param name="timePicker"></param>
+		/// <param name="hour"></param>
+		/// <param name="minute"></param>
+		public void OnTimeSet(TimePicker timePicker, int hour, int minute){
+			//update _sessions
+			_sessions[editIndex].StartHour = hour;
+			_sessions[editIndex].StartMinute = minute;
+
+			//reset adapter, open edit view on session in list
+			ResetListViewAdapter(editIndex);
+		}
+
+		public void OnShowDatePickerDialog(int sessionIndex) {
+			UpdateEditIndex(sessionIndex);
+
+			DatePickerDialogFragment dialog = new DatePickerDialogFragment(Context, DateTime.Now, this);
+			dialog.Show(FragmentManager, "dialog");
+		}
+
+		public void OnShowTimePickerDialog(int sessionIndex) {
+			UpdateEditIndex(sessionIndex);
+
+			TimePickerDialogFragment dialog = new TimePickerDialogFragment(Context, DateTime.Now, this);
+			dialog.Show(FragmentManager, "dialog");
 		}
 
 		/// <summary>
@@ -267,8 +321,8 @@ namespace Tomado {
 		/// <summary>
 		/// Populate class listview with sessions.
 		/// </summary>
-		private void ResetListViewAdapter() {
-			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this);
+		private void ResetListViewAdapter(int editSessionIndex = -1) {
+			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, editSessionIndex);
 		}
 
 		/// <summary>

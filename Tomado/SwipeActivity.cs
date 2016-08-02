@@ -19,7 +19,7 @@ namespace Tomado {
 	/// Activity that holds multiple fragments that can be swiped through.
 	/// </summary>
 	[Activity(MainLauncher = true, Icon = "@drawable/icon", LaunchMode=Android.Content.PM.LaunchMode.SingleTop, WindowSoftInputMode=SoftInput.AdjustPan)]
-	class SwipeActivity : FragmentActivity, SessionAdapter.SessionClickListener, TimerFragment.TimerFinishListener, View.IOnClickListener {
+	class SwipeActivity : FragmentActivity, SessionAdapter.SessionClickListener, TimerFragment.TimerFinishListener {
 		ViewPager viewPager;
 		TimerFragment timerFragment;
 		SessionsFragment sessionsFragment;
@@ -51,10 +51,6 @@ namespace Tomado {
 
 		protected override void OnStart() {
 			base.OnStart();
-		}
-
-		public void OnClick(View v) {
-			sessionsFragment.OnTouch(v);
 		}
 
 		protected override void OnNewIntent(Intent intent) {
