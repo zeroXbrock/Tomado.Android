@@ -54,8 +54,11 @@ namespace Tomado {
 				Dismiss();
 			};
 
+			var textViewCongratsTitle = view.FindViewById<TextView>(Resource.Id.textViewCongratulationsTitle);
 			TextView textViewCongratsMessage = view.FindViewById<TextView>(Resource.Id.textViewCongratulationsMessage);
-			textViewCongratsMessage.Text = "Good job! You completed " + taskName + " in " + pomodoros.ToString() + " tomados!";
+
+			textViewCongratsTitle.Text = taskName;
+			textViewCongratsMessage.Text = "Completed in " + pomodoros.ToString() + " sessions!";
 
 			return view;
 		}

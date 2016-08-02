@@ -123,7 +123,6 @@ namespace Tomado {
 
 			FloatingActionMenu editMenuButton = view.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
 			
-			
 			editMenuButton.IconToggleAnimatorSet = CreateCustomAnimationMenuButton(view);
 			bool toggled = false;
 

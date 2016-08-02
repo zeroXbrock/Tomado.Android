@@ -8,15 +8,31 @@
         android:layout_width="match_parent"
         android:layout_height="128dp"
         style="@android:style/Widget.Material.Button.Borderless" />
-    <TextView
-        android:text="Congrats!"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="wrap_content"
-        android:layout_height="128dp"
-        android:id="@+id/textViewCongratulationsMessage"
+        android:layout_height="wrap_content"
         style="@style/DialogGreen"
-        android:layout_toLeftOf="@+id/buttonOK_congrats"
-        android:gravity="center|left" />
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/buttonOK_congrats">
+        <TextView
+            android:text="Congrats!"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewCongratulationsTitle"
+            android:paddingBottom="0dp"
+            android:gravity="center|left" />
+        <TextView
+            android:text="Completed in 4 hours &amp; 20 minutes."
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/buttonOK_congrats"
+            android:layout_below="@+id/textViewCongratulationsTitle"
+            android:id="@+id/textViewCongratulationsMessage"
+            android:gravity="center|left" />
+    </LinearLayout>
     <Button
         android:text="OK"
         android:id="@+id/buttonOK_congrats"
