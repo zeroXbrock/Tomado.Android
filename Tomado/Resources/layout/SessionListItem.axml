@@ -9,33 +9,79 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+			android:id="@+id/SessionListItemTextLayout">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/imageButtonEditSession">
+                <TextView
+                    android:text="Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/evTitle"
+                    android:textSize="16dip" />
+                <TextView
+                    android:text="Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/evTime"
+                    android:textSize="12dip" />
+            </LinearLayout>
+            <ImageButton
+                android:src="@drawable/ic_edit_white_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:padding="4dp"
+                android:id="@+id/imageButtonEditSession"
+                android:background="#00000000"
+                android:layout_centerInParent="true" />
+        </RelativeLayout>
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:text="Title"
-                android:layout_width="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/DialogGreen"
+            android:id="@+id/EditSessionLayout"
+            android:layout_below="@+id/SessionListItemTextLayout">
+            <EditText
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/evTitle"
-                android:textSize="16dip" />
-            <TextView
-                android:text="Text"
-                android:layout_width="wrap_content"
+                android:id="@+id/editText_Title_EditSession"
+                android:hint="Title"
+				android:imeOptions="actionDone"
+				android:singleLine="true"/>
+            <EditText
+                android:inputType="date"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/evTime"
-                android:textSize="12dip" />
+                android:id="@+id/editText_Date_EditSession"
+                android:hint="Date"
+				
+				android:imeOptions="actionDone"/>
+            <EditText
+                android:inputType="time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText_Time_EditSession"
+                android:hint="Time"
+				
+				android:imeOptions="actionDone"/>
         </LinearLayout>
+    <!--
         <com.github.clans.fab.FloatingActionMenu
             android:id="@+id/menuButton_EditSession"
+            fab:menu_icon="@drawable/ic_edit_white_24dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:menu_fab_size="mini"
             fab_colorNormal="@color/base_app_complementary_color"
-            android:layout_centerVertical="true"
-            
             fab:fab_shadowColor="#000"
-            android:layout_toLeftOf="@+id/SessionEditButton"
-            android:layout_alignParentRight="true" />
+            android:layout_toRightOf="@+id/SessionListItemTextLayout" />
+	  -->
     </RelativeLayout>
 </LinearLayout>

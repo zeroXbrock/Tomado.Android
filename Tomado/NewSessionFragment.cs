@@ -61,7 +61,7 @@ namespace Tomado {
 			Dialog.SetTitle("New session");
 			Dialog.Window.SetBackgroundDrawableResource(Resource.Color.base_app_complementary_color);
 			
-			View view = inflater.Inflate(Resource.Layout.NewSession, container, false);
+			View view = inflater.Inflate(Resource.Layout.NewSessionDialog, container, false);
 
 			saveButton = view.FindViewById<Button>(Resource.Id.buttonSave_NewSession);
 			cancelButton = view.FindViewById<Button>(Resource.Id.buttonCancel_NewSession);
@@ -92,6 +92,10 @@ namespace Tomado {
 			cancelButton.Click += delegate {
 				Dismiss();
 			};
+
+			timeEditText.Focusable = false;
+			dateEditText.Focusable = false;
+
 			timeEditText.Click += delegate {
 				var dialog = new TimePickerDialogFragment(Activity, DateTime.Now, this);
 				dialog.Show(FragmentManager, null);

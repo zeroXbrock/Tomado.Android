@@ -92,8 +92,8 @@ namespace Tomado {
 			
 			newSessionMenu = rootView.FindViewById<FloatingActionMenu>(Resource.Id.menu_newSession);
 
-			//newSessionMenu.SetOnClickListener(this);
-			//newSessionMenu.SetClosedOnTouchOutside(false); //doesn't work
+			//set listview mode to allow overscroll
+			listViewSessions.OverScrollMode = OverScrollMode.Always;
 			
 			newSessionButton = new FloatingActionButton(Activity);
 			newSessionButton.SetImageResource(Resource.Drawable.ic_add_white_24dp);
