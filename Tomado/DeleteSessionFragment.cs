@@ -43,7 +43,7 @@ namespace Tomado {
 			Button yesButton = view.FindViewById<Button>(Resource.Id.buttonYes_DeleteSession);
 			Button noButton = view.FindViewById<Button>(Resource.Id.buttonNo_DeleteSession);
 
-			textView.Text = "Do you want to delete \"" + title + "\"?";
+			textView.Text = "Delete \"" + title + "\"?";
 
 			yesButton.Click += delegate {
 				deleteSessionListener.OnDeleteSession(session);

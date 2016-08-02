@@ -119,14 +119,18 @@ namespace Tomado {
 			///set info for each item in listview
 			//set text views
 			view.FindViewById<TextView>(Resource.Id.evTitle).Text = session.Title;
-			view.FindViewById<TextView>(Resource.Id.evTime).Text = (dateTime.ToShortTimeString() + "\t" + dateTime.ToShortDateString());
+			view.FindViewById<TextView>(Resource.Id.evTime).Text = (dateTime.ToShortTimeString() + "\n" + dateTime.ToShortDateString());
 
 			FloatingActionMenu editMenuButton = view.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
 			
+			
 			editMenuButton.IconToggleAnimatorSet = CreateCustomAnimationMenuButton(view);
 			bool toggled = false;
-			editMenuButton.MenuToggle += delegate {
 
+			if (!editMenuButton.IsOpened)
+				editMenuButton.Open(true);
+
+			editMenuButton.MenuToggle += delegate {
 				if (!toggled) {
 					Toast.MakeText(view.Context, "toggle", ToastLength.Short).Show();
 					toggled = true;

@@ -2,9 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:background="@color/base_app_color"
-    android:minHeight="160dp">
+    android:layout_height="240dp"
+    android:background="@color/base_app_color">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -13,18 +12,13 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            AbsoluteLayout.LayoutBounds="0,0,0,0"
-            AbsoluteLayout.LayoutFlags="All"
             android:id="@+id/textViewDeleteSession"
-            android:layout_marginTop="16dp"
+            style="@style/DialogRed"
             android:layout_toLeftOf="@+id/buttonYes_DeleteSession" />
         <Button
             android:text="No"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            AbsoluteLayout.LayoutBounds="0,0.5,0,0"
-            AbsoluteLayout.LayoutFlags="All"
+            android:layout_height="240dp"
             android:id="@+id/buttonNo_DeleteSession"
             style="@android:style/Widget.Material.Light.Button.Borderless"
             android:layout_centerVertical="true"
@@ -34,7 +28,7 @@
         <Button
             android:text="Yes"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="240dp"
             android:id="@+id/buttonYes_DeleteSession"
             style="@android:style/Widget.Material.Light.Button.Borderless"
             android:background="@color/base_app_complementary_color"

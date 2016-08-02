@@ -56,7 +56,8 @@ namespace Tomado {
 
 		public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			Dialog.SetTitle("Free time sessions");
-			
+			Dialog.Window.SetBackgroundDrawableResource(Resource.Color.base_app_complementary_color);
+
 			View view = inflater.Inflate(Resource.Layout.FreeTimeDialog, container, false);
 
 			listViewFreeTime = view.FindViewById<ListView>(Resource.Id.listViewFreeTimeSessions);

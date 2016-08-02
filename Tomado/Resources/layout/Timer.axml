@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:minWidth="25px"
     android:minHeight="25px"
-	android:background="@color/base_app_color">
+    android:background="@color/base_app_color">
 <!--TextView LinearLayout section begin-->
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +18,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textViewTimerTitle"
-            android:text="title" />
+			android:padding="48dp"
+            android:text="title"
+			android:gravity="center"/>
         <TextView
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_width="wrap_content"

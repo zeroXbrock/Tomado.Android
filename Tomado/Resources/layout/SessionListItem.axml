@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/SessionsListItemLayout"
@@ -30,10 +30,11 @@
             android:id="@+id/menuButton_EditSession"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:menu_fab_size="mini"
+            fab:menu_fab_size="mini"
             fab_colorNormal="@color/base_app_complementary_color"
             android:layout_centerVertical="true"
-            app:fab_elevationCompat="4dp"
+            
+            fab:fab_shadowColor="#000"
             android:layout_toLeftOf="@+id/SessionEditButton"
             android:layout_alignParentRight="true" />
     </RelativeLayout>

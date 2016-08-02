@@ -59,6 +59,7 @@ namespace Tomado {
 			// return inflater.Inflate(Resource.Layout.YourFragment, container, false);
 
 			Dialog.SetTitle("New session");
+			Dialog.Window.SetBackgroundDrawableResource(Resource.Color.base_app_complementary_color);
 			
 			View view = inflater.Inflate(Resource.Layout.NewSession, container, false);
 

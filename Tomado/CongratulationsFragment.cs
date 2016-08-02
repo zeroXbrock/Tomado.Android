@@ -40,14 +40,17 @@ namespace Tomado {
 			// Use this to return your custom view for this Fragment
 			// return inflater.Inflate(Resource.Layout.YourFragment, container, false);
 
-			Dialog.SetTitle("Congratulations!");
-			Dialog.Window.SetBackgroundDrawableResource(Resource.Drawable.base_app_complementary_color_drawable);
+			Dialog.Window.RequestFeature(WindowFeatures.NoTitle);
+			
+			Dialog.Window.SetLayout(WindowManagerLayoutParams.MatchParent, Resource.String.DialogHeight);
 			
 			View view = inflater.Inflate(Resource.Layout.CongratulationsDialog, container, false);
 
 			Button okButton = view.FindViewById<Button>(Resource.Id.buttonOK_congrats);
+			Button okButtonInvisible = view.FindViewById<Button>(Resource.Id.buttonOKInvisible_congrats);
 
-			okButton.Click += delegate {
+			okButton.Clickable = false;
+			okButtonInvisible.Click += delegate {
 				Dismiss();
 			};
 
