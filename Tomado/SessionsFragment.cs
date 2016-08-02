@@ -32,7 +32,7 @@ namespace Tomado {
 	public class SessionsFragment : Android.Support.V4.App.Fragment, FreeTimeFragment.GetNewFreeTimeListener, NewSessionFragment.GetNewSessionListener, 
 									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, SessionAdapter.ShowDeleteSessionDialogListener,
 									DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener,
-									SessionAdapter.ShowTimePickerDialogListener, SessionAdapter.ShowDatePickerDialogListener {
+									SessionAdapter.ShowTimePickerDialogListener, SessionAdapter.ShowDatePickerDialogListener, SessionAdapter.TitleSetListener {
 		//view instances
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
@@ -116,6 +116,8 @@ namespace Tomado {
 
 			searchButton.Click += delegate {
 				ShowFreeTimeDialog();
+
+				ResetListViewAdapter();
 			};
 
 			newSessionMenu.SetMenuButtonColorNormalResId(Resource.Color.base_app_complementary_color);
@@ -151,16 +153,18 @@ namespace Tomado {
 		/// <param name="month"></param>
 		/// <param name="day"></param>
 		public void OnDateSet(DatePicker datePicker, int year, int month, int day) {
+			DeleteSessionFromDatabase(_sessions[editIndex].ID);
+
 			//update _sessions
 			_sessions[editIndex].Year = year;
 			_sessions[editIndex].MonthOfYear = month;
 			_sessions[editIndex].DayOfMonth = day;
 
-			//reset adapter
+			//update database w/ new session info
+			SaveSessionToDatabase(_sessions[editIndex]);
+
+			//reset adapter & edit view on session in list
 			ResetListViewAdapter(editIndex);
-
-			//open edit view on session in list
-
 		}
 
 		/// <summary>
@@ -170,12 +174,27 @@ namespace Tomado {
 		/// <param name="hour"></param>
 		/// <param name="minute"></param>
 		public void OnTimeSet(TimePicker timePicker, int hour, int minute){
+			DeleteSessionFromDatabase(_sessions[editIndex].ID);
+
 			//update _sessions
 			_sessions[editIndex].StartHour = hour;
 			_sessions[editIndex].StartMinute = minute;
 
+			//update database w/ new session info
+			SaveSessionToDatabase(_sessions[editIndex]);
+
 			//reset adapter, open edit view on session in list
 			ResetListViewAdapter(editIndex);
+		}
+
+		public void OnTitleSet(int sessionIndex, string title) {
+			DeleteSessionFromDatabase(_sessions[sessionIndex].ID);
+
+			_sessions[sessionIndex].Title = title;
+
+			ResetListViewAdapter(sessionIndex);
+
+			SaveSessionToDatabase(_sessions[sessionIndex]);
 		}
 
 		public void OnShowDatePickerDialog(int sessionIndex) {
@@ -322,7 +341,7 @@ namespace Tomado {
 		/// Populate class listview with sessions.
 		/// </summary>
 		private void ResetListViewAdapter(int editSessionIndex = -1) {
-			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, editSessionIndex);
+			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, editSessionIndex);
 		}
 
 		/// <summary>
@@ -395,6 +414,10 @@ namespace Tomado {
 		private async void DeleteSessionFromDatabase(Session session) {
 			//remove session from database
 			await connection.DeleteAsync(session);
+		}
+
+		private async void DeleteSessionFromDatabase(int ID) {
+			await connection.ExecuteScalarAsync<int>("DELETE FROM Session WHERE ID=" + ID + ";");
 		}
 
 		/// <summary>

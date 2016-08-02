@@ -17,7 +17,7 @@ namespace Tomado {
 	/// Session class; holds all info about a session.
 	/// </summary>
 	public class Session {
-		[PrimaryKey, AutoIncrement]
+		[PrimaryKey, AutoIncrement, Unique]
 		public int ID { get; set; }
 
 		int startHour, startMinute, year, monthOfYear, dayOfMonth;

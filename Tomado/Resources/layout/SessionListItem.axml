@@ -58,7 +58,7 @@
                 android:hint="Title"
                 android:imeOptions="actionDone"
                 android:singleLine="true"
-                android:textColor="#000000" />
+                android:textColorHint="#fff" />
             <EditText
                 android:inputType="date"
                 android:layout_width="match_parent"

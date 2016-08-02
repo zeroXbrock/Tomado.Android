@@ -34,6 +34,7 @@ namespace Tomado {
 		DatePickerDialog.IOnDateSetListener dateSetListener;
 		ShowTimePickerDialogListener timePickerListener;
 		ShowDatePickerDialogListener datePickerListener;
+		TitleSetListener titleSetListener;
 
 		int editSessionindex = -1;//used to open edit view for a session in list
 
@@ -77,7 +78,11 @@ namespace Tomado {
 			void OnShowDatePickerDialog(int sessionIndex);
 		}
 
-		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener, TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener, int editSessionIndex = -1) {
+		public interface TitleSetListener {
+			void OnTitleSet(int sessionIndex, string title);
+		}
+
+		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener, TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener, TitleSetListener titleSetListener, int editSessionIndex = -1) {
 			this.context = context;
 			this.sessions = sessions;
 			this.sessionClickListener = sessionClickListener;
@@ -87,6 +92,7 @@ namespace Tomado {
 			this.datePickerListener = datePickerListener;
 			this.timePickerListener = timePickerListener;
 			this.editSessionindex = editSessionIndex;
+			this.titleSetListener = titleSetListener;
 		}
 
 		public override long GetItemId(int position) {
@@ -115,9 +121,18 @@ namespace Tomado {
 			Session session = sessions[position];
 			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 
+			//get textviews
+			var titleTextView = view.FindViewById<TextView>(Resource.Id.evTitle);
+			var timeTextView = view.FindViewById<TextView>(Resource.Id.evTime);
+			
+			//get edittextviews
+			var titleEditTextView = view.FindViewById<EditText>(Resource.Id.editText_Title_EditSession);
+			var timeEditTextView = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
+			var dateEditTextView = view.FindViewById<EditText>(Resource.Id.editText_Date_EditSession);
+			
 			//set text views: title and time/date
-			view.FindViewById<TextView>(Resource.Id.evTitle).Text = session.Title;
-			view.FindViewById<TextView>(Resource.Id.evTime).Text = (dateTime.ToShortTimeString() + "\n" + dateTime.ToShortDateString());
+			titleTextView.Text = session.Title;
+			timeTextView.Text = (dateTime.ToShortTimeString() + "\n" + dateTime.ToShortDateString());
 
 			//get menu (toggle edit view) button
 			//FloatingActionMenu editMenuButton = view.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
@@ -183,13 +198,33 @@ namespace Tomado {
 				//open dialog
 				datePickerListener.OnShowDatePickerDialog(position);
 			};
+			editTextTitle.EditorAction += delegate {
+				//set session title
+				titleSetListener.OnTitleSet(position, editTextTitle.Text);
+
+				//close KB
+				Android.Views.InputMethods.InputMethodManager imm = (Android.Views.InputMethods.InputMethodManager)context.GetSystemService(Context.InputMethodService);
+				imm.HideSoftInputFromWindow(editTextTitle.WindowToken, Android.Views.InputMethods.HideSoftInputFlags.None);
+			};
+			
 
 			//if we make an adapter with a non-neg editSessionIndex, open the edit dialog on that session
 			if (editSessionindex == position) {
+				//list adapter has been reset
+				//make edit layout visible
 				editLayout.Visibility = ViewStates.Visible;
+
+				//make background green
 				view.SetBackgroundResource(Resource.Color.base_app_complementary_color);
+
+				//toggle, duh
 				toggled = true;
 			}
+
+			//set edittextviews to reflect session info
+			editTextTitle.Hint = session.Title;
+			editTextTime.Text = dateTime.ToShortTimeString();
+			editTextDate.Text = dateTime.ToShortDateString();
 
 			return view;
 		}
