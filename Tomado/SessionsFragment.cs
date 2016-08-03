@@ -196,13 +196,10 @@ namespace Tomado {
 		public void OnClickEditButton(int sessionIndex) {
 			UpdateEditIndex(sessionIndex);
 
-			//opening the edit view
-			if (sessionIndex >= 0) {
+			ResetListViewAdapter(sessionIndex);
 
-			}
-			else {
-
-			}
+			//scroll to item being edited
+			listViewSessions.SetSelection(sessionIndex);
 		}
 
 		public void OnTitleSet(int sessionIndex, string title) {

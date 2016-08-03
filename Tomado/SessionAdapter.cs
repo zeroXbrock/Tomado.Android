@@ -251,6 +251,18 @@ namespace Tomado {
 					//editTextTitle.ShowSoftInputOnFocus = true;
 					editTextTitle.RequestFocusFromTouch();
 				}
+				else {
+					//close menu
+					editLayout.Visibility = ViewStates.Gone;
+
+					//make background red
+					view.SetBackgroundResource(Resource.Color.base_app_color);
+
+					//set icon to pencil
+					editMenuButton.SetImageResource(Resource.Drawable.ic_edit_white_24dp);
+
+					//don't untoggle, bruh, let the if statements above handle it
+				}
 
 			//set edittextviews to reflect session info
 			editTextTitle.Hint = session.Title;
