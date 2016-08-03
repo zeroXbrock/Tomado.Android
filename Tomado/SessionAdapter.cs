@@ -118,8 +118,10 @@ namespace Tomado {
 		public override View GetView(int position, View convertView, ViewGroup parent) {
 			View view = convertView;//reuse existing view if available
 			if (view == null) {
-				view = context.LayoutInflater.Inflate(Resource.Layout.SessionListItem, null);
-			}
+				
+			}//disregard recycling
+
+			view = context.LayoutInflater.Inflate(Resource.Layout.SessionListItem, null);
 
 			//get layout for edit view
 			ViewGroup editLayout = view.FindViewById<LinearLayout>(Resource.Id.EditSessionLayout);
