@@ -167,6 +167,9 @@ namespace Tomado {
 
 						//update edit index
 						openEditViewListener.OnClickEditButton(position);
+
+						//change button icon
+						editMenuButton.SetImageResource(Resource.Drawable.ic_check_white_24dp);
 					}
 					else {
 						//hide edit menu
@@ -180,6 +183,8 @@ namespace Tomado {
 
 						//update edit index
 						openEditViewListener.OnClickEditButton(-1);
+
+						editMenuButton.SetImageResource(Resource.Drawable.ic_edit_white_24dp);
 					}
 				};
 			}
