@@ -35,7 +35,7 @@ namespace Tomado {
 		ShowTimePickerDialogListener timePickerListener;
 		ShowDatePickerDialogListener datePickerListener;
 		TitleSetListener titleSetListener;
-		OpenEditViewListener openEditViewListener;
+		ClickEditButtonListener openEditViewListener;
 
 		int editSessionindex = -1;//used to open edit view for a session in list
 
@@ -60,8 +60,8 @@ namespace Tomado {
 			void OnSessionClick(Session session);
 		}
 
-		public interface OpenEditViewListener {
-			void OnOpenEditView(int sessionIndex);
+		public interface ClickEditButtonListener {
+			void OnClickEditButton(int sessionIndex);
 		}
 
 		public interface SetTimeListener {
@@ -89,7 +89,7 @@ namespace Tomado {
 
 		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener, 
 			TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener, 
-			TitleSetListener titleSetListener, OpenEditViewListener openEditViewListener, int editSessionIndex = -1) {
+			TitleSetListener titleSetListener, ClickEditButtonListener openEditViewListener, int editSessionIndex = -1) {
 			this.context = context;
 			this.sessions = sessions;
 			this.sessionClickListener = sessionClickListener;
@@ -166,7 +166,7 @@ namespace Tomado {
 						toggled = true;
 
 						//update edit index
-						openEditViewListener.OnOpenEditView(position);
+						openEditViewListener.OnClickEditButton(position);
 					}
 					else {
 						//hide edit menu
@@ -179,7 +179,7 @@ namespace Tomado {
 						toggled = false;
 
 						//update edit index
-						openEditViewListener.OnOpenEditView(-1);
+						openEditViewListener.OnClickEditButton(-1);
 					}
 				};
 			}
@@ -232,7 +232,7 @@ namespace Tomado {
 
 				//focus on title edittext; show keyboard
 				//editTextTitle.ShowSoftInputOnFocus = true;
-				//editTextTitle.RequestFocusFromTouch();
+				editTextTitle.RequestFocusFromTouch();
 
 			}
 

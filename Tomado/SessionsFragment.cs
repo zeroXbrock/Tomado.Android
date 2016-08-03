@@ -34,7 +34,7 @@ namespace Tomado {
 									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, SessionAdapter.ShowDeleteSessionDialogListener,
 									DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener,
 									SessionAdapter.ShowTimePickerDialogListener, SessionAdapter.ShowDatePickerDialogListener, SessionAdapter.TitleSetListener,
-									SessionAdapter.OpenEditViewListener {
+									SessionAdapter.ClickEditButtonListener {
 		//view instances
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
@@ -165,6 +165,9 @@ namespace Tomado {
 
 			//reset adapter & edit view on session in list
 			ResetListViewAdapter(editIndex);
+
+			//scroll to new item
+			listViewSessions.SetSelection(listViewSessions.Count - 1);
 		}
 
 		/// <summary>
@@ -185,10 +188,21 @@ namespace Tomado {
 
 			//reset adapter, open edit view on session in list
 			ResetListViewAdapter(editIndex);
+
+			//scroll to new item
+			listViewSessions.SetSelection(listViewSessions.Count - 1);
 		}
 
-		public void OnOpenEditView(int sessionIndex) {
+		public void OnClickEditButton(int sessionIndex) {
 			UpdateEditIndex(sessionIndex);
+
+			//opening the edit view
+			if (sessionIndex >= 0) {
+
+			}
+			else {
+
+			}
 		}
 
 		public void OnTitleSet(int sessionIndex, string title) {
@@ -203,6 +217,9 @@ namespace Tomado {
 			//close KB
 			var mgr = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
 			mgr.HideSoftInputFromWindow(View.WindowToken, 0);
+
+			//scroll to new item
+			listViewSessions.SetSelection(listViewSessions.Count - 1);
 		}
 
 		public void OnShowDatePickerDialog(int sessionIndex) {
@@ -378,6 +395,14 @@ namespace Tomado {
 			
 			//add the session
 			OnAddNewSession(session);
+
+			//scroll to new item
+			listViewSessions.SetSelection(listViewSessions.Count - 1);
+
+			//show keyboard
+			//Activity.Window.SetSoftInputMode(SoftInput.StateVisible);
+			//var mgr = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
+			//mgr.ShowSoftInputFromInputMethod(View.ApplicationWindowToken, ShowFlags.Forced);
 		}
 
 		/// <summary>
