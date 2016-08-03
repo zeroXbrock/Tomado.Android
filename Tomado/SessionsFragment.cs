@@ -72,6 +72,9 @@ namespace Tomado {
 		public override void OnCreate(Bundle savedInstanceState) {
 			base.OnCreate(savedInstanceState);
 
+			if (savedInstanceState != null)
+				editIndex = savedInstanceState.GetInt("editIndex");
+
 			//get database path
 			docsFolder = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
 			pathToDatabase = System.IO.Path.Combine(docsFolder, "sessions.db");
@@ -137,6 +140,13 @@ namespace Tomado {
 			return rootView;
 		}
 
+		public override void OnSaveInstanceState(Bundle outState) {
+			base.OnSaveInstanceState(outState);
+
+			outState.PutInt("editIndex", editIndex);
+			
+		}
+
 		/// <summary>
 		/// Method to keep track of session being edited
 		/// </summary>
@@ -195,8 +205,8 @@ namespace Tomado {
 		int lastSessionIndex = -1;
 
 		public void OnClickEditButton(int sessionIndex) {
-			UpdateEditIndex(sessionIndex);
-
+			//use editindex to check for recently added freetime
+			
 			ResetListViewAdapter(sessionIndex);
 
 			if (sessionIndex >= 0) {
@@ -204,13 +214,15 @@ namespace Tomado {
 			}
 			else {
 				//update notification info on close edit view
-				ScheduleSessionNotification(_sessions[lastSessionIndex]);
+				ScheduleSessionNotification(_sessions[editIndex]);
 				
 				//scroll to item being edited
 				listViewSessions.SetSelection(lastSessionIndex);
 				//listViewSessions.SetSelectionFromTop
 
 			}
+
+			UpdateEditIndex(sessionIndex);
 
 			//close KB
 			HideKeyboard();
@@ -298,13 +310,10 @@ namespace Tomado {
 			LoadSessionsFromDatabase().ContinueWith(t => {
 				session = _sessions[_sessions.Count - 1];
 
-				//schedule the notification
-				ScheduleSessionNotification(session);
+				//schedule the notification if launched from new session dialog
+				if (editIndex < 0)
+					ScheduleSessionNotification(session);
 			});
-		}
-
-		public void OnShowDeleteSessionDialog(Session session) {
-			ShowDeleteSessionDialog(session);
 		}
 
 		/// <summary>
@@ -317,6 +326,41 @@ namespace Tomado {
 			bool recurring = session.Recurring;
 
 			OnAddNewSession(dateTime, title, recurring);
+		}
+
+		/// <summary>
+		/// Handler for SwipeRefreshView
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		public async void OnRefresh(object sender, EventArgs e) {
+			//load sessions from database
+			await LoadSessionsFromDatabase();
+			Activity.RunOnUiThread(() => { ResetListViewAdapter(); });
+			swipeRefreshLayout.Refreshing = false;
+		}
+
+		/// <summary>
+		/// Called when user creates a new freetime session
+		/// </summary>
+		/// <param name="session"></param>
+		public void OnGetNewFreeTime(Session session) {
+			//update index
+			UpdateEditIndex(_sessions.Count);
+
+			//add the session
+			OnAddNewSession(session);
+
+			//scroll to new item
+			listViewSessions.SetSelection(listViewSessions.Count - 1);
+		}
+
+		/// <summary>
+		/// Called when receiving event to show delete session dialog
+		/// </summary>
+		/// <param name="session"></param>
+		public void OnShowDeleteSessionDialog(Session session) {
+			ShowDeleteSessionDialog(session);
 		}
 		
 		/// <summary>
@@ -393,32 +437,7 @@ namespace Tomado {
 			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, editSessionIndex);
 		}
 
-		/// <summary>
-		/// Handler for SwipeRefreshView
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		public async void OnRefresh(object sender, EventArgs e) {
-			//load sessions from database
-			await LoadSessionsFromDatabase();
-			Activity.RunOnUiThread(() => { ResetListViewAdapter(); });
-			swipeRefreshLayout.Refreshing = false;
-		}
-
-		/// <summary>
-		/// Called when user creates a new freetime session
-		/// </summary>
-		/// <param name="session"></param>
-		public void OnGetNewFreeTime(Session session) {
-			//update index
-			UpdateEditIndex(_sessions.Count);
-			
-			//add the session
-			OnAddNewSession(session);
-
-			//scroll to new item
-			listViewSessions.SetSelection(listViewSessions.Count - 1);
-		}
+		
 
 		/// <summary>
 		/// Adds a session to the class sessions list and returns the session it created.
