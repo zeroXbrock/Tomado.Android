@@ -209,6 +209,7 @@ namespace Tomado {
 				//scroll to item being edited
 				listViewSessions.SetSelection(lastSessionIndex);
 				//listViewSessions.SetSelectionFromTop
+
 			}
 
 			//close KB

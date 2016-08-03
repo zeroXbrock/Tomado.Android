@@ -136,9 +136,9 @@ namespace Tomado {
 			var timeTextView = view.FindViewById<TextView>(Resource.Id.evTime);
 			
 			//get edittextviews
-			var titleEditTextView = view.FindViewById<EditText>(Resource.Id.editText_Title_EditSession);
-			var timeEditTextView = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
-			var dateEditTextView = view.FindViewById<EditText>(Resource.Id.editText_Date_EditSession);
+			var editTextTitle = view.FindViewById<EditText>(Resource.Id.editText_Title_EditSession);
+			var editTextDate = view.FindViewById<EditText>(Resource.Id.editText_Date_EditSession);
+			var editTextTime = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
 			
 			//set text views: title and time/date
 			titleTextView.Text = session.Title;
@@ -183,6 +183,12 @@ namespace Tomado {
 						//toggle
 						toggled = false;
 
+						//always set title when closing edit view
+						string title = (editTextTitle.Text == "") ? editTextTitle.Hint : editTextTitle.Text;
+
+						//fire title set event
+						titleSetListener.OnTitleSet(editSessionindex, title);
+
 						//update edit index
 						editSessionindex = -1;
 
@@ -191,6 +197,7 @@ namespace Tomado {
 
 					//fire edit click event
 					openEditViewListener.OnClickEditButton(editSessionindex);
+					
 				};
 			}
 
@@ -210,9 +217,6 @@ namespace Tomado {
 				};
 			}
 
-			var editTextTitle = view.FindViewById<EditText>(Resource.Id.editText_Title_EditSession);
-			var editTextDate = view.FindViewById<EditText>(Resource.Id.editText_Date_EditSession);
-			var editTextTime = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
 
 			editTextTime.Click += delegate {
 				//open dialog
