@@ -35,6 +35,7 @@ namespace Tomado {
 		ShowTimePickerDialogListener timePickerListener;
 		ShowDatePickerDialogListener datePickerListener;
 		TitleSetListener titleSetListener;
+		OpenEditViewListener openEditViewListener;
 
 		int editSessionindex = -1;//used to open edit view for a session in list
 
@@ -57,6 +58,10 @@ namespace Tomado {
 			/// </summary>
 			/// <param name="session"></param>
 			void OnSessionClick(Session session);
+		}
+
+		public interface OpenEditViewListener {
+			void OnOpenEditView(int sessionIndex);
 		}
 
 		public interface SetTimeListener {
@@ -82,7 +87,9 @@ namespace Tomado {
 			void OnTitleSet(int sessionIndex, string title);
 		}
 
-		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener, TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener, TitleSetListener titleSetListener, int editSessionIndex = -1) {
+		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener, 
+			TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener, 
+			TitleSetListener titleSetListener, OpenEditViewListener openEditViewListener, int editSessionIndex = -1) {
 			this.context = context;
 			this.sessions = sessions;
 			this.sessionClickListener = sessionClickListener;
@@ -93,6 +100,7 @@ namespace Tomado {
 			this.timePickerListener = timePickerListener;
 			this.editSessionindex = editSessionIndex;
 			this.titleSetListener = titleSetListener;
+			this.openEditViewListener = openEditViewListener;
 		}
 
 		public override long GetItemId(int position) {
@@ -156,6 +164,9 @@ namespace Tomado {
 
 						//toggle
 						toggled = true;
+
+						//update edit index
+						openEditViewListener.OnOpenEditView(position);
 					}
 					else {
 						//hide edit menu
@@ -166,6 +177,9 @@ namespace Tomado {
 
 						//toggle
 						toggled = false;
+
+						//update edit index
+						openEditViewListener.OnOpenEditView(-1);
 					}
 				};
 			}
@@ -201,10 +215,6 @@ namespace Tomado {
 			editTextTitle.EditorAction += delegate {
 				//set session title
 				titleSetListener.OnTitleSet(position, editTextTitle.Text);
-
-				//close KB
-				Android.Views.InputMethods.InputMethodManager imm = (Android.Views.InputMethods.InputMethodManager)context.GetSystemService(Context.InputMethodService);
-				imm.HideSoftInputFromWindow(editTextTitle.WindowToken, Android.Views.InputMethods.HideSoftInputFlags.None);
 			};
 			
 
@@ -219,6 +229,11 @@ namespace Tomado {
 
 				//toggle, duh
 				toggled = true;
+
+				//focus on title edittext; show keyboard
+				//editTextTitle.ShowSoftInputOnFocus = true;
+				//editTextTitle.RequestFocusFromTouch();
+
 			}
 
 			//set edittextviews to reflect session info

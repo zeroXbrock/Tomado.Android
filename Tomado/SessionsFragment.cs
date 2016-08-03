@@ -18,6 +18,7 @@ using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Util;
+using Android.Views.InputMethods;
 
 using Clans.Fab; //floating buttons
 
@@ -32,7 +33,8 @@ namespace Tomado {
 	public class SessionsFragment : Android.Support.V4.App.Fragment, FreeTimeFragment.GetNewFreeTimeListener, NewSessionFragment.GetNewSessionListener, 
 									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, SessionAdapter.ShowDeleteSessionDialogListener,
 									DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener,
-									SessionAdapter.ShowTimePickerDialogListener, SessionAdapter.ShowDatePickerDialogListener, SessionAdapter.TitleSetListener {
+									SessionAdapter.ShowTimePickerDialogListener, SessionAdapter.ShowDatePickerDialogListener, SessionAdapter.TitleSetListener,
+									SessionAdapter.OpenEditViewListener {
 		//view instances
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
@@ -116,8 +118,6 @@ namespace Tomado {
 
 			searchButton.Click += delegate {
 				ShowFreeTimeDialog();
-
-				ResetListViewAdapter();
 			};
 
 			newSessionMenu.SetMenuButtonColorNormalResId(Resource.Color.base_app_complementary_color);
@@ -187,6 +187,10 @@ namespace Tomado {
 			ResetListViewAdapter(editIndex);
 		}
 
+		public void OnOpenEditView(int sessionIndex) {
+			UpdateEditIndex(sessionIndex);
+		}
+
 		public void OnTitleSet(int sessionIndex, string title) {
 			DeleteSessionFromDatabase(_sessions[sessionIndex].ID);
 
@@ -195,6 +199,10 @@ namespace Tomado {
 			ResetListViewAdapter(sessionIndex);
 
 			SaveSessionToDatabase(_sessions[sessionIndex]);
+
+			//close KB
+			var mgr = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
+			mgr.HideSoftInputFromWindow(View.WindowToken, 0);
 		}
 
 		public void OnShowDatePickerDialog(int sessionIndex) {
@@ -244,7 +252,7 @@ namespace Tomado {
 			Session session = AddSession(1, dateTime, title, recurring);
 
 			//reset the listview adapter
-			ResetListViewAdapter();
+			ResetListViewAdapter(editIndex);
 
 			//update the database
 			SaveSessionToDatabase(session);
@@ -262,6 +270,10 @@ namespace Tomado {
 			ShowDeleteSessionDialog(session);
 		}
 
+		/// <summary>
+		/// Overload of matching function to accept session.
+		/// </summary>
+		/// <param name="session"></param>
 		private void OnAddNewSession(Session session) {
 			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 			string title = session.Title;
@@ -341,7 +353,7 @@ namespace Tomado {
 		/// Populate class listview with sessions.
 		/// </summary>
 		private void ResetListViewAdapter(int editSessionIndex = -1) {
-			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, editSessionIndex);
+			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, editSessionIndex);
 		}
 
 		/// <summary>
@@ -356,7 +368,15 @@ namespace Tomado {
 			swipeRefreshLayout.Refreshing = false;
 		}
 
+		/// <summary>
+		/// Called when user creates a new freetime session
+		/// </summary>
+		/// <param name="session"></param>
 		public void OnGetNewFreeTime(Session session) {
+			//update index
+			UpdateEditIndex(_sessions.Count);
+			
+			//add the session
 			OnAddNewSession(session);
 		}
 
