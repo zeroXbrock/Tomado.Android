@@ -192,31 +192,39 @@ namespace Tomado {
 			//scroll to new item
 			listViewSessions.SetSelection(listViewSessions.Count - 1);
 		}
+		int lastSessionIndex = -1;
 
 		public void OnClickEditButton(int sessionIndex) {
 			UpdateEditIndex(sessionIndex);
 
 			ResetListViewAdapter(sessionIndex);
 
+			if (sessionIndex >= 0)
+				lastSessionIndex = sessionIndex;
 			//scroll to item being edited
-			listViewSessions.SetSelection(sessionIndex);
+			listViewSessions.SetSelection(lastSessionIndex);
+			//listViewSessions.SetSelectionFromTop
 		}
 
 		public void OnTitleSet(int sessionIndex, string title) {
-			DeleteSessionFromDatabase(_sessions[sessionIndex].ID);
+			if (title != "") {
+				DeleteSessionFromDatabase(_sessions[sessionIndex].ID);
 
-			_sessions[sessionIndex].Title = title;
+				_sessions[sessionIndex].Title = title;
 
-			ResetListViewAdapter(sessionIndex);
+				ResetListViewAdapter(sessionIndex);
 
-			SaveSessionToDatabase(_sessions[sessionIndex]);
+				SaveSessionToDatabase(_sessions[sessionIndex]);
 
+				//scroll to new item
+				listViewSessions.SetSelection(sessionIndex);
+			}
+			
 			//close KB
 			var mgr = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
 			mgr.HideSoftInputFromWindow(View.WindowToken, 0);
 
-			//scroll to new item
-			listViewSessions.SetSelection(listViewSessions.Count - 1);
+			
 		}
 
 		public void OnShowDatePickerDialog(int sessionIndex) {
