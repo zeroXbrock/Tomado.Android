@@ -45,6 +45,7 @@ namespace Tomado {
 				view = context.LayoutInflater.Inflate(Resource.Layout.FreeTimeListItem, null);
 			}
 
+
 			TextView textViewTime = view.FindViewById<TextView>(Resource.Id.textViewTime);
 			TextView textViewDuration = view.FindViewById<TextView>(Resource.Id.textViewDuration);
 			freeTimeListItem = view.FindViewById<LinearLayout>(Resource.Id.freeTimeListItem);
@@ -52,6 +53,7 @@ namespace Tomado {
 			FreeTime ft = freetime[position];
 
 			DateTime time = ft.Start;
+
 			long durationInTicks = (ft.End.Ticks - ft.Start.Ticks);
 			durationHours = durationInTicks / TimeSpan.TicksPerHour;
 			durationMinutes = (durationInTicks - (durationHours * TimeSpan.TicksPerHour)) / TimeSpan.TicksPerMinute;

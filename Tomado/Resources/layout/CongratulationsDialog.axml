@@ -1,28 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
-        android:text="Congrats!"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+    android:layout_height="128dp">
+    <Button
+        android:id="@+id/buttonOKInvisible_congrats"
+        android:background="@color/base_app_complementary_color"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textViewCongratulationsMessage"
-        style="@style/DialogContentTextView" />
+        android:layout_height="128dp"
+        style="@android:style/Widget.Material.Button.Borderless" />
     <LinearLayout
-        android:orientation="horizontal"
-        android:minWidth="25px"
-        android:minHeight="25px"
-        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/linearLayout1"
-        android:gravity="right">
-        <Button
-            android:text="OK"
-            android:id="@+id/buttonOK_congrats"
+        style="@style/DialogGreen"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/buttonOK_congrats">
+        <TextView
+            android:text="Congrats!"
+            android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            style="@android:style/Widget.Material.Button.Borderless" />
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewCongratulationsTitle"
+            android:paddingBottom="0dp"
+            android:gravity="center|left" />
+        <TextView
+            android:text="Completed in 4 hours &amp; 20 minutes."
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/buttonOK_congrats"
+            android:layout_below="@+id/textViewCongratulationsTitle"
+            android:id="@+id/textViewCongratulationsMessage"
+            android:gravity="center|left" />
     </LinearLayout>
-</LinearLayout>
+    <Button
+        android:text="OK"
+        android:id="@+id/buttonOK_congrats"
+        android:layout_width="wrap_content"
+        style="@android:style/Widget.Material.Button.Borderless"
+        android:layout_alignParentRight="true"
+        android:layout_height="128dp"
+        android:maxLines="3" />
+</RelativeLayout>

@@ -1,10 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <resources>
-  <style name="DialogContentTextView">
-	<item name="android:layout_marginLeft">24dp</item>
+  <style name="DialogRed">
+	<item name="android:padding">24dp</item>
+	
+	<item name="android:background">@color/base_app_color</item>
   </style>
-  <style name="DialogContentEditText">
-	<item name="android:layout_marginLeft">16dp</item>
-	<item name="android:layout_marginRight">16dp</item>
+  <style name="DialogGreen">
+	<item name="android:padding">24dp</item>
+
+	<item name="android:background">@color/base_app_complementary_color</item>
   </style>
+
 </resources>

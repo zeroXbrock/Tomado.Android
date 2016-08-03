@@ -113,15 +113,11 @@ namespace Tomado {
 			};
 			pauseButton.Click += delegate {
 				isPaused = true;
-				isTimerRunning = false;
-
-				if (countDownTimer != null)
-					countDownTimer.Cancel();
+				CancelTimer();
 			};
 			finishButton.Click += delegate {
 				//stop timer
-				pauseButton.CallOnClick();
-				isPaused = false;
+				CancelTimer();
 
 				//open congrats dialog
 				ShowCongratsDialog(fragmentSession);
@@ -139,9 +135,18 @@ namespace Tomado {
 			return rootView;
 		}
 
-		///helper functions to thin OnCreateView out
-		
-		//
+		//helper functions to thin OnCreateView out
+
+		/// <summary>
+		/// Sets timer running var to false and cancels timer.
+		/// </summary>
+		private void CancelTimer() {
+			isTimerRunning = false;
+
+			if (countDownTimer != null)
+				countDownTimer.Cancel();
+		}
+
 		/// <summary>
 		/// Sets local vars to bundle data.
 		/// </summary>

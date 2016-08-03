@@ -18,6 +18,7 @@ using Android.Support.V4.App;
 using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Util;
+using Android.Views.InputMethods;
 
 using Clans.Fab; //floating buttons
 
@@ -30,12 +31,18 @@ namespace Tomado {
 	/// Fragment that display a list of Sessions.
 	/// </summary>
 	public class SessionsFragment : Android.Support.V4.App.Fragment, FreeTimeFragment.GetNewFreeTimeListener, NewSessionFragment.GetNewSessionListener, 
-									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener {
-		//view instasnces
+									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, SessionAdapter.ShowDeleteSessionDialogListener,
+									DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener,
+									SessionAdapter.ShowTimePickerDialogListener, SessionAdapter.ShowDatePickerDialogListener, SessionAdapter.TitleSetListener,
+									SessionAdapter.ClickEditButtonListener {
+		//view instances
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
 		FloatingActionMenu newSessionMenu;
 		SwipeRefreshLayout swipeRefreshLayout;
+
+		//keep track of item being edited
+		int editIndex = -1;
 
 		//listener to send click event back to activity
 		SessionAdapter.SessionClickListener sessionClickListener;
@@ -92,8 +99,8 @@ namespace Tomado {
 			
 			newSessionMenu = rootView.FindViewById<FloatingActionMenu>(Resource.Id.menu_newSession);
 
-			//newSessionMenu.SetOnClickListener(this);
-			//newSessionMenu.SetClosedOnTouchOutside(false); //doesn't work
+			//set listview mode to allow overscroll
+			listViewSessions.OverScrollMode = OverScrollMode.Always;
 			
 			newSessionButton = new FloatingActionButton(Activity);
 			newSessionButton.SetImageResource(Resource.Drawable.ic_add_white_24dp);
@@ -115,8 +122,8 @@ namespace Tomado {
 
 			newSessionMenu.SetMenuButtonColorNormalResId(Resource.Color.base_app_complementary_color);
 
-			newSessionMenu.AddMenuButton(searchButton);
 			newSessionMenu.AddMenuButton(newSessionButton);
+			newSessionMenu.AddMenuButton(searchButton);
 
 			//swipeRefreshLayout.SetOnRefreshListener(this);
 			swipeRefreshLayout.Refresh += OnRefresh;
@@ -130,12 +137,103 @@ namespace Tomado {
 			return rootView;
 		}
 
-		public bool OnTouch(View v) {
-			if (v.Id != Resource.Id.menu_newSession) {
-				newSessionMenu.Close(true);
-			}
+		/// <summary>
+		/// Method to keep track of session being edited
+		/// </summary>
+		/// <param name="index"></param>
+		private void UpdateEditIndex(int index) {
+			editIndex = index;
+		}
 
-			return false;
+		/// <summary>
+		/// Called when datepickerdialog closes w/ OK and was started from this context
+		/// </summary>
+		/// <param name="datePicker"></param>
+		/// <param name="year"></param>
+		/// <param name="month"></param>
+		/// <param name="day"></param>
+		public void OnDateSet(DatePicker datePicker, int year, int month, int day) {
+			DeleteSessionFromDatabase(_sessions[editIndex].ID);
+
+			//update _sessions
+			_sessions[editIndex].Year = year;
+			_sessions[editIndex].MonthOfYear = month;
+			_sessions[editIndex].DayOfMonth = day;
+
+			//update database w/ new session info
+			SaveSessionToDatabase(_sessions[editIndex]);
+
+			//reset adapter & edit view on session in list
+			ResetListViewAdapter(editIndex);
+
+			//scroll to new item
+			listViewSessions.SetSelection(listViewSessions.Count - 1);
+		}
+
+		/// <summary>
+		/// Called when timepickerdialog closes w/ OK and was started from this context
+		/// </summary>
+		/// <param name="timePicker"></param>
+		/// <param name="hour"></param>
+		/// <param name="minute"></param>
+		public void OnTimeSet(TimePicker timePicker, int hour, int minute){
+			DeleteSessionFromDatabase(_sessions[editIndex].ID);
+
+			//update _sessions
+			_sessions[editIndex].StartHour = hour;
+			_sessions[editIndex].StartMinute = minute;
+
+			//update database w/ new session info
+			SaveSessionToDatabase(_sessions[editIndex]);
+
+			//reset adapter, open edit view on session in list
+			ResetListViewAdapter(editIndex);
+
+			//scroll to new item
+			listViewSessions.SetSelection(listViewSessions.Count - 1);
+		}
+
+		public void OnClickEditButton(int sessionIndex) {
+			UpdateEditIndex(sessionIndex);
+
+			//opening the edit view
+			if (sessionIndex >= 0) {
+
+			}
+			else {
+
+			}
+		}
+
+		public void OnTitleSet(int sessionIndex, string title) {
+			DeleteSessionFromDatabase(_sessions[sessionIndex].ID);
+
+			_sessions[sessionIndex].Title = title;
+
+			ResetListViewAdapter(sessionIndex);
+
+			SaveSessionToDatabase(_sessions[sessionIndex]);
+
+			//close KB
+			var mgr = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
+			mgr.HideSoftInputFromWindow(View.WindowToken, 0);
+
+			//scroll to new item
+			listViewSessions.SetSelection(listViewSessions.Count - 1);
+		}
+
+		public void OnShowDatePickerDialog(int sessionIndex) {
+			UpdateEditIndex(sessionIndex);
+
+			DatePickerDialogFragment dialog = new DatePickerDialogFragment(Context, DateTime.Now, this);
+			dialog.Show(FragmentManager, "dialog");
+		}
+
+		public void OnShowTimePickerDialog(int sessionIndex) {
+			UpdateEditIndex(sessionIndex);
+
+			TimePickerDialogFragment dialog = new TimePickerDialogFragment(Context, DateTime.Now, this);
+			dialog.Show(FragmentManager, "dialog");
 		}
 
 		/// <summary>
@@ -171,7 +269,7 @@ namespace Tomado {
 			Session session = AddSession(1, dateTime, title, recurring);
 
 			//reset the listview adapter
-			ResetListViewAdapter();
+			ResetListViewAdapter(editIndex);
 
 			//update the database
 			SaveSessionToDatabase(session);
@@ -185,6 +283,14 @@ namespace Tomado {
 			});
 		}
 
+		public void OnShowDeleteSessionDialog(Session session) {
+			ShowDeleteSessionDialog(session);
+		}
+
+		/// <summary>
+		/// Overload of matching function to accept session.
+		/// </summary>
+		/// <param name="session"></param>
 		private void OnAddNewSession(Session session) {
 			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 			string title = session.Title;
@@ -238,10 +344,33 @@ namespace Tomado {
 		}
 
 		/// <summary>
+		/// Shows a dialog asking user to delete session
+		/// </summary>
+		private void ShowDeleteSessionDialog(Session session) {
+			Android.Support.V4.App.FragmentTransaction ft = FragmentManager.BeginTransaction();
+
+			//some code to remove any existing dialogs
+			Android.Support.V4.App.Fragment prev = FragmentManager.FindFragmentByTag("dialog");
+			if (prev != null) {
+				ft.Remove(prev);
+			}
+
+			ft.AddToBackStack(null);
+
+			//create and show dialog
+			var dialog = new DeleteSessionFragment(session, this);
+
+			dialog.SetTargetFragment(this, 0);
+			
+
+			dialog.Show(FragmentManager, "dialog");
+		}
+
+		/// <summary>
 		/// Populate class listview with sessions.
 		/// </summary>
-		private void ResetListViewAdapter() {
-			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this);
+		private void ResetListViewAdapter(int editSessionIndex = -1) {
+			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, editSessionIndex);
 		}
 
 		/// <summary>
@@ -256,8 +385,24 @@ namespace Tomado {
 			swipeRefreshLayout.Refreshing = false;
 		}
 
+		/// <summary>
+		/// Called when user creates a new freetime session
+		/// </summary>
+		/// <param name="session"></param>
 		public void OnGetNewFreeTime(Session session) {
+			//update index
+			UpdateEditIndex(_sessions.Count);
+			
+			//add the session
 			OnAddNewSession(session);
+
+			//scroll to new item
+			listViewSessions.SetSelection(listViewSessions.Count - 1);
+
+			//show keyboard
+			//Activity.Window.SetSoftInputMode(SoftInput.StateVisible);
+			//var mgr = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
+			//mgr.ShowSoftInputFromInputMethod(View.ApplicationWindowToken, ShowFlags.Forced);
 		}
 
 		/// <summary>
@@ -314,6 +459,10 @@ namespace Tomado {
 		private async void DeleteSessionFromDatabase(Session session) {
 			//remove session from database
 			await connection.DeleteAsync(session);
+		}
+
+		private async void DeleteSessionFromDatabase(int ID) {
+			await connection.ExecuteScalarAsync<int>("DELETE FROM Session WHERE ID=" + ID + ";");
 		}
 
 		/// <summary>

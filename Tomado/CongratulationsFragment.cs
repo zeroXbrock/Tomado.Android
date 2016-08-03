@@ -5,6 +5,8 @@ using System.Text;
 
 using Android.App;
 using Android.Content;
+using Android.Graphics.Drawables;
+using Android.Graphics;
 using Android.OS;
 using Android.Runtime;
 using Android.Util;
@@ -38,18 +40,25 @@ namespace Tomado {
 			// Use this to return your custom view for this Fragment
 			// return inflater.Inflate(Resource.Layout.YourFragment, container, false);
 
-			Dialog.SetTitle("Congratulations!");
-
+			Dialog.Window.RequestFeature(WindowFeatures.NoTitle);
+			
+			Dialog.Window.SetLayout(WindowManagerLayoutParams.MatchParent, Resource.String.DialogHeight);
+			
 			View view = inflater.Inflate(Resource.Layout.CongratulationsDialog, container, false);
 
 			Button okButton = view.FindViewById<Button>(Resource.Id.buttonOK_congrats);
+			Button okButtonInvisible = view.FindViewById<Button>(Resource.Id.buttonOKInvisible_congrats);
 
-			okButton.Click += delegate {
+			okButton.Clickable = false;
+			okButtonInvisible.Click += delegate {
 				Dismiss();
 			};
 
+			var textViewCongratsTitle = view.FindViewById<TextView>(Resource.Id.textViewCongratulationsTitle);
 			TextView textViewCongratsMessage = view.FindViewById<TextView>(Resource.Id.textViewCongratulationsMessage);
-			textViewCongratsMessage.Text = "Good job! You completed " + taskName + " in " + pomodoros.ToString() + " tomados!";
+
+			textViewCongratsTitle.Text = taskName;
+			textViewCongratsMessage.Text = "Completed in " + pomodoros.ToString() + " sessions!";
 
 			return view;
 		}
