@@ -204,6 +204,10 @@ namespace Tomado {
 			//scroll to item being edited
 			listViewSessions.SetSelection(lastSessionIndex);
 			//listViewSessions.SetSelectionFromTop
+
+			//close KB
+			var mgr = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
+			mgr.HideSoftInputFromWindow(View.WindowToken, 0);
 		}
 
 		public void OnTitleSet(int sessionIndex, string title) {
