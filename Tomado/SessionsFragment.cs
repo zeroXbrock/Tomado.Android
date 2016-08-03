@@ -199,15 +199,20 @@ namespace Tomado {
 
 			ResetListViewAdapter(sessionIndex);
 
-			if (sessionIndex >= 0)
+			if (sessionIndex >= 0) {
 				lastSessionIndex = sessionIndex;
-			//scroll to item being edited
-			listViewSessions.SetSelection(lastSessionIndex);
-			//listViewSessions.SetSelectionFromTop
+			}
+			else {
+				//update notification info on close edit view
+				ScheduleSessionNotification(_sessions[lastSessionIndex]);
+				
+				//scroll to item being edited
+				listViewSessions.SetSelection(lastSessionIndex);
+				//listViewSessions.SetSelectionFromTop
+			}
 
 			//close KB
-			var mgr = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
-			mgr.HideSoftInputFromWindow(View.WindowToken, 0);
+			HideKeyboard();
 		}
 
 		public void OnTitleSet(int sessionIndex, string title) {
@@ -225,8 +230,7 @@ namespace Tomado {
 			}
 			
 			//close KB
-			var mgr = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
-			mgr.HideSoftInputFromWindow(View.WindowToken, 0);
+			HideKeyboard();
 
 			
 		}
@@ -413,11 +417,6 @@ namespace Tomado {
 
 			//scroll to new item
 			listViewSessions.SetSelection(listViewSessions.Count - 1);
-
-			//show keyboard
-			//Activity.Window.SetSoftInputMode(SoftInput.StateVisible);
-			//var mgr = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
-			//mgr.ShowSoftInputFromInputMethod(View.ApplicationWindowToken, ShowFlags.Forced);
 		}
 
 		/// <summary>
@@ -456,7 +455,16 @@ namespace Tomado {
 		void DeleteSession(Session session) {
 			//remove session from class sessions list
 			_sessions.Remove(session);
-		}		
+		}
+
+		void HideKeyboard() {
+			var mgr = (InputMethodManager)Activity.GetSystemService(Context.InputMethodService);
+			mgr.HideSoftInputFromWindow(View.WindowToken, 0);
+		}
+
+		void ShowKeyboard() {
+
+		}
 
 		#region database methods
 		/// <summary>
@@ -563,14 +571,15 @@ namespace Tomado {
 		/// Schedules a notification to launch in the future; to open a session from
 		/// </summary>
 		/// <param name="session"></param>
-		public async void ScheduleSessionNotification(Session session) {
+		public async void ScheduleSessionNotification(Session session) {			
 			Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
 			
 			alarmIntent.PutExtra("ID", session.ID);
 			alarmIntent.PutExtra("title", "Tomado");
 			alarmIntent.PutExtra("content", session.Title);
 
-			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 0, alarmIntent, PendingIntentFlags.UpdateCurrent);
+			//makes new notification or updates pre-existing one
+			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, session.ID, alarmIntent, PendingIntentFlags.UpdateCurrent);
 			AlarmManager alarmManager = (AlarmManager)Activity.GetSystemService(Context.AlarmService);
 			
 			if (session.Recurring) {
