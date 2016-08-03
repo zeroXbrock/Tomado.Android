@@ -168,7 +168,7 @@ namespace Tomado {
 						toggled = true;
 
 						//update edit index
-						openEditViewListener.OnClickEditButton(position);
+						editSessionindex = position;
 
 						//change button icon
 						editMenuButton.SetImageResource(Resource.Drawable.ic_check_white_24dp);
@@ -184,10 +184,13 @@ namespace Tomado {
 						toggled = false;
 
 						//update edit index
-						openEditViewListener.OnClickEditButton(-1);
+						editSessionindex = -1;
 
 						editMenuButton.SetImageResource(Resource.Drawable.ic_edit_white_24dp);
 					}
+
+					//fire edit click event
+					openEditViewListener.OnClickEditButton(editSessionindex);
 				};
 			}
 
@@ -225,23 +228,29 @@ namespace Tomado {
 			};
 			
 
-			//if we make an adapter with a non-neg editSessionIndex, open the edit dialog on that session
-			if (editSessionindex == position) {
-				//list adapter has been reset
-				//make edit layout visible
-				editLayout.Visibility = ViewStates.Visible;
+			
+			//don't open any dialogs if 
+			if (editSessionindex == -1)
+				toggled = false;
+			else //if we make an adapter with a non-neg editSessionIndex, open the edit dialog on that session
+				if (editSessionindex == position) {
+					//list adapter has been reset
+					//make edit layout visible
+					editLayout.Visibility = ViewStates.Visible;
 
-				//make background green
-				view.SetBackgroundResource(Resource.Color.base_app_complementary_color);
+					//make background green
+					view.SetBackgroundResource(Resource.Color.base_app_complementary_color);
 
-				//toggle, duh
-				toggled = true;
+					//set icon to check mark
+					editMenuButton.SetImageResource(Resource.Drawable.ic_check_white_24dp);
 
-				//focus on title edittext; show keyboard
-				//editTextTitle.ShowSoftInputOnFocus = true;
-				editTextTitle.RequestFocusFromTouch();
+					//toggle, duh
+					toggled = true;
 
-			}
+					//focus on title edittext; show keyboard
+					//editTextTitle.ShowSoftInputOnFocus = true;
+					editTextTitle.RequestFocusFromTouch();
+				}
 
 			//set edittextviews to reflect session info
 			editTextTitle.Hint = session.Title;
