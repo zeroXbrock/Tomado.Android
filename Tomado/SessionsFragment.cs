@@ -234,12 +234,18 @@ namespace Tomado {
 		public void OnShowDatePickerDialog(int sessionIndex) {
 			UpdateEditIndex(sessionIndex);
 
+			//refocus listview
+			listViewSessions.SetSelection(sessionIndex);
+
 			DatePickerDialogFragment dialog = new DatePickerDialogFragment(Context, DateTime.Now, this);
 			dialog.Show(FragmentManager, "dialog");
 		}
 
 		public void OnShowTimePickerDialog(int sessionIndex) {
 			UpdateEditIndex(sessionIndex);
+
+			//refocus listview
+			listViewSessions.SetSelection(sessionIndex);
 
 			TimePickerDialogFragment dialog = new TimePickerDialogFragment(Context, DateTime.Now, this);
 			dialog.Show(FragmentManager, "dialog");
