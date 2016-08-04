@@ -241,6 +241,9 @@ namespace Tomado {
 			editTextTitle.EditorAction += delegate {
 				//set session title
 				titleSetListener.OnTitleSet(position, editTextTitle.Text);
+
+				//lose focus
+				view.RequestFocus(FocusSearchDirection.Backward);
 			};
 			editTextTitle.AddTextChangedListener(this);
 
