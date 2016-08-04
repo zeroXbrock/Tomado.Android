@@ -106,8 +106,8 @@ namespace Tomado {
 			//iterate through items to find selected events
 			while (cursor.MoveToNext()) {
 				//start & end date define period to look in for events
-				DateTime sDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(cursor.GetLong(2)).ToLocalTime();//index 2 is start date; 3 is end date
-				DateTime eDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(cursor.GetLong(3)).ToLocalTime();
+				DateTime sDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds((double)cursor.GetLong(2)).ToLocalTime();//index 2 is start date; 3 is end date
+				DateTime eDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds((double)cursor.GetLong(3)).ToLocalTime();
 
 				if (sDate >= now && sDate < tomorrow) {
 					//add item to selected events
@@ -132,6 +132,9 @@ namespace Tomado {
 			if (selectedEventsCursor.Count == 0) {
 				freetime.Add(new FreeTime() { Start = start, End = tomorrow });
 			}
+			//on last item, add freetime from end of last event to midnight
+			else if (start.Ticks < tomorrow.Ticks)
+				freetime.Add(new FreeTime() { Start = start, End = tomorrow });
 
 			//return list
 			return freetime;
@@ -150,7 +153,7 @@ namespace Tomado {
 			//get a cursor to browse calendar events
 			var loader = new CursorLoader(Activity, calendarsUri, calendarsProjection, null, null, null);
 			var cursor = (ICursor)loader.LoadInBackground(); //runs asynch
-
+			
 			return cursor;
 		}
 	}
