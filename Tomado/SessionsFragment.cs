@@ -41,6 +41,10 @@ namespace Tomado {
 		FloatingActionMenu newSessionMenu;
 		SwipeRefreshLayout swipeRefreshLayout;
 
+		//will be view instances
+		DatePickerDialogFragment dateDialog;
+		TimePickerDialogFragment timeDialog;
+
 		//keep track of item being edited
 		int editIndex = -1;
 		string title = "";
@@ -180,9 +184,12 @@ namespace Tomado {
 				title = adapter.TitleText;
 			}
 
+			if (dateDialog != null) {
+				
+			}
+
 			outState.PutString("title", title);
 			outState.PutInt("editIndex", editIndex);
-			
 		}
 
 		/// <summary>
@@ -292,8 +299,11 @@ namespace Tomado {
 			//refocus listview
 			listViewSessions.SetSelection(sessionIndex);
 
-			DatePickerDialogFragment dialog = new DatePickerDialogFragment(Context, DateTime.Now, this);
-			dialog.Show(FragmentManager, "dialog");
+			dateDialog = new DatePickerDialogFragment(Context, DateTime.Now, this);
+			
+			//set dialog to retain instance; prevents it from crashing the app
+			dateDialog.RetainInstance = true; 
+			dateDialog.Show(FragmentManager, "dialog");
 		}
 
 		public void OnShowTimePickerDialog(int sessionIndex) {
@@ -302,8 +312,10 @@ namespace Tomado {
 			//refocus listview
 			listViewSessions.SetSelection(sessionIndex);
 
-			TimePickerDialogFragment dialog = new TimePickerDialogFragment(Context, DateTime.Now, this);
-			dialog.Show(FragmentManager, "dialog");
+			timeDialog = new TimePickerDialogFragment(Context, DateTime.Now, this);
+
+			timeDialog.RetainInstance = true;
+			timeDialog.Show(FragmentManager, "dialog");
 		}
 
 		/// <summary>
