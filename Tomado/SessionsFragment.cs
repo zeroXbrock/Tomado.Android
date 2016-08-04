@@ -430,6 +430,8 @@ namespace Tomado {
 			//create and show dialog
 			NewSessionFragment dialog = new NewSessionFragment();
 
+			dialog.RetainInstance = true;
+
 			dialog.SetTargetFragment(this, 0);
 
 			dialog.Show(FragmentManager, "dialog");
@@ -451,6 +453,8 @@ namespace Tomado {
 
 			//create and show dialog
 			FreeTimeFragment dialog = new FreeTimeFragment(this);
+
+			dialog.RetainInstance = true;
 			
 			dialog.SetTargetFragment(this, 0);
 
