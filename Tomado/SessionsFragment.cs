@@ -43,6 +43,7 @@ namespace Tomado {
 
 		//keep track of item being edited
 		int editIndex = -1;
+		string title = "";
 
 		//listener to send click event back to activity
 		SessionAdapter.SessionClickListener sessionClickListener;
@@ -92,6 +93,16 @@ namespace Tomado {
 		public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			//return base.OnCreateView(inflater, container, savedInstanceState);
 
+			if (savedInstanceState != null){
+				//get sessions
+				var parcelable = savedInstanceState.GetParcelableArray("sessions");
+				//_sessions = parcelable.ToList<(IParcelable)>();
+
+				//get editIndex
+				editIndex = savedInstanceState.GetInt("editIndex");
+				title = savedInstanceState.GetString("title");
+			}
+
 			//get our base layout
 			View rootView = inflater.Inflate(Resource.Layout.Sessions, container, false);
 
@@ -105,6 +116,7 @@ namespace Tomado {
 			//set listview mode to allow overscroll
 			listViewSessions.OverScrollMode = OverScrollMode.Always;
 			
+			//instantiate views
 			newSessionButton = new FloatingActionButton(Activity);
 			newSessionButton.SetImageResource(Resource.Drawable.ic_add_white_24dp);
 			newSessionButton.LabelText = "New Session";
@@ -113,6 +125,7 @@ namespace Tomado {
 			searchButton.SetImageResource(Resource.Drawable.ic_search_white_24dp);
 			searchButton.LabelText = "Find free time";
 
+			//set button events
 			newSessionButton.Click += delegate {
 				//open new session dialog fragment
 				//NewSessionFragment fragment = new NewSessionFragment();
@@ -123,18 +136,32 @@ namespace Tomado {
 				ShowFreeTimeDialog();
 			};
 
+			//set menu button style
 			newSessionMenu.SetMenuButtonColorNormalResId(Resource.Color.base_app_complementary_color);
 
+			//add buttons to menu
 			newSessionMenu.AddMenuButton(newSessionButton);
 			newSessionMenu.AddMenuButton(searchButton);
 
-			//swipeRefreshLayout.SetOnRefreshListener(this);
+			//set refresh event
 			swipeRefreshLayout.Refresh += OnRefresh;
 
 			//get sessions from database and update listView
 			LoadSessionsFromDatabase().ContinueWith(t => {
-				Activity.RunOnUiThread(() => { ResetListViewAdapter(); });
-			});			
+				Activity.RunOnUiThread(() => { 
+					ResetListViewAdapter(); //listViewSessions is guaranteed to be instantiated now
+					//set edit view if there is one
+					if (editIndex > 0 && savedInstanceState != null) {
+						var adapter = (SessionAdapter)listViewSessions.Adapter;
+
+						//get item at index
+						var itemView = adapter.GetView(editIndex, null, null);
+
+						//call edit button click to open the edit menu
+						itemView.FindViewById<ImageButton>(Resource.Id.imageButtonEditSession).CallOnClick();
+					}
+				});
+			});
 
 			//return the inflated/modified base layout
 			return rootView;
@@ -143,6 +170,17 @@ namespace Tomado {
 		public override void OnSaveInstanceState(Bundle outState) {
 			base.OnSaveInstanceState(outState);
 
+			var adapter = (SessionAdapter)listViewSessions.Adapter;
+			View itemView = null;
+
+			//get item at index
+			if (editIndex >= 0) {
+				itemView = adapter.GetView(editIndex, null, null);
+
+				title = adapter.TitleText;
+			}
+
+			outState.PutString("title", title);
 			outState.PutInt("editIndex", editIndex);
 			
 		}
@@ -434,7 +472,7 @@ namespace Tomado {
 		/// Populate class listview with sessions.
 		/// </summary>
 		private void ResetListViewAdapter(int editSessionIndex = -1) {
-			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, editSessionIndex);
+			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, title, editSessionIndex);
 		}
 
 		

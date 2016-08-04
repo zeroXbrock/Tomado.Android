@@ -24,7 +24,7 @@ namespace Tomado {
 	/// <summary>
 	/// Adapter to populate Sessions list.
 	/// </summary>
-	public class SessionAdapter : BaseAdapter<Session> {
+	public class SessionAdapter : BaseAdapter<Session>, Android.Text.ITextWatcher {
 		List<Session> sessions;
 		Activity context;
 		DeleteSessionListener deleteSessionListener;
@@ -89,7 +89,7 @@ namespace Tomado {
 
 		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener, 
 			TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener, 
-			TitleSetListener titleSetListener, ClickEditButtonListener openEditViewListener, int editSessionIndex = -1) {
+			TitleSetListener titleSetListener, ClickEditButtonListener openEditViewListener, string title, int editSessionIndex = -1) {
 			this.context = context;
 			this.sessions = sessions;
 			this.sessionClickListener = sessionClickListener;
@@ -101,6 +101,7 @@ namespace Tomado {
 			this.editSessionindex = editSessionIndex;
 			this.titleSetListener = titleSetListener;
 			this.openEditViewListener = openEditViewListener;
+			this.TitleText = title;
 		}
 
 		public override long GetItemId(int position) {
@@ -111,14 +112,25 @@ namespace Tomado {
 			get { return sessions[position]; }
 		}
 
+		public List<Session> Sessions {
+			get {
+				return sessions;
+			}
+		}
+
 		public override int Count {
 			get { return sessions.Count; }
+		}
+
+		//var to store title text while user types
+		public string TitleText {
+			get;
+			set;
 		}
 
 		public override View GetView(int position, View convertView, ViewGroup parent) {
 			View view = convertView;//reuse existing view if available
 			if (view == null) {
-				
 			}//disregard recycling
 
 			view = context.LayoutInflater.Inflate(Resource.Layout.SessionListItem, null);
@@ -141,7 +153,7 @@ namespace Tomado {
 			var editTextTime = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
 			
 			//set text views: title and time/date
-			titleTextView.Text = session.Title;
+			titleTextView.Text = session.Title;	
 			timeTextView.Text = (dateTime.ToShortTimeString() + "\n" + dateTime.ToShortDateString());
 
 			//get menu (toggle edit view) button
@@ -230,10 +242,10 @@ namespace Tomado {
 				//set session title
 				titleSetListener.OnTitleSet(position, editTextTitle.Text);
 			};
-			
+			editTextTitle.AddTextChangedListener(this);
 
 			
-			//don't open any dialogs if 
+			//don't open any dialogs if index is <0; that means nothing is being edited
 			if (editSessionindex == -1)
 				toggled = false;
 			else //if we make an adapter with a non-neg editSessionIndex, open the edit dialog on that session
@@ -269,14 +281,26 @@ namespace Tomado {
 				}
 
 			//set edittextviews to reflect session info
-			editTextTitle.Hint = session.Title;
+			if (TitleText == null || TitleText == "")
+				editTextTitle.Hint = session.Title;
+			else
+				editTextTitle.Text = TitleText;
 			editTextTime.Text = dateTime.ToShortTimeString();
 			editTextDate.Text = dateTime.ToShortDateString();
 
 			return view;
 		}
 
+		//event handlers for them keyboard events
+		public void OnTextChanged(ICharSequence text, int start, int before, int count) {
+			TitleText = text.ToString();
+		}
+		public void AfterTextChanged(Android.Text.IEditable s) {
 
+		}
+		public void BeforeTextChanged(ICharSequence s, int start, int count, int after) {
+
+		}
 
 		/*
 		private AnimatorSet CreateCustomAnimationMenuButton(View rootView) {
