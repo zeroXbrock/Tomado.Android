@@ -11,22 +11,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"
-        android:layout_marginTop="150dip">
+        android:layout_marginTop="50dp">
         <TextView
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textViewTimerTitle"
-			android:padding="48dp"
+            android:padding="48dp"
             android:text="title"
-			android:gravity="center"/>
+            android:layout_gravity="center_horizontal" />
         <TextView
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textViewTimer"
-            android:text="time" />
+            android:text="time"
+            android:layout_gravity="center_horizontal" />
     </LinearLayout>
 <!--TextView LinearLayout section end-->
 <!--Button RelativeLayout section begin-->
