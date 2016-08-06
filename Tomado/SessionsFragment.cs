@@ -299,7 +299,11 @@ namespace Tomado {
 			//refocus listview
 			listViewSessions.SetSelection(sessionIndex);
 
-			dateDialog = new DatePickerDialogFragment(Context, DateTime.Now, this);
+			Session session = _sessions[sessionIndex];
+
+			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth);
+
+			dateDialog = new DatePickerDialogFragment(Context, dateTime, this);
 			
 			//set dialog to retain instance; prevents it from crashing the app
 			dateDialog.RetainInstance = true; 
@@ -312,7 +316,11 @@ namespace Tomado {
 			//refocus listview
 			listViewSessions.SetSelection(sessionIndex);
 
-			timeDialog = new TimePickerDialogFragment(Context, DateTime.Now, this);
+			Session session = _sessions[sessionIndex];
+
+			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
+
+			timeDialog = new TimePickerDialogFragment(Context, dateTime, this);
 
 			timeDialog.RetainInstance = true;
 			timeDialog.Show(FragmentManager, "dialog");
@@ -700,7 +708,7 @@ namespace Tomado {
 		}
 
 		public override Dialog OnCreateDialog(Bundle savedInstanceState) {
-			var dialog = new Android.App.TimePickerDialog(_context, _listener, DateTime.Now.Hour, DateTime.Now.Minute, false);
+			var dialog = new Android.App.TimePickerDialog(_context, _listener, _time.Hour, _time.Minute, false);
 			return dialog;
 		}
 	}
