@@ -369,8 +369,8 @@ namespace Tomado
 			// aapt resource value: 0x7f06001c
 			public const int buttonCancel_NewSession = 2131099676;
 			
-			// aapt resource value: 0x7f060031
-			public const int buttonFinish = 2131099697;
+			// aapt resource value: 0x7f060030
+			public const int buttonFinish = 2131099696;
 			
 			// aapt resource value: 0x7f060012
 			public const int buttonNo_DeleteSession = 2131099666;
@@ -380,9 +380,6 @@ namespace Tomado
 			
 			// aapt resource value: 0x7f06000d
 			public const int buttonOK_congrats = 2131099661;
-			
-			// aapt resource value: 0x7f060030
-			public const int buttonPause = 2131099696;
 			
 			// aapt resource value: 0x7f06001d
 			public const int buttonSave_NewSession = 2131099677;

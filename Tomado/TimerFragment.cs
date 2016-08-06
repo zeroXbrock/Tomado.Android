@@ -18,7 +18,7 @@ namespace Tomado {
 	public class TimerFragment : Android.Support.V4.App.Fragment {
 		//view instances
 		TextView timerTextView, titleTextView;
-		ImageButton workButton, pauseButton, finishButton;
+		ImageButton workButton, finishButton;
 
 		//notification vars
 		const int timerNotificationId = 0;
@@ -64,7 +64,6 @@ namespace Tomado {
 			timerTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimer);
 			titleTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimerTitle);
 			workButton = rootView.FindViewById<ImageButton>(Resource.Id.buttonWork);
-			pauseButton = rootView.FindViewById<ImageButton>(Resource.Id.buttonPause);
 			finishButton = rootView.FindViewById<ImageButton>(Resource.Id.buttonFinish);
 
 			if (fragmentSession == null) { //lone timer
@@ -92,29 +91,39 @@ namespace Tomado {
 					fragmentSession.Pomodoros++;
 				}
 				if (isPaused) {
+					//resume timer
+
+					workButton.SetImageResource(Resource.Drawable.ic_pause_circle_filled_white_24dp);
+
 					duration = remainingTimeInMillis;
 					
 					isPaused = false;
 					
 					StartTimer(duration);
 				}
-				else {
-					if (!isTimerRunning) {
-						if (lastTimerType != TimerType.Work)
-							fragmentSession.Pomodoros++;
+				else if (!isTimerRunning) {
+					//new session (continuation of work)
 
-						UpdateTimer();
+					workButton.SetImageResource(Resource.Drawable.ic_pause_circle_filled_white_24dp);
+
+					if (lastTimerType != TimerType.Work)
+						fragmentSession.Pomodoros++;
+
+					UpdateTimer();
 						
-						//titleTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
-						
-						StartTimer(duration);
-					}
+					StartTimer(duration);
 				}
+				else {
+					//pause
+					workButton.SetImageResource(Resource.Drawable.ic_play_circle_filled_white_24dp);
+
+					isPaused = true;
+					
+					CancelTimer();
+				}
+				
 			};
-			pauseButton.Click += delegate {
-				isPaused = true;
-				CancelTimer();
-			};
+			
 			finishButton.Click += delegate {
 				//stop timer
 				CancelTimer();
@@ -400,6 +409,8 @@ namespace Tomado {
 			isTimerRunning = false;
 
 			UpdateTimerNotification("Finished", true);
+
+			workButton.SetImageResource(Resource.Drawable.ic_play_circle_filled_white_24dp);
 		}
 
 		public void OnNewTimer(Session session) {
