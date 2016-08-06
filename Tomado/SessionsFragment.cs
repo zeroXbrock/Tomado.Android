@@ -670,7 +670,7 @@ namespace Tomado {
 			else {
 				//set non-recurring event for session date/time
 				DateTime now = DateTime.Now.ToUniversalTime();
-				DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0).ToUniversalTime();
+				DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear+1, session.DayOfMonth, session.StartHour, session.StartMinute, 0).ToUniversalTime();
 				long intervalTicks = sessionDateTime.Ticks - now.Ticks;
 				long intervalMillis = intervalTicks / TimeSpan.TicksPerMillisecond;
 
