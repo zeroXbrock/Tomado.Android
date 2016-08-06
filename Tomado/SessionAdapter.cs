@@ -141,7 +141,7 @@ namespace Tomado {
 
 			//get session for this list item
 			Session session = sessions[position];
-			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
+			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear + 1, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 
 			//get textviews
 			var titleTextView = view.FindViewById<TextView>(Resource.Id.evTitle);
@@ -153,7 +153,8 @@ namespace Tomado {
 			var editTextTime = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
 			
 			//set text views: title and time/date
-			titleTextView.Text = session.Title;	
+			titleTextView.Text = session.Title;
+
 			timeTextView.Text = (dateTime.ToShortTimeString() + "\n" + dateTime.ToShortDateString());
 
 			//get menu (toggle edit view) button
