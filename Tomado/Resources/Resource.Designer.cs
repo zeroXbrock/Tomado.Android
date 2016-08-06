@@ -293,11 +293,11 @@ namespace Tomado
 		public partial class Drawable
 		{
 			
-			// aapt resource value: 0x7f020009
-			public const int base_app_color_drawable = 2130837513;
+			// aapt resource value: 0x7f02000d
+			public const int base_app_color_drawable = 2130837517;
 			
-			// aapt resource value: 0x7f02000a
-			public const int base_app_complementary_color_drawable = 2130837514;
+			// aapt resource value: 0x7f02000e
+			public const int base_app_complementary_color_drawable = 2130837518;
 			
 			// aapt resource value: 0x7f020000
 			public const int fab_add = 2130837504;
@@ -312,19 +312,31 @@ namespace Tomado
 			public const int ic_arrow_drop_down_circle_white_24dp = 2130837507;
 			
 			// aapt resource value: 0x7f020004
-			public const int ic_check_white_24dp = 2130837508;
+			public const int ic_check_circle_white_24dp = 2130837508;
 			
 			// aapt resource value: 0x7f020005
-			public const int ic_delete_white_24dp = 2130837509;
+			public const int ic_check_white_24dp = 2130837509;
 			
 			// aapt resource value: 0x7f020006
-			public const int ic_edit_white_24dp = 2130837510;
+			public const int ic_delete_white_24dp = 2130837510;
 			
 			// aapt resource value: 0x7f020007
-			public const int ic_search_white_24dp = 2130837511;
+			public const int ic_edit_white_24dp = 2130837511;
 			
 			// aapt resource value: 0x7f020008
-			public const int Icon = 2130837512;
+			public const int ic_pause_circle_filled_white_24dp = 2130837512;
+			
+			// aapt resource value: 0x7f020009
+			public const int ic_play_circle_filled_white_24dp = 2130837513;
+			
+			// aapt resource value: 0x7f02000a
+			public const int ic_play_circle_outline_white_24dp = 2130837514;
+			
+			// aapt resource value: 0x7f02000b
+			public const int ic_search_white_24dp = 2130837515;
+			
+			// aapt resource value: 0x7f02000c
+			public const int Icon = 2130837516;
 			
 			static Drawable()
 			{

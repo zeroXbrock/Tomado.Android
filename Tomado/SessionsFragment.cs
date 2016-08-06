@@ -653,7 +653,7 @@ namespace Tomado {
 		/// Schedules a notification to launch in the future; to open a session from
 		/// </summary>
 		/// <param name="session"></param>
-		public async void ScheduleSessionNotification(Session session) {			
+		public void ScheduleSessionNotification(Session session) {			
 			Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
 			
 			alarmIntent.PutExtra("ID", session.ID);

@@ -18,7 +18,7 @@ namespace Tomado {
 	public class TimerFragment : Android.Support.V4.App.Fragment {
 		//view instances
 		TextView timerTextView, titleTextView;
-		Button workButton, pauseButton, finishButton;
+		ImageButton workButton, pauseButton, finishButton;
 
 		//notification vars
 		const int timerNotificationId = 0;
@@ -63,9 +63,9 @@ namespace Tomado {
 
 			timerTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimer);
 			titleTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimerTitle);
-			workButton = rootView.FindViewById<Button>(Resource.Id.buttonWork);
-			pauseButton = rootView.FindViewById<Button>(Resource.Id.buttonPause);
-			finishButton = rootView.FindViewById<Button>(Resource.Id.buttonFinish);
+			workButton = rootView.FindViewById<ImageButton>(Resource.Id.buttonWork);
+			pauseButton = rootView.FindViewById<ImageButton>(Resource.Id.buttonPause);
+			finishButton = rootView.FindViewById<ImageButton>(Resource.Id.buttonFinish);
 
 			if (fragmentSession == null) { //lone timer
 				Init(savedInstanceState);
@@ -105,7 +105,7 @@ namespace Tomado {
 
 						UpdateTimer();
 						
-						titleTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
+						//titleTextView.SetText(lastTimerType.ToString(), TextView.BufferType.Normal);
 						
 						StartTimer(duration);
 					}
