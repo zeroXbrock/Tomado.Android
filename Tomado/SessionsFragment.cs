@@ -678,38 +678,4 @@ namespace Tomado {
 			}
 		}
 	}
-
-	public class DatePickerDialogFragment : Android.Support.V4.App.DialogFragment {
-		private readonly Context _context;
-		private DateTime _date;
-		private readonly DatePickerDialog.IOnDateSetListener _listener;
-
-		public DatePickerDialogFragment(Context context, DateTime date, DatePickerDialog.IOnDateSetListener listener){
-			_context = context;
-			_date = date;
-			_listener = listener;
-		}
-
-		public override Dialog OnCreateDialog(Bundle savedInstanceState) {
-			var dialog = new Android.App.DatePickerDialog(_context, _listener, _date.Year, _date.Month, _date.Day);
-			return dialog;
-		}
-	}
-
-	public class TimePickerDialogFragment : Android.Support.V4.App.DialogFragment {
-		private readonly Context _context;
-		private DateTime _time;
-		private readonly TimePickerDialog.IOnTimeSetListener _listener;
-
-		public TimePickerDialogFragment(Context context, DateTime time, TimePickerDialog.IOnTimeSetListener listener){
-			_context = context;
-			_time = time;
-			_listener = listener;
-		}
-
-		public override Dialog OnCreateDialog(Bundle savedInstanceState) {
-			var dialog = new Android.App.TimePickerDialog(_context, _listener, _time.Hour, _time.Minute, false);
-			return dialog;
-		}
-	}
 }
