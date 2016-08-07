@@ -135,7 +135,6 @@ namespace Tomado {
 			//set button events
 			newSessionButton.Click += delegate {
 				//open new session dialog fragment
-				//NewSessionFragment fragment = new NewSessionFragment();
 				ShowNewSessionDialog();
 			};
 
@@ -408,6 +407,8 @@ namespace Tomado {
 		public void OnGetNewFreeTime(Session session) {
 			//update index
 			UpdateEditIndex(_sessions.Count);
+
+			session.MonthOfYear--;
 
 			//add the session
 			OnAddNewSession(session);
