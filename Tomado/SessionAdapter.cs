@@ -214,8 +214,6 @@ namespace Tomado {
 				};
 			}
 
-			view.LongClickable = true;
-
 			if (!view.HasOnClickListeners) {
 				view.LongClick += delegate {
 					//show 'delete session' dialog
@@ -243,8 +241,8 @@ namespace Tomado {
 				//set session title
 				titleSetListener.OnTitleSet(position, editTextTitle.Text);
 
-				//lose focus
-				view.RequestFocus(FocusSearchDirection.Backward);
+				//lose focus on edittext
+				editLayout.RequestFocus(FocusSearchDirection.Backward);
 			};
 			editTextTitle.AddTextChangedListener(this);
 
@@ -289,6 +287,7 @@ namespace Tomado {
 				editTextTitle.Hint = session.Title;
 			else
 				editTextTitle.Text = TitleText;
+
 			editTextTime.Text = dateTime.ToShortTimeString();
 			editTextDate.Text = dateTime.ToShortDateString();
 

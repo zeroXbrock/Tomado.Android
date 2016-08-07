@@ -6,15 +6,15 @@
     android:layout_height="wrap_content"
     android:id="@+id/SessionsListItemLayout"
     android:padding="12dp"
-	android:focusable="true"
-	android:focusableInTouchMode="true">
+	android:longClickable="true"
+    android:focusableInTouchMode="false">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/SessionListItemTextLayout">
+            android:id="@+id/SessionListItemTextLayout" >
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="fill_parent"
@@ -48,6 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/EditSessionLayout"
+			android:focusableInTouchMode="true"
             android:layout_below="@+id/SessionListItemTextLayout"
             android:paddingLeft="0dp"
             android:paddingRight="24dp"

@@ -68,6 +68,7 @@
     <Compile Include="AlarmReceiver.cs" />
     <Compile Include="CongratulationsFragment.cs" />
     <Compile Include="CTimer.cs" />
+    <Compile Include="DatePickerDialogFragment.cs" />
     <Compile Include="DeleteSessionFragment.cs" />
     <Compile Include="FragmentAdapter.cs" />
     <Compile Include="FreeTimeAdapter.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="SessionsFragment.cs" />
     <Compile Include="SwipeActivity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TimePickerDialogFragment.cs" />
     <Compile Include="TimerFragment.cs" />
   </ItemGroup>
   <ItemGroup>
