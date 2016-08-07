@@ -114,7 +114,8 @@ namespace Tomado {
 
 			//get view instances
 			listViewSessions = rootView.FindViewById<ListView>(Resource.Id.listViewSessions);
-			listViewSessions.Touch += delegate { newSessionMenu.Close(true); };
+			//listViewSessions.ContextClick += delegate { HideFabMenu(); }; //LAGS LISTVIEW... DISABLING UNTIL ANOTHER METHOD IS FOUND
+			
 
 			swipeRefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.SwipeRefreshLayout_Sessions);
 			
@@ -192,6 +193,11 @@ namespace Tomado {
 
 			outState.PutString("title", title);
 			outState.PutInt("editIndex", editIndex);
+		}
+
+		private void HideFabMenu() {
+			if (newSessionMenu.IsOpened)
+				newSessionMenu.Close(true);
 		}
 
 		/// <summary>
