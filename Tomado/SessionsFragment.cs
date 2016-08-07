@@ -117,7 +117,6 @@ namespace Tomado {
 			listViewSessions.Touch += delegate { newSessionMenu.Close(true); };
 
 			swipeRefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.SwipeRefreshLayout_Sessions);
-			swipeRefreshLayout.Touch += delegate { newSessionMenu.Close(true); };
 			
 			newSessionMenu = rootView.FindViewById<FloatingActionMenu>(Resource.Id.menu_newSession);
 
