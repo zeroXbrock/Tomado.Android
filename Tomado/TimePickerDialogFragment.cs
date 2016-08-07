@@ -24,6 +24,11 @@ namespace Tomado {
 
 		public override Dialog OnCreateDialog(Bundle savedInstanceState) {
 			var dialog = new Android.App.TimePickerDialog(_context, _listener, _time.Hour, _time.Minute, false);
+
+			//dialog.RequestWindowFeature((int)WindowFeatures.CustomTitle);
+			//dialog.SetCustomTitle(null);
+			dialog.SetTitle("");
+
 			return dialog;
 		}
 	}
