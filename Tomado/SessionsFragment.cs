@@ -40,6 +40,8 @@ namespace Tomado {
 		FloatingActionButton newSessionButton, searchButton;
 		FloatingActionMenu newSessionMenu;
 		SwipeRefreshLayout swipeRefreshLayout;
+		View rootView;
+		View baseView;
 
 		//will be view instances
 		DatePickerDialogFragment dateDialog;
@@ -108,12 +110,14 @@ namespace Tomado {
 			}
 
 			//get our base layout
-			View rootView = inflater.Inflate(Resource.Layout.Sessions, container, false);
+			rootView = inflater.Inflate(Resource.Layout.Sessions, container, false);
 
 			//get view instances
 			listViewSessions = rootView.FindViewById<ListView>(Resource.Id.listViewSessions);
+			listViewSessions.Touch += delegate { newSessionMenu.Close(true); };
 
 			swipeRefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.SwipeRefreshLayout_Sessions);
+			swipeRefreshLayout.Touch += delegate { newSessionMenu.Close(true); };
 			
 			newSessionMenu = rootView.FindViewById<FloatingActionMenu>(Resource.Id.menu_newSession);
 

@@ -79,71 +79,74 @@ namespace Tomado {
 			}
 
 			#region button clicks
+			if (!workButton.HasOnClickListeners) {
+				workButton.Click += delegate {
+					if (firstRun) {
+						remainingTimeInMillis = (long)CTimer.TimerLengths.Work;
 
-			workButton.Click += delegate {
-				if (firstRun) {
-					remainingTimeInMillis = (long)CTimer.TimerLengths.Work;
+						UpdateTimer();
 
-					UpdateTimer();
+						firstRun = false;
 
-					firstRun = false;
-
-					fragmentSession.Pomodoros++;
-				}
-				if (isPaused) {
-					//resume timer
-
-					workButton.SetImageResource(Resource.Drawable.ic_pause_circle_filled_white_24dp);
-
-					duration = remainingTimeInMillis;
-					
-					isPaused = false;
-					
-					StartTimer(duration);
-				}
-				else if (!isTimerRunning) {
-					//new session (continuation of work)
-
-					workButton.SetImageResource(Resource.Drawable.ic_pause_circle_filled_white_24dp);
-
-					if (lastTimerType != TimerType.Work)
 						fragmentSession.Pomodoros++;
+					}
+					if (isPaused) {
+						//resume timer
 
-					UpdateTimer();
-						
-					StartTimer(duration);
-				}
-				else {
-					//pause
-					workButton.SetImageResource(Resource.Drawable.ic_play_circle_filled_white_24dp);
+						workButton.SetImageResource(Resource.Drawable.ic_pause_circle_filled_white_24dp);
 
-					isPaused = true;
-					
+						duration = remainingTimeInMillis;
+
+						isPaused = false;
+
+						StartTimer(duration);
+					}
+					else if (!isTimerRunning) {
+						//new session (continuation of work)
+
+						workButton.SetImageResource(Resource.Drawable.ic_pause_circle_filled_white_24dp);
+
+						if (lastTimerType != TimerType.Work)
+							fragmentSession.Pomodoros++;
+
+						UpdateTimer();
+
+						StartTimer(duration);
+					}
+					else {
+						//pause
+						workButton.SetImageResource(Resource.Drawable.ic_play_circle_filled_white_24dp);
+
+						isPaused = true;
+
+						CancelTimer();
+					}
+
+				};
+			}
+
+			if (!finishButton.HasOnClickListeners) {
+				finishButton.Click += delegate {
+					//stop timer
 					CancelTimer();
-				}
-				
-			};
-			
-			finishButton.Click += delegate {
-				//stop timer
-				CancelTimer();
+					
+					//open congrats dialog
+					ShowCongratsDialog(fragmentSession);
 
-				//open congrats dialog
-				ShowCongratsDialog(fragmentSession);
+					timerFinishListener.OnTimerFinish(fragmentSession);
 
-				timerFinishListener.OnTimerFinish(fragmentSession);
+					Session session = new Session();
+					session.Title = "Task";
+					SetFragmentSession(session);
 
-				Session session = new Session();
-				session.Title = "Task";
-				SetFragmentSession(session);
-
-				ResetTimer();
-			};
+					ResetTimer();
+				};
+			}
 			#endregion
 
 			return rootView;
 		}
-
+		
 		//helper functions to thin OnCreateView out
 
 		/// <summary>
