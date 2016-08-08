@@ -34,7 +34,7 @@ namespace Tomado {
 									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, SessionAdapter.ShowDeleteSessionDialogListener,
 									DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener,
 									SessionAdapter.ShowTimePickerDialogListener, SessionAdapter.ShowDatePickerDialogListener, SessionAdapter.TitleSetListener,
-									SessionAdapter.ClickEditButtonListener {
+									SessionAdapter.ClickEditButtonListener, SessionAdapter.SetRecurrenceListener {
 		//view instances
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
@@ -114,7 +114,8 @@ namespace Tomado {
 
 			//get view instances
 			listViewSessions = rootView.FindViewById<ListView>(Resource.Id.listViewSessions);
-			listViewSessions.Touch += delegate { newSessionMenu.Close(true); };
+			//listViewSessions.ContextClick += delegate { HideFabMenu(); }; //LAGS LISTVIEW... DISABLING UNTIL ANOTHER METHOD IS FOUND
+			
 
 			swipeRefreshLayout = rootView.FindViewById<SwipeRefreshLayout>(Resource.Id.SwipeRefreshLayout_Sessions);
 			
@@ -122,6 +123,10 @@ namespace Tomado {
 
 			//set listview mode to allow overscroll
 			listViewSessions.OverScrollMode = OverScrollMode.Always;
+
+			//add footer to listview
+			AddFooter(inflater);
+
 			
 			//instantiate views
 			newSessionButton = new FloatingActionButton(Activity);
@@ -135,7 +140,6 @@ namespace Tomado {
 			//set button events
 			newSessionButton.Click += delegate {
 				//open new session dialog fragment
-				//NewSessionFragment fragment = new NewSessionFragment();
 				ShowNewSessionDialog();
 			};
 
@@ -195,6 +199,30 @@ namespace Tomado {
 			outState.PutInt("editIndex", editIndex);
 		}
 
+		private void HideFabMenu() {
+			if (newSessionMenu.IsOpened)
+				newSessionMenu.Close(true);
+		}
+
+		private void AddFooter(LayoutInflater inflater) {
+			//get projected height
+			
+			int height = newSessionMenu.MeasuredHeight * 2; //being lazy for now
+
+			//inflate the footer
+			LinearLayout footer = (LinearLayout)inflater.Inflate(Resource.Layout.ListViewFooter, listViewSessions, false);
+			
+			//get footer layout params
+			var layoutParams = footer.LayoutParameters;
+
+			//adjust params
+			layoutParams.Height = height;
+			footer.RequestLayout();			
+
+			//add footer to listview
+			listViewSessions.AddFooterView(footer);
+		}
+
 		/// <summary>
 		/// Method to keep track of session being edited
 		/// </summary>
@@ -251,10 +279,11 @@ namespace Tomado {
 			listViewSessions.SetSelection(listViewSessions.Count - 1);
 		}
 		int lastSessionIndex = -1;
+		int lastSessionID = -1;
 
 		public void OnClickEditButton(int sessionIndex) {
 			//use editindex to check for recently added freetime
-			
+
 			ResetListViewAdapter(sessionIndex);
 
 			if (sessionIndex >= 0) {
@@ -262,13 +291,13 @@ namespace Tomado {
 			}
 			else {
 				//update notification info on close edit view
-				ScheduleSessionNotification(_sessions[editIndex]);
-				
-				//scroll to item being edited
-				listViewSessions.SetSelection(lastSessionIndex);
-				//listViewSessions.SetSelectionFromTop
-
+				//if it is recurring, it'll be set by the recurrence listener
+				if (!_sessions[editIndex].Recurring)
+					ScheduleSessionNotification(_sessions[editIndex]);
 			}
+
+			//scroll to item being edited
+			listViewSessions.SetSelection(lastSessionIndex);
 
 			UpdateEditIndex(sessionIndex);
 
@@ -292,8 +321,10 @@ namespace Tomado {
 			
 			//close KB
 			HideKeyboard();
+		}
 
-			
+		public void OnSetRecurrence(Session session, List<WeekdayButton> weekdayButtons) {
+			ScheduleSessionNotification(session, weekdayButtons);
 		}
 
 		public void OnShowDatePickerDialog(int sessionIndex) {
@@ -409,6 +440,8 @@ namespace Tomado {
 			//update index
 			UpdateEditIndex(_sessions.Count);
 
+			session.MonthOfYear--;
+
 			//add the session
 			OnAddNewSession(session);
 
@@ -499,10 +532,13 @@ namespace Tomado {
 		/// Populate class listview with sessions.
 		/// </summary>
 		private void ResetListViewAdapter(int editSessionIndex = -1) {
-			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, title, editSessionIndex);
+			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, this, title, editSessionIndex);
 		}
 
-		
+		private void CancelSessionNotification(int ID) {
+			var manager = NotificationManager.FromContext(Context);
+			manager.Cancel(ID);
+		}
 
 		/// <summary>
 		/// Adds a session to the class sessions list and returns the session it created.
@@ -569,8 +605,13 @@ namespace Tomado {
 			await connection.DeleteAsync(session);
 		}
 
+		/// <summary>
+		/// Deletes session from the database and removes its notification.
+		/// </summary>
+		/// <param name="ID"></param>
 		private async void DeleteSessionFromDatabase(int ID) {
 			await connection.ExecuteScalarAsync<int>("DELETE FROM Session WHERE ID=" + ID + ";");
+			CancelSessionNotification(ID);
 		}
 
 		/// <summary>
@@ -656,7 +697,7 @@ namespace Tomado {
 		/// Schedules a notification to launch in the future; to open a session from
 		/// </summary>
 		/// <param name="session"></param>
-		public void ScheduleSessionNotification(Session session) {			
+		public void ScheduleSessionNotification(Session session, List<WeekdayButton> weekdayButtons = null) {			
 			Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
 			
 			alarmIntent.PutExtra("ID", session.ID);
@@ -664,21 +705,56 @@ namespace Tomado {
 			alarmIntent.PutExtra("content", session.Title);
 
 			//makes new notification or updates pre-existing one
-			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, session.ID, alarmIntent, PendingIntentFlags.UpdateCurrent);
+			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 1, alarmIntent, PendingIntentFlags.UpdateCurrent); //ID:1 for session notifications
 			AlarmManager alarmManager = (AlarmManager)Activity.GetSystemService(Context.AlarmService);
 			
-			if (session.Recurring) {
+			DateTime now = DateTime.Now.ToUniversalTime();
+			DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear+1, session.DayOfMonth, session.StartHour, session.StartMinute, 0).ToUniversalTime();
+
+			if (session.Recurring && weekdayButtons != null) {
 				//set recurring event
+
+				long ticksPerWeek = TimeSpan.TicksPerDay * 7;
+				long millisPerWeek = ticksPerWeek / TimeSpan.TicksPerMillisecond;
+
+				//strictly the date of the session; at midnight
+				DateTime sessionDate = new DateTime(sessionDateTime.Year, sessionDateTime.Month, sessionDateTime.Day).ToUniversalTime();
+
+				//time from midnight
+				long ticksFromMidnight = sessionDateTime.Ticks - sessionDate.Ticks;
+
+				foreach (var i in weekdayButtons) {
+					if (i.Toggled) {
+						DateTime day = DateTime.Today.ToUniversalTime();
+						
+						while (day.DayOfWeek != i.DayOfWeek)
+							day = day.AddDays(1);
+
+						//day currently at target day @ 12AM; add millis to adjust notification time
+						day = day.AddTicks(ticksFromMidnight);
+
+						long dayMillis = day.Ticks / TimeSpan.TicksPerMillisecond;												
+
+						//set alarm for this occurence
+						//alarmManager.SetRepeating(AlarmType.RtcWakeup, dayMillis, millisPerWeek, pendingIntent);
+						Java.Util.Calendar calendar = Java.Util.Calendar.Instance;
+						calendar.Set(Java.Util.CalendarField.HourOfDay, session.StartHour);
+						calendar.Set(Java.Util.CalendarField.Minute, session.StartMinute);
+
+						alarmManager.SetRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, 5000, pendingIntent);//actual interval: AlarmManager.IntervalDay * 7
+						
+					}
+				}				
 			}
 			else {
 				//set non-recurring event for session date/time
-				DateTime now = DateTime.Now.ToUniversalTime();
-				DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear+1, session.DayOfMonth, session.StartHour, session.StartMinute, 0).ToUniversalTime();
-				long intervalTicks = sessionDateTime.Ticks - now.Ticks;
-				long intervalMillis = intervalTicks / TimeSpan.TicksPerMillisecond;
 
-				alarmManager.SetExact(AlarmType.RtcWakeup, Java.Lang.JavaSystem.CurrentTimeMillis() + intervalMillis, pendingIntent);//sessionDateTime.Ticks/TimeSpan.TicksPerMillisecond
+				long startTicks = sessionDateTime.Ticks - now.Ticks;
+				long startMillis = startTicks / TimeSpan.TicksPerMillisecond;
+
+				alarmManager.SetExact(AlarmType.RtcWakeup, Java.Lang.JavaSystem.CurrentTimeMillis() + startMillis, pendingIntent);
 			}
 		}
+		
 	}
 }

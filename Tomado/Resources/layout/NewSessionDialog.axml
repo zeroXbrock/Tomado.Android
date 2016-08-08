@@ -26,7 +26,7 @@
     <Switch
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/switchRecurring"
+        android:id="@+id/switchRecurring_NewSession"
         android:text="Recurring" />
     <LinearLayout
         android:orientation="horizontal"

@@ -15,6 +15,7 @@ using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Graphics.Drawables;
+using Android.Util;
 
 using Clans.Fab;
 
@@ -36,8 +37,9 @@ namespace Tomado {
 		ShowDatePickerDialogListener datePickerListener;
 		TitleSetListener titleSetListener;
 		ClickEditButtonListener openEditViewListener;
+		SetRecurrenceListener setRecurrenceListener;
 
-		int editSessionindex = -1;//used to open edit view for a session in list
+		int editSessionIndex = -1;//used to open edit view for a session in list
 
 		/// <summary>
 		/// Interface to provide callback for deleting sessions.
@@ -68,6 +70,10 @@ namespace Tomado {
 			void OnOpenTimeDialog();
 		}
 
+		public interface SetRecurrenceListener {
+			void OnSetRecurrence(Session session, List<WeekdayButton> weekdayButtons);
+		}
+
 		/// <summary>
 		/// Listener to handle showing delete session dialog
 		/// </summary>
@@ -89,7 +95,7 @@ namespace Tomado {
 
 		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener, 
 			TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener, 
-			TitleSetListener titleSetListener, ClickEditButtonListener openEditViewListener, string title, int editSessionIndex = -1) {
+			TitleSetListener titleSetListener, ClickEditButtonListener openEditViewListener, SetRecurrenceListener setRecurrenceListener, string title, int editSessionIndex = -1) {
 			this.context = context;
 			this.sessions = sessions;
 			this.sessionClickListener = sessionClickListener;
@@ -98,9 +104,10 @@ namespace Tomado {
 			this.dateSetListener = dateSetListener;
 			this.datePickerListener = datePickerListener;
 			this.timePickerListener = timePickerListener;
-			this.editSessionindex = editSessionIndex;
+			this.editSessionIndex = editSessionIndex;
 			this.titleSetListener = titleSetListener;
 			this.openEditViewListener = openEditViewListener;
+			this.setRecurrenceListener = setRecurrenceListener;
 			this.TitleText = title;
 		}
 
@@ -139,6 +146,10 @@ namespace Tomado {
 			ViewGroup editLayout = view.FindViewById<LinearLayout>(Resource.Id.EditSessionLayout);
 			editLayout.Visibility = ViewStates.Gone;
 
+			//get switch and recurring layout
+			Switch recurringSwitch = view.FindViewById<Switch>(Resource.Id.switchRecurring_SessionListItem);
+			var recurringLayout = view.FindViewById<LinearLayout>(Resource.Id.Layout_Recurring_SessionListItem);
+
 			//get session for this list item
 			Session session = sessions[position];
 			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear + 1, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
@@ -151,6 +162,16 @@ namespace Tomado {
 			var editTextTitle = view.FindViewById<EditText>(Resource.Id.editText_Title_EditSession);
 			var editTextDate = view.FindViewById<EditText>(Resource.Id.editText_Date_EditSession);
 			var editTextTime = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
+
+			//get weekday buttons; store in a list; Sunday -> Saturday
+			List<WeekdayButton> weekdayButtons = new List<WeekdayButton>();
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonSunday_Recurring), DayOfWeek.Sunday));
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonMonday_Recurring), DayOfWeek.Monday));
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonTuesday_Recurring), DayOfWeek.Tuesday));
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonWednesday_Recurring), DayOfWeek.Wednesday));
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonThursday_Recurring), DayOfWeek.Thursday));
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonFriday_Recurring), DayOfWeek.Friday));
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonSaturday_Recurring), DayOfWeek.Saturday));
 			
 			//set text views: title and time/date
 			titleTextView.Text = session.Title;
@@ -181,7 +202,7 @@ namespace Tomado {
 						toggled = true;
 
 						//update edit index
-						editSessionindex = position;
+						editSessionIndex = position;
 
 						//change button icon
 						editMenuButton.SetImageResource(Resource.Drawable.ic_check_white_24dp);
@@ -200,17 +221,30 @@ namespace Tomado {
 						string title = (editTextTitle.Text == "") ? editTextTitle.Hint : editTextTitle.Text;
 
 						//fire title set event
-						titleSetListener.OnTitleSet(editSessionindex, title);
+						titleSetListener.OnTitleSet(editSessionIndex, title);
 
 						//update edit index
-						editSessionindex = -1;
+						editSessionIndex = -1;
 
+						//update recurrence list
+						setRecurrenceListener.OnSetRecurrence(session, weekdayButtons);
+
+						//change button icon
 						editMenuButton.SetImageResource(Resource.Drawable.ic_edit_white_24dp);
 					}
 
 					//fire edit click event
-					openEditViewListener.OnClickEditButton(editSessionindex);
+					openEditViewListener.OnClickEditButton(editSessionIndex);
 					
+				};
+			}
+
+			//set weekday button clicks
+			foreach (var b in weekdayButtons) {
+				b.Button.Click += delegate {
+					Log.Debug("weekday", b.Button.Text);
+					b.Toggled = !b.Toggled;
+					Log.Debug("weekday toggle", b.Toggled.ToString());
 				};
 			}
 
@@ -220,6 +254,20 @@ namespace Tomado {
 					showDeleteSessionDialogListener.OnShowDeleteSessionDialog(session);
 				};
 			}
+
+			recurringSwitch.Click += delegate {
+				if (!recurringSwitch.Checked) {
+					recurringLayout.Visibility = ViewStates.Gone;
+					session.Recurring = false;
+				}
+				else {
+					recurringLayout.Visibility = ViewStates.Visible;
+					session.Recurring = true;
+				}
+			};
+
+			recurringSwitch.Checked = session.Recurring;
+			recurringLayout.Visibility = (session.Recurring) ? ViewStates.Visible : ViewStates.Gone;
 
 			var sessionLayout = view.FindViewById<LinearLayout>(Resource.Id.SessionsListItemLayout);
 			if (!sessionLayout.HasOnClickListeners) {
@@ -248,10 +296,10 @@ namespace Tomado {
 
 			
 			//don't open any dialogs if index is <0; that means nothing is being edited
-			if (editSessionindex == -1)
+			if (editSessionIndex == -1)
 				toggled = false;
 			else //if we make an adapter with a non-neg editSessionIndex, open the edit dialog on that session
-				if (editSessionindex == position) {
+				if (editSessionIndex == position) {
 					//list adapter has been reset
 					//make edit layout visible
 					editLayout.Visibility = ViewStates.Visible;
@@ -278,8 +326,6 @@ namespace Tomado {
 
 					//set icon to pencil
 					editMenuButton.SetImageResource(Resource.Drawable.ic_edit_white_24dp);
-
-					//don't untoggle, bruh, let the if statements above handle it
 				}
 
 			//set edittextviews to reflect session info
@@ -304,6 +350,8 @@ namespace Tomado {
 		public void BeforeTextChanged(ICharSequence s, int start, int count, int after) {
 
 		}
+
+		
 
 		/*
 		private AnimatorSet CreateCustomAnimationMenuButton(View rootView) {

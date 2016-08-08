@@ -22,11 +22,8 @@ namespace Tomado {
 			var appIntent = new Intent(context, typeof(SwipeActivity));
 			appIntent.PutExtra("ID", ID);
 
-			var contentIntent = PendingIntent.GetActivity(context, 0, appIntent, PendingIntentFlags.CancelCurrent);
+			PendingIntent contentIntent = PendingIntent.GetActivity(context, 0, appIntent, PendingIntentFlags.UpdateCurrent);//ID:0 for timer notifications
 			var manager = NotificationManager.FromContext(context);
-
-			//var style = new NotificationCompat.BigTextStyle();
-			//style.BigText(content);
 
 			var builder = new Notification.Builder(context)
 				.SetAutoCancel(true)
@@ -34,11 +31,11 @@ namespace Tomado {
 				.SetContentTitle(title)
 				.SetContentText(content)
 				.SetWhen(Java.Lang.JavaSystem.CurrentTimeMillis())
-				//.SetStyle(style)
 				.SetContentIntent(contentIntent);
 
 			var notification = builder.Build();
-			manager.Notify(0, notification);
+
+			manager.Notify(ID, notification);
 		}
 	}
 }

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:id="@+id/SessionsListItemLayout"
     android:padding="12dp"
-	android:longClickable="true"
+    android:longClickable="true"
     android:focusableInTouchMode="false">
     <RelativeLayout
         android:layout_width="match_parent"
@@ -14,7 +14,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/SessionListItemTextLayout" >
+            android:id="@+id/SessionListItemTextLayout">
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="fill_parent"
@@ -48,7 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/EditSessionLayout"
-			android:focusableInTouchMode="true"
+            android:focusableInTouchMode="true"
             android:layout_below="@+id/SessionListItemTextLayout"
             android:paddingLeft="0dp"
             android:paddingRight="24dp"
@@ -78,6 +78,15 @@
                 android:hint="Time"
                 android:focusableInTouchMode="false"
                 android:imeOptions="actionDone" />
+            <Switch
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/switchRecurring_SessionListItem"
+                android:text="Recurring" />
+            <include
+                layout="@layout/Recurring"
+                android:id="@+id/Layout_Recurring_SessionListItem"
+                android:visibility="gone" />
         </LinearLayout>
     <!--
         <com.github.clans.fab.FloatingActionMenu
