@@ -123,6 +123,10 @@ namespace Tomado {
 
 			//set listview mode to allow overscroll
 			listViewSessions.OverScrollMode = OverScrollMode.Always;
+
+			//add footer to listview
+			AddFooter(inflater);
+
 			
 			//instantiate views
 			newSessionButton = new FloatingActionButton(Activity);
@@ -200,6 +204,25 @@ namespace Tomado {
 				newSessionMenu.Close(true);
 		}
 
+		private void AddFooter(LayoutInflater inflater) {
+			//get projected height
+			//LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams)newSessionMenu.LayoutParameters;
+			int height = newSessionMenu.MeasuredHeight;// + lp.BottomMargin;
+
+			//inflate the footer
+			LinearLayout footer = (LinearLayout)inflater.Inflate(Resource.Layout.ListViewFooter, listViewSessions, false);
+			
+			//get footer layout params
+			var layoutParams = footer.LayoutParameters;
+
+			//adjust params
+			layoutParams.Height = height;
+			footer.RequestLayout();			
+
+			//add footer to listview
+			listViewSessions.AddFooterView(footer);
+		}
+
 		/// <summary>
 		/// Method to keep track of session being edited
 		/// </summary>
@@ -271,13 +294,10 @@ namespace Tomado {
 				//if it is recurring, it'll be set by the recurrence listener
 				if (!_sessions[editIndex].Recurring)
 					ScheduleSessionNotification(_sessions[editIndex]);
-
-
-				//scroll to item being edited
-				listViewSessions.SetSelection(lastSessionIndex);
-				//listViewSessions.SetSelectionFromTop
-
 			}
+
+			//scroll to item being edited
+			listViewSessions.SetSelection(lastSessionIndex);
 
 			UpdateEditIndex(sessionIndex);
 
@@ -721,8 +741,7 @@ namespace Tomado {
 						calendar.Set(Java.Util.CalendarField.HourOfDay, session.StartHour);
 						calendar.Set(Java.Util.CalendarField.Minute, session.StartMinute);
 
-						//alarmManager.SetRepeating(AlarmType.RtcWakeup, day.Ticks / TimeSpan.TicksPerMillisecond, AlarmManager.IntervalDay * 7, pendingIntent);
-						alarmManager.SetRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, 5000, pendingIntent);
+						alarmManager.SetRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, 5000, pendingIntent);//actual interval: AlarmManager.IntervalDay * 7
 						
 					}
 				}				

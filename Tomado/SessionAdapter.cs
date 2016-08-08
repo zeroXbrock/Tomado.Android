@@ -266,6 +266,9 @@ namespace Tomado {
 				}
 			};
 
+			recurringSwitch.Checked = session.Recurring;
+			recurringLayout.Visibility = (session.Recurring) ? ViewStates.Visible : ViewStates.Gone;
+
 			var sessionLayout = view.FindViewById<LinearLayout>(Resource.Id.SessionsListItemLayout);
 			if (!sessionLayout.HasOnClickListeners) {
 				sessionLayout.Click += delegate {

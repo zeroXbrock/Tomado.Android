@@ -7,7 +7,7 @@
   <receiver
 	android:name=".AlarmReceiver"
 	android:enabled="true"
-	android:exported="true"
+	android:exported="false"
 	android:process=":remote"
 	android:label="AlarmReceiver" />
 </manifest>

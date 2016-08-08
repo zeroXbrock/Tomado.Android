@@ -118,6 +118,9 @@
     <AndroidResource Include="Resources\layout\Recurring.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
+    <AndroidResource Include="Resources\layout\ListViewFooter.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\Timer.axml">
