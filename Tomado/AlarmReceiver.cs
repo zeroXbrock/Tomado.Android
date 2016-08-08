@@ -25,9 +25,6 @@ namespace Tomado {
 			PendingIntent contentIntent = PendingIntent.GetActivity(context, 0, appIntent, PendingIntentFlags.UpdateCurrent);//ID:0 for timer notifications
 			var manager = NotificationManager.FromContext(context);
 
-			//var style = new NotificationCompat.BigTextStyle();
-			//style.BigText(content);
-
 			var builder = new Notification.Builder(context)
 				.SetAutoCancel(true)
 				.SetSmallIcon(Resource.Drawable.Icon)
@@ -37,7 +34,8 @@ namespace Tomado {
 				.SetContentIntent(contentIntent);
 
 			var notification = builder.Build();
-			manager.Notify(1, notification);
+
+			manager.Notify(ID, notification);
 		}
 	}
 }

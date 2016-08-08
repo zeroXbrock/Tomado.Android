@@ -323,8 +323,6 @@ namespace Tomado {
 
 					//set icon to pencil
 					editMenuButton.SetImageResource(Resource.Drawable.ic_edit_white_24dp);
-
-					//don't untoggle, bruh, let the if statements above handle it
 				}
 
 			//set edittextviews to reflect session info

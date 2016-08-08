@@ -256,10 +256,11 @@ namespace Tomado {
 			listViewSessions.SetSelection(listViewSessions.Count - 1);
 		}
 		int lastSessionIndex = -1;
+		int lastSessionID = -1;
 
 		public void OnClickEditButton(int sessionIndex) {
 			//use editindex to check for recently added freetime
-			
+
 			ResetListViewAdapter(sessionIndex);
 
 			if (sessionIndex >= 0) {
@@ -267,8 +268,11 @@ namespace Tomado {
 			}
 			else {
 				//update notification info on close edit view
-				ScheduleSessionNotification(_sessions[editIndex]);
-				
+				//if it is recurring, it'll be set by the recurrence listener
+				if (!_sessions[editIndex].Recurring)
+					ScheduleSessionNotification(_sessions[editIndex]);
+
+
 				//scroll to item being edited
 				listViewSessions.SetSelection(lastSessionIndex);
 				//listViewSessions.SetSelectionFromTop
@@ -511,7 +515,10 @@ namespace Tomado {
 			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, this, title, editSessionIndex);
 		}
 
-		
+		private void CancelSessionNotification(int ID) {
+			var manager = NotificationManager.FromContext(Context);
+			manager.Cancel(ID);
+		}
 
 		/// <summary>
 		/// Adds a session to the class sessions list and returns the session it created.
@@ -578,8 +585,13 @@ namespace Tomado {
 			await connection.DeleteAsync(session);
 		}
 
+		/// <summary>
+		/// Deletes session from the database and removes its notification.
+		/// </summary>
+		/// <param name="ID"></param>
 		private async void DeleteSessionFromDatabase(int ID) {
 			await connection.ExecuteScalarAsync<int>("DELETE FROM Session WHERE ID=" + ID + ";");
+			CancelSessionNotification(ID);
 		}
 
 		/// <summary>
@@ -673,7 +685,7 @@ namespace Tomado {
 			alarmIntent.PutExtra("content", session.Title);
 
 			//makes new notification or updates pre-existing one
-			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 1, alarmIntent, PendingIntentFlags.CancelCurrent); //ID:1 for session notifications
+			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 1, alarmIntent, PendingIntentFlags.UpdateCurrent); //ID:1 for session notifications
 			AlarmManager alarmManager = (AlarmManager)Activity.GetSystemService(Context.AlarmService);
 			
 			DateTime now = DateTime.Now.ToUniversalTime();
@@ -686,7 +698,7 @@ namespace Tomado {
 				long millisPerWeek = ticksPerWeek / TimeSpan.TicksPerMillisecond;
 
 				//strictly the date of the session; at midnight
-				DateTime sessionDate = new DateTime(sessionDateTime.Year, sessionDateTime.Month, sessionDateTime.Day);
+				DateTime sessionDate = new DateTime(sessionDateTime.Year, sessionDateTime.Month, sessionDateTime.Day).ToUniversalTime();
 
 				//time from midnight
 				long ticksFromMidnight = sessionDateTime.Ticks - sessionDate.Ticks;
@@ -709,13 +721,11 @@ namespace Tomado {
 						calendar.Set(Java.Util.CalendarField.HourOfDay, session.StartHour);
 						calendar.Set(Java.Util.CalendarField.Minute, session.StartMinute);
 
-						alarmManager.SetRepeating(AlarmType.RtcWakeup, day.Ticks / TimeSpan.TicksPerMillisecond, AlarmManager.IntervalDay * 7, pendingIntent);
-
+						//alarmManager.SetRepeating(AlarmType.RtcWakeup, day.Ticks / TimeSpan.TicksPerMillisecond, AlarmManager.IntervalDay * 7, pendingIntent);
+						alarmManager.SetRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, 5000, pendingIntent);
 						
 					}
-				}
-
-				
+				}				
 			}
 			else {
 				//set non-recurring event for session date/time
@@ -726,9 +736,6 @@ namespace Tomado {
 				alarmManager.SetExact(AlarmType.RtcWakeup, Java.Lang.JavaSystem.CurrentTimeMillis() + startMillis, pendingIntent);
 			}
 		}
-
-		public void CancelSessionNotification(Session session) {
-
-		}
+		
 	}
 }
