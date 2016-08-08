@@ -34,7 +34,7 @@ namespace Tomado {
 									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, SessionAdapter.ShowDeleteSessionDialogListener,
 									DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener,
 									SessionAdapter.ShowTimePickerDialogListener, SessionAdapter.ShowDatePickerDialogListener, SessionAdapter.TitleSetListener,
-									SessionAdapter.ClickEditButtonListener {
+									SessionAdapter.ClickEditButtonListener, SessionAdapter.SetRecurrenceListener {
 		//view instances
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
@@ -297,8 +297,10 @@ namespace Tomado {
 			
 			//close KB
 			HideKeyboard();
+		}
 
-			
+		public void OnSetRecurrence(Session session, List<WeekdayButton> weekdayButtons) {
+			ScheduleSessionNotification(session, weekdayButtons);
 		}
 
 		public void OnShowDatePickerDialog(int sessionIndex) {
@@ -506,7 +508,7 @@ namespace Tomado {
 		/// Populate class listview with sessions.
 		/// </summary>
 		private void ResetListViewAdapter(int editSessionIndex = -1) {
-			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, title, editSessionIndex);
+			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, this, title, editSessionIndex);
 		}
 
 		
@@ -663,7 +665,7 @@ namespace Tomado {
 		/// Schedules a notification to launch in the future; to open a session from
 		/// </summary>
 		/// <param name="session"></param>
-		public void ScheduleSessionNotification(Session session) {			
+		public void ScheduleSessionNotification(Session session, List<WeekdayButton> weekdayButtons = null) {			
 			Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
 			
 			alarmIntent.PutExtra("ID", session.ID);
@@ -671,21 +673,62 @@ namespace Tomado {
 			alarmIntent.PutExtra("content", session.Title);
 
 			//makes new notification or updates pre-existing one
-			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, session.ID, alarmIntent, PendingIntentFlags.UpdateCurrent);
+			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 1, alarmIntent, PendingIntentFlags.CancelCurrent); //ID:1 for session notifications
 			AlarmManager alarmManager = (AlarmManager)Activity.GetSystemService(Context.AlarmService);
 			
-			if (session.Recurring) {
+			DateTime now = DateTime.Now.ToUniversalTime();
+			DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear+1, session.DayOfMonth, session.StartHour, session.StartMinute, 0).ToUniversalTime();
+
+			if (session.Recurring && weekdayButtons != null) {
 				//set recurring event
+
+				long ticksPerWeek = TimeSpan.TicksPerDay * 7;
+				long millisPerWeek = ticksPerWeek / TimeSpan.TicksPerMillisecond;
+
+				//strictly the date of the session; at midnight
+				DateTime sessionDate = new DateTime(sessionDateTime.Year, sessionDateTime.Month, sessionDateTime.Day);
+
+				//time from midnight
+				long ticksFromMidnight = sessionDateTime.Ticks - sessionDate.Ticks;
+
+				foreach (var i in weekdayButtons) {
+					if (i.Toggled) {
+						DateTime day = DateTime.Today.ToUniversalTime();
+						
+						while (day.DayOfWeek != i.DayOfWeek)
+							day = day.AddDays(1);
+
+						//day currently at target day @ 12AM; add millis to adjust notification time
+						day = day.AddTicks(ticksFromMidnight);
+
+						long dayMillis = day.Ticks / TimeSpan.TicksPerMillisecond;												
+
+						//set alarm for this occurence
+						//alarmManager.SetRepeating(AlarmType.RtcWakeup, dayMillis, millisPerWeek, pendingIntent);
+						Java.Util.Calendar calendar = Java.Util.Calendar.Instance;
+						calendar.Set(Java.Util.CalendarField.HourOfDay, session.StartHour);
+						calendar.Set(Java.Util.CalendarField.Minute, session.StartMinute);
+
+						alarmManager.SetRepeating(AlarmType.RtcWakeup, day.Ticks / TimeSpan.TicksPerMillisecond, AlarmManager.IntervalDay * 7, pendingIntent);
+
+						
+					}
+				}
+
+				
 			}
 			else {
 				//set non-recurring event for session date/time
-				DateTime now = DateTime.Now.ToUniversalTime();
-				DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear+1, session.DayOfMonth, session.StartHour, session.StartMinute, 0).ToUniversalTime();
-				long intervalTicks = sessionDateTime.Ticks - now.Ticks;
-				long intervalMillis = intervalTicks / TimeSpan.TicksPerMillisecond;
 
-				alarmManager.SetExact(AlarmType.RtcWakeup, Java.Lang.JavaSystem.CurrentTimeMillis() + intervalMillis, pendingIntent);//sessionDateTime.Ticks/TimeSpan.TicksPerMillisecond
+				long startTicks = sessionDateTime.Ticks - now.Ticks;
+				long startMillis = startTicks / TimeSpan.TicksPerMillisecond;
+
+				alarmManager.SetExact(AlarmType.RtcWakeup, Java.Lang.JavaSystem.CurrentTimeMillis() + startMillis, pendingIntent);
 			}
+		}
+
+		public void CancelSessionNotification(Session session) {
+
 		}
 	}
 }

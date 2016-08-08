@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:minWidth="25px"
+    android:minHeight="25px">
+    <Button
+        android:text="S"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonSunday_Recurring" />
+    <Button
+        android:text="M"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonMonday_Recurring" />
+    <Button
+        android:text="T"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonTuesday_Recurring" />
+    <Button
+        android:text="W"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonWednesday_Recurring" />
+    <Button
+        android:text="T"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonThursday_Recurring" />
+    <Button
+        android:text="F"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonFriday_Recurring" />
+    <Button
+        android:text="S"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonSaturday_Recurring" />
+</LinearLayout>

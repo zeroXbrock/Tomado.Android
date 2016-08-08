@@ -68,7 +68,7 @@ namespace Tomado {
 			timeEditText = view.FindViewById<EditText>(Resource.Id.editTextTime_NewSession);
 			dateEditText = view.FindViewById<EditText>(Resource.Id.editTextDate_NewSession);
 			titleEditText = view.FindViewById<EditText>(Resource.Id.editTextTitle_NewSession);
-			recurringSwitch = view.FindViewById<Switch>(Resource.Id.switchRecurring);
+			recurringSwitch = view.FindViewById<Switch>(Resource.Id.switchRecurring_NewSession);
 						
 			//set default values
 			SetDefaultTimeValues();
