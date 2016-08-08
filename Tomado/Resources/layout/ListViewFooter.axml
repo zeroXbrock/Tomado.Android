@@ -4,13 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:minWidth="25px"
-    android:minHeight="25px">
+    android:minHeight="25px"
+	android:background="#ccc"
+	android:alpha="0.3">
     <ImageView
         android:src="@drawable/icon"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
         android:padding="4dp"
-        android:id="@+id/imageView1"
+        android:id="@+id/imageViewFooter"
         android:scaleType="fitCenter"
-        android:background="#aaa" />
+		android:alpha="1"/>
 </LinearLayout>

@@ -206,8 +206,8 @@ namespace Tomado {
 
 		private void AddFooter(LayoutInflater inflater) {
 			//get projected height
-			//LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams)newSessionMenu.LayoutParameters;
-			int height = newSessionMenu.MeasuredHeight;// + lp.BottomMargin;
+			
+			int height = newSessionMenu.MeasuredHeight * 2; //being lazy for now
 
 			//inflate the footer
 			LinearLayout footer = (LinearLayout)inflater.Inflate(Resource.Layout.ListViewFooter, listViewSessions, false);

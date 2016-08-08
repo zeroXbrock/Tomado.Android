@@ -457,7 +457,7 @@ namespace Tomado
 			public const int imageButtonEditSession = 2131099688;
 			
 			// aapt resource value: 0x7f060017
-			public const int imageView1 = 2131099671;
+			public const int imageViewFooter = 2131099671;
 			
 			// aapt resource value: 0x7f060003
 			public const int left = 2131099651;
