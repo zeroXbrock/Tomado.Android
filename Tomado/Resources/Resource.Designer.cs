@@ -369,14 +369,17 @@ namespace Tomado
 			// aapt resource value: 0x7f060032
 			public const int SwipeRefreshLayout_Sessions = 2131099698;
 			
+			// aapt resource value: 0x7f060037
+			public const int TextView_SessionCount = 2131099703;
+			
 			// aapt resource value: 0x7f060036
 			public const int Timer_MainLayout = 2131099702;
 			
 			// aapt resource value: 0x7f06001d
 			public const int buttonCancel_NewSession = 2131099677;
 			
-			// aapt resource value: 0x7f06003b
-			public const int buttonFinish = 2131099707;
+			// aapt resource value: 0x7f06003c
+			public const int buttonFinish = 2131099708;
 			
 			// aapt resource value: 0x7f060024
 			public const int buttonFriday_Recurring = 2131099684;
@@ -411,8 +414,8 @@ namespace Tomado
 			// aapt resource value: 0x7f060022
 			public const int buttonWednesday_Recurring = 2131099682;
 			
-			// aapt resource value: 0x7f06003a
-			public const int buttonWork = 2131099706;
+			// aapt resource value: 0x7f06003b
+			public const int buttonWork = 2131099707;
 			
 			// aapt resource value: 0x7f060011
 			public const int buttonYes_DeleteSession = 2131099665;
@@ -489,8 +492,8 @@ namespace Tomado
 			// aapt resource value: 0x7f060002
 			public const int normal = 2131099650;
 			
-			// aapt resource value: 0x7f060039
-			public const int relativeLayout1 = 2131099705;
+			// aapt resource value: 0x7f06003a
+			public const int relativeLayout1 = 2131099706;
 			
 			// aapt resource value: 0x7f060004
 			public const int right = 2131099652;
@@ -519,11 +522,11 @@ namespace Tomado
 			// aapt resource value: 0x7f060015
 			public const int textViewTime = 2131099669;
 			
-			// aapt resource value: 0x7f060038
-			public const int textViewTimer = 2131099704;
+			// aapt resource value: 0x7f060039
+			public const int textViewTimer = 2131099705;
 			
-			// aapt resource value: 0x7f060037
-			public const int textViewTimerTitle = 2131099703;
+			// aapt resource value: 0x7f060038
+			public const int textViewTimerTitle = 2131099704;
 			
 			// aapt resource value: 0x7f06000b
 			public const int up = 2131099659;

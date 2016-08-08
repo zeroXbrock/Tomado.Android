@@ -6,6 +6,13 @@
     android:minWidth="25px"
     android:minHeight="25px"
     android:background="@color/base_app_color">
+    <TextView
+        android:id="@+id/TextView_SessionCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+		android:layout_alignParentRight="true"
+		android:padding="12dp"/>
 <!--TextView LinearLayout section begin-->
     <LinearLayout
         android:layout_width="match_parent"

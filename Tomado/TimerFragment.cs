@@ -17,7 +17,7 @@ namespace Tomado {
 	/// </summary>
 	public class TimerFragment : Android.Support.V4.App.Fragment {
 		//view instances
-		TextView timerTextView, titleTextView;
+		TextView timerTextView, titleTextView, sessionsTextView;
 		ImageButton workButton, finishButton;
 
 		//notification vars
@@ -40,7 +40,6 @@ namespace Tomado {
 		int shortBreaks = 0;
 		bool isPaused = true; //it starts off paused, technically
 		bool firstRun = true;
-		int pomodoros = 0; //# of work sessions
 		
 		Session fragmentSession; //keeps track of this timer's session info
 
@@ -63,6 +62,7 @@ namespace Tomado {
 
 			timerTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimer);
 			titleTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimerTitle);
+			sessionsTextView = rootView.FindViewById<TextView>(Resource.Id.TextView_SessionCount);
 			workButton = rootView.FindViewById<ImageButton>(Resource.Id.buttonWork);
 			finishButton = rootView.FindViewById<ImageButton>(Resource.Id.buttonFinish);
 
@@ -121,7 +121,7 @@ namespace Tomado {
 
 						CancelTimer();
 					}
-
+					sessionsTextView.Text = fragmentSession.Pomodoros.ToString();
 				};
 			}
 
