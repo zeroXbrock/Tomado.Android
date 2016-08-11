@@ -352,9 +352,11 @@ namespace Tomado {
 		/// <param name="position"></param>
 		/// <param name="ID"></param>
 		public void OnDeleteSession(Session session) {
-			DeleteSessionFromDatabase(session);
 			DeleteSession(session);
+
 			ResetListViewAdapter();
+
+			DeleteSessionFromDatabase(session);
 		}
 
 		/// <summary>
@@ -561,7 +563,24 @@ namespace Tomado {
 		/// <param name="session"></param>
 		void DeleteSession(Session session) {
 			//remove session from class sessions list
-			_sessions.Remove(session);
+			if (_sessions.Remove(session))
+				Log.Debug("remove", "success");
+			else {
+				//try to delete item by ID match
+				if (DeleteSession(session.ID))
+					Log.Debug("remove", "success by ID match");
+				else
+					Log.Debug("remove", "fail");
+			}
+		}
+
+		bool DeleteSession(int ID) {
+			foreach (var s in _sessions) {
+				if (s.ID == ID) {
+					return _sessions.Remove(s);
+				}
+			}
+			return false;
 		}
 
 		void HideKeyboard() {
