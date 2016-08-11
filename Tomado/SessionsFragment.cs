@@ -181,20 +181,6 @@ namespace Tomado {
 		public override void OnSaveInstanceState(Bundle outState) {
 			base.OnSaveInstanceState(outState);
 
-			var adapter = (SessionAdapter)listViewSessions.Adapter;
-			View itemView = null;
-
-			//get item at index
-			if (editIndex >= 0) {
-				itemView = adapter.GetView(editIndex, null, null);
-
-				title = adapter.TitleText;
-			}
-
-			if (dateDialog != null) {
-				
-			}
-
 			outState.PutString("title", title);
 			outState.PutInt("editIndex", editIndex);
 		}
