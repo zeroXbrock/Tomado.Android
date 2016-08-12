@@ -28,6 +28,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/switchRecurring_NewSession"
         android:text="Recurring" />
+    <include
+        layout="@layout/Recurring"
+        android:id="@+id/Layout_Recurring_NewSession"
+        android:visibility="gone" />
     <LinearLayout
         android:orientation="horizontal"
         android:minWidth="25px"

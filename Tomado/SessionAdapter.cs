@@ -256,14 +256,8 @@ namespace Tomado {
 			}
 
 			recurringSwitch.Click += delegate {
-				if (!recurringSwitch.Checked) {
-					recurringLayout.Visibility = ViewStates.Gone;
-					session.Recurring = false;
-				}
-				else {
-					recurringLayout.Visibility = ViewStates.Visible;
-					session.Recurring = true;
-				}
+				recurringLayout.Visibility = recurringSwitch.Checked ? ViewStates.Visible : ViewStates.Gone;
+				session.Recurring = recurringSwitch.Checked;
 			};
 
 			recurringSwitch.Checked = session.Recurring;

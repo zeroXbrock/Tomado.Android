@@ -16,6 +16,11 @@ namespace Tomado {
 			Button = button;
 			Toggled = toggled;
 			DayOfWeek = dayOfWeek;
+
+			button.Click += delegate {
+				button.SetBackgroundResource(toggled ? Resource.Color.base_app_color : Resource.Color.base_app_complementary_color);
+				toggled = !toggled;
+			};
 		}
 
 		//0-indexed!

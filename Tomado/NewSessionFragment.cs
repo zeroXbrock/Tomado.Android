@@ -24,6 +24,7 @@ namespace Tomado {
 		Button saveButton, cancelButton;
 		EditText timeEditText, dateEditText, titleEditText;
 		Switch recurringSwitch;
+		LinearLayout recurringLayout;
 
 		//session vars
 		int _year, _month, _day, _hour, _minute;
@@ -69,6 +70,17 @@ namespace Tomado {
 			dateEditText = view.FindViewById<EditText>(Resource.Id.editTextDate_NewSession);
 			titleEditText = view.FindViewById<EditText>(Resource.Id.editTextTitle_NewSession);
 			recurringSwitch = view.FindViewById<Switch>(Resource.Id.switchRecurring_NewSession);
+			recurringLayout = view.FindViewById<LinearLayout>(Resource.Id.Layout_Recurring_NewSession);
+			
+			//TODO: This weekday button code should really be encapsulated into another fragment since it's being used identically elsewhere (SessionAdapter)
+			List<WeekdayButton> weekdayButtons = new List<WeekdayButton>();
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonSunday_Recurring), DayOfWeek.Sunday));
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonMonday_Recurring), DayOfWeek.Monday));
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonTuesday_Recurring), DayOfWeek.Tuesday));
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonWednesday_Recurring), DayOfWeek.Wednesday));
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonThursday_Recurring), DayOfWeek.Thursday));
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonFriday_Recurring), DayOfWeek.Friday));
+			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonSaturday_Recurring), DayOfWeek.Saturday));
 						
 			//set default values
 			SetDefaultTimeValues();
@@ -104,6 +116,18 @@ namespace Tomado {
 				var dialog = new DatePickerDialogFragment(Activity, DateTime.Now, this);
 				dialog.Show(FragmentManager, null);
 			};
+
+			recurringSwitch.Click += delegate {
+				recurringLayout.Visibility = recurringSwitch.Checked ? ViewStates.Visible : ViewStates.Gone;
+				recurring = recurringSwitch.Checked;
+			};
+
+			//set weekday button clicks
+			foreach (var b in weekdayButtons) {
+				b.Button.Click += delegate {
+					b.Toggled = !b.Toggled;
+				};
+			}
 
 			return view;
 		}
