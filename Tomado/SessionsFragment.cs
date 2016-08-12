@@ -713,8 +713,8 @@ namespace Tomado {
 			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 1, alarmIntent, PendingIntentFlags.UpdateCurrent); //ID:1 for session notifications
 			AlarmManager alarmManager = (AlarmManager)Activity.GetSystemService(Context.AlarmService);
 			
-			DateTime now = DateTime.Now.ToUniversalTime();
-			DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear+1, session.DayOfMonth, session.StartHour, session.StartMinute, 0).ToUniversalTime();
+			DateTime now = DateTime.Now;
+			DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear+1, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 
 			if (session.Recurring && weekdayButtons != null) {
 				//set recurring event
@@ -723,29 +723,29 @@ namespace Tomado {
 				long millisPerWeek = ticksPerWeek / TimeSpan.TicksPerMillisecond;
 
 				//strictly the date of the session; at midnight
-				DateTime sessionDate = new DateTime(sessionDateTime.Year, sessionDateTime.Month, sessionDateTime.Day).ToUniversalTime();
+				DateTime sessionDate = new DateTime(sessionDateTime.Year, sessionDateTime.Month, sessionDateTime.Day, 0, 0, 0);
 
-				//time from midnight
+				//ticks from midnight to time of event
 				long ticksFromMidnight = sessionDateTime.Ticks - sessionDate.Ticks;
 
 				foreach (var i in weekdayButtons) {
 					if (i.Toggled) {
-						DateTime day = DateTime.Today.ToUniversalTime();
+
+						//days from now until toggled weekday
+						int daysUntilEvent = 0;
+						while (sessionDate.DayOfWeek != i.DayOfWeek) {
+							sessionDate = sessionDate.AddDays(1);
+							daysUntilEvent++;
+						}
+
 						
-						while (day.DayOfWeek != i.DayOfWeek)
-							day = day.AddDays(1);
-
-						//day currently at target day @ 12AM; add millis to adjust notification time
-						day = day.AddTicks(ticksFromMidnight);
-
-						long dayMillis = day.Ticks / TimeSpan.TicksPerMillisecond;												
-
-						//set alarm for this occurence
-						//alarmManager.SetRepeating(AlarmType.RtcWakeup, dayMillis, millisPerWeek, pendingIntent);
+						//get calendar to set alarm
 						Java.Util.Calendar calendar = Java.Util.Calendar.Instance;
 						calendar.Set(Java.Util.CalendarField.HourOfDay, session.StartHour);
 						calendar.Set(Java.Util.CalendarField.Minute, session.StartMinute);
+						calendar.Add(Java.Util.CalendarField.DayOfMonth, daysUntilEvent);
 
+						//set alarm for this occurence
 						alarmManager.SetRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, 5000, pendingIntent);//actual interval: AlarmManager.IntervalDay * 7
 						
 					}
