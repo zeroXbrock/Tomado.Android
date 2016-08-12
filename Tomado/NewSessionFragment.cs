@@ -113,7 +113,7 @@ namespace Tomado {
 				dialog.Show(FragmentManager, null);
 			};
 			dateEditText.Click += delegate {
-				var dialog = new DatePickerDialogFragment(Activity, DateTime.Now, this);
+				var dialog = new DatePickerDialogFragment(Activity, DateTime.Now.AddMonths(-1), this);
 				dialog.Show(FragmentManager, null);
 			};
 
@@ -125,7 +125,9 @@ namespace Tomado {
 			//set weekday button clicks
 			foreach (var b in weekdayButtons) {
 				b.Button.Click += delegate {
+					Log.Debug("weekday", b.Button.Text);
 					b.Toggled = !b.Toggled;
+					Log.Debug("weekday toggle", b.Toggled.ToString());
 				};
 			}
 
@@ -152,7 +154,7 @@ namespace Tomado {
 		//populate the date/time vars w/ default values
 		private void SetDefaultTimeValues() {
 			_year = sessionDateTime.Year;
-			_month = sessionDateTime.Month;
+			_month = sessionDateTime.Month-1;
 			_day = sessionDateTime.Day;
 			_hour = sessionDateTime.Hour;
 			_minute = sessionDateTime.Minute;
@@ -160,7 +162,7 @@ namespace Tomado {
 
 		//updates DateTime class var and the edittext views
 		private void UpdateDateTimeInfo() {
-			sessionDateTime = new DateTime(_year, _month, _day, _hour, _minute, 0);
+			sessionDateTime = new DateTime(_year, _month+1, _day, _hour, _minute, 0);
 
 			timeEditText.Text = sessionDateTime.ToShortTimeString();
 			dateEditText.Text = sessionDateTime.ToShortDateString();
