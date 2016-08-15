@@ -26,6 +26,8 @@ namespace Tomado
 		
 		public static void UpdateIdValues()
 		{
+			global::SQLite.Net.Platform.XamarinAndroid.Resource.String.ApplicationName = global::Tomado.Resource.String.ApplicationName;
+			global::SQLite.Net.Platform.XamarinAndroid.Resource.String.Hello = global::Tomado.Resource.String.Hello;
 		}
 		
 		public partial class Animation
@@ -252,11 +254,11 @@ namespace Tomado
 		public partial class Color
 		{
 			
-			// aapt resource value: 0x7f070000
-			public const int base_app_color = 2131165184;
+			// aapt resource value: 0x7f080000
+			public const int base_app_color = 2131230720;
 			
-			// aapt resource value: 0x7f070001
-			public const int base_app_complementary_color = 2131165185;
+			// aapt resource value: 0x7f080001
+			public const int base_app_complementary_color = 2131230721;
 			
 			static Color()
 			{
@@ -271,14 +273,14 @@ namespace Tomado
 		public partial class Dimension
 		{
 			
-			// aapt resource value: 0x7f050000
-			public const int fab_size_mini = 2131034112;
+			// aapt resource value: 0x7f060000
+			public const int fab_size_mini = 2131099648;
 			
-			// aapt resource value: 0x7f050001
-			public const int fab_size_normal = 2131034113;
+			// aapt resource value: 0x7f060001
+			public const int fab_size_normal = 2131099649;
 			
-			// aapt resource value: 0x7f050002
-			public const int labels_text_size = 2131034114;
+			// aapt resource value: 0x7f060002
+			public const int labels_text_size = 2131099650;
 			
 			static Dimension()
 			{
@@ -351,191 +353,164 @@ namespace Tomado
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f06002c
-			public const int EditSessionLayout = 2131099692;
+			// aapt resource value: 0x7f070024
+			public const int EditSessionLayout = 2131165220;
 			
-			// aapt resource value: 0x7f060032
-			public const int FrameLayout_Base_Sessions = 2131099698;
+			// aapt resource value: 0x7f070029
+			public const int FrameLayout_Base_Sessions = 2131165225;
 			
-			// aapt resource value: 0x7f06001c
-			public const int Layout_Recurring_NewSession = 2131099676;
+			// aapt resource value: 0x7f070028
+			public const int RecurringView_EditSession = 2131165224;
 			
-			// aapt resource value: 0x7f060031
-			public const int Layout_Recurring_SessionListItem = 2131099697;
+			// aapt resource value: 0x7f07001b
+			public const int RecurringView_NewSession = 2131165211;
 			
-			// aapt resource value: 0x7f060028
-			public const int SessionListItemTextLayout = 2131099688;
+			// aapt resource value: 0x7f070020
+			public const int SessionListItemTextLayout = 2131165216;
 			
-			// aapt resource value: 0x7f060027
-			public const int SessionsListItemLayout = 2131099687;
+			// aapt resource value: 0x7f07001f
+			public const int SessionsListItemLayout = 2131165215;
 			
-			// aapt resource value: 0x7f060033
-			public const int SwipeRefreshLayout_Sessions = 2131099699;
+			// aapt resource value: 0x7f07002a
+			public const int SwipeRefreshLayout_Sessions = 2131165226;
 			
-			// aapt resource value: 0x7f060038
-			public const int TextView_SessionCount = 2131099704;
+			// aapt resource value: 0x7f07002f
+			public const int TextView_SessionCount = 2131165231;
 			
-			// aapt resource value: 0x7f060037
-			public const int Timer_MainLayout = 2131099703;
+			// aapt resource value: 0x7f07002e
+			public const int Timer_MainLayout = 2131165230;
 			
-			// aapt resource value: 0x7f06001e
-			public const int buttonCancel_NewSession = 2131099678;
+			// aapt resource value: 0x7f07001d
+			public const int buttonCancel_NewSession = 2131165213;
 			
-			// aapt resource value: 0x7f06003d
-			public const int buttonFinish = 2131099709;
+			// aapt resource value: 0x7f070034
+			public const int buttonFinish = 2131165236;
 			
-			// aapt resource value: 0x7f060025
-			public const int buttonFriday_Recurring = 2131099685;
+			// aapt resource value: 0x7f070012
+			public const int buttonNo_DeleteSession = 2131165202;
 			
-			// aapt resource value: 0x7f060021
-			public const int buttonMonday_Recurring = 2131099681;
+			// aapt resource value: 0x7f07000c
+			public const int buttonOKInvisible_congrats = 2131165196;
 			
-			// aapt resource value: 0x7f060012
-			public const int buttonNo_DeleteSession = 2131099666;
+			// aapt resource value: 0x7f07000d
+			public const int buttonOK_congrats = 2131165197;
 			
-			// aapt resource value: 0x7f06000c
-			public const int buttonOKInvisible_congrats = 2131099660;
+			// aapt resource value: 0x7f07001e
+			public const int buttonSave_NewSession = 2131165214;
 			
-			// aapt resource value: 0x7f06000d
-			public const int buttonOK_congrats = 2131099661;
+			// aapt resource value: 0x7f070033
+			public const int buttonWork = 2131165235;
 			
-			// aapt resource value: 0x7f060026
-			public const int buttonSaturday_Recurring = 2131099686;
+			// aapt resource value: 0x7f070011
+			public const int buttonYes_DeleteSession = 2131165201;
 			
-			// aapt resource value: 0x7f06001f
-			public const int buttonSave_NewSession = 2131099679;
+			// aapt resource value: 0x7f07000a
+			public const int down = 2131165194;
 			
-			// aapt resource value: 0x7f060020
-			public const int buttonSunday_Recurring = 2131099680;
+			// aapt resource value: 0x7f070019
+			public const int editTextDate_NewSession = 2131165209;
 			
-			// aapt resource value: 0x7f060024
-			public const int buttonThursday_Recurring = 2131099684;
+			// aapt resource value: 0x7f07001a
+			public const int editTextTime_NewSession = 2131165210;
 			
-			// aapt resource value: 0x7f060022
-			public const int buttonTuesday_Recurring = 2131099682;
+			// aapt resource value: 0x7f070018
+			public const int editTextTitle_NewSession = 2131165208;
 			
-			// aapt resource value: 0x7f060023
-			public const int buttonWednesday_Recurring = 2131099683;
+			// aapt resource value: 0x7f070026
+			public const int editText_Date_EditSession = 2131165222;
 			
-			// aapt resource value: 0x7f06003c
-			public const int buttonWork = 2131099708;
+			// aapt resource value: 0x7f070027
+			public const int editText_Time_EditSession = 2131165223;
 			
-			// aapt resource value: 0x7f060011
-			public const int buttonYes_DeleteSession = 2131099665;
+			// aapt resource value: 0x7f070025
+			public const int editText_Title_EditSession = 2131165221;
 			
-			// aapt resource value: 0x7f06000a
-			public const int down = 2131099658;
+			// aapt resource value: 0x7f070005
+			public const int end = 2131165189;
 			
-			// aapt resource value: 0x7f060019
-			public const int editTextDate_NewSession = 2131099673;
+			// aapt resource value: 0x7f070023
+			public const int evTime = 2131165219;
 			
-			// aapt resource value: 0x7f06001a
-			public const int editTextTime_NewSession = 2131099674;
+			// aapt resource value: 0x7f070022
+			public const int evTitle = 2131165218;
 			
-			// aapt resource value: 0x7f060018
-			public const int editTextTitle_NewSession = 2131099672;
+			// aapt resource value: 0x7f070000
+			public const int fab_label = 2131165184;
 			
-			// aapt resource value: 0x7f06002e
-			public const int editText_Date_EditSession = 2131099694;
+			// aapt resource value: 0x7f070014
+			public const int freeTimeListItem = 2131165204;
 			
-			// aapt resource value: 0x7f06002f
-			public const int editText_Time_EditSession = 2131099695;
+			// aapt resource value: 0x7f070021
+			public const int imageButtonEditSession = 2131165217;
 			
-			// aapt resource value: 0x7f06002d
-			public const int editText_Title_EditSession = 2131099693;
+			// aapt resource value: 0x7f070017
+			public const int imageViewFooter = 2131165207;
 			
-			// aapt resource value: 0x7f060005
-			public const int end = 2131099653;
+			// aapt resource value: 0x7f070003
+			public const int left = 2131165187;
 			
-			// aapt resource value: 0x7f06002b
-			public const int evTime = 2131099691;
+			// aapt resource value: 0x7f07001c
+			public const int linearLayout1 = 2131165212;
 			
-			// aapt resource value: 0x7f06002a
-			public const int evTitle = 2131099690;
+			// aapt resource value: 0x7f070013
+			public const int listViewFreeTimeSessions = 2131165203;
 			
-			// aapt resource value: 0x7f060000
-			public const int fab_label = 2131099648;
+			// aapt resource value: 0x7f07002b
+			public const int listViewSessions = 2131165227;
 			
-			// aapt resource value: 0x7f060014
-			public const int freeTimeListItem = 2131099668;
+			// aapt resource value: 0x7f070006
+			public const int marquee = 2131165190;
 			
-			// aapt resource value: 0x7f060029
-			public const int imageButtonEditSession = 2131099689;
+			// aapt resource value: 0x7f07002c
+			public const int menu_newSession = 2131165228;
 			
-			// aapt resource value: 0x7f060017
-			public const int imageViewFooter = 2131099671;
+			// aapt resource value: 0x7f070007
+			public const int middle = 2131165191;
 			
-			// aapt resource value: 0x7f060003
-			public const int left = 2131099651;
+			// aapt resource value: 0x7f070001
+			public const int mini = 2131165185;
 			
-			// aapt resource value: 0x7f06001d
-			public const int linearLayout1 = 2131099677;
+			// aapt resource value: 0x7f070008
+			public const int none = 2131165192;
 			
-			// aapt resource value: 0x7f060013
-			public const int listViewFreeTimeSessions = 2131099667;
+			// aapt resource value: 0x7f070002
+			public const int normal = 2131165186;
 			
-			// aapt resource value: 0x7f060034
-			public const int listViewSessions = 2131099700;
+			// aapt resource value: 0x7f070032
+			public const int relativeLayout1 = 2131165234;
 			
-			// aapt resource value: 0x7f060006
-			public const int marquee = 2131099654;
+			// aapt resource value: 0x7f070004
+			public const int right = 2131165188;
 			
-			// aapt resource value: 0x7f060035
-			public const int menu_newSession = 2131099701;
+			// aapt resource value: 0x7f070009
+			public const int start = 2131165193;
 			
-			// aapt resource value: 0x7f060007
-			public const int middle = 2131099655;
+			// aapt resource value: 0x7f07000f
+			public const int textViewCongratulationsMessage = 2131165199;
 			
-			// aapt resource value: 0x7f060001
-			public const int mini = 2131099649;
+			// aapt resource value: 0x7f07000e
+			public const int textViewCongratulationsTitle = 2131165198;
 			
-			// aapt resource value: 0x7f060008
-			public const int none = 2131099656;
+			// aapt resource value: 0x7f070010
+			public const int textViewDeleteSession = 2131165200;
 			
-			// aapt resource value: 0x7f060002
-			public const int normal = 2131099650;
+			// aapt resource value: 0x7f070016
+			public const int textViewDuration = 2131165206;
 			
-			// aapt resource value: 0x7f06003b
-			public const int relativeLayout1 = 2131099707;
+			// aapt resource value: 0x7f070015
+			public const int textViewTime = 2131165205;
 			
-			// aapt resource value: 0x7f060004
-			public const int right = 2131099652;
+			// aapt resource value: 0x7f070031
+			public const int textViewTimer = 2131165233;
 			
-			// aapt resource value: 0x7f060009
-			public const int start = 2131099657;
+			// aapt resource value: 0x7f070030
+			public const int textViewTimerTitle = 2131165232;
 			
-			// aapt resource value: 0x7f06001b
-			public const int switchRecurring_NewSession = 2131099675;
+			// aapt resource value: 0x7f07000b
+			public const int up = 2131165195;
 			
-			// aapt resource value: 0x7f060030
-			public const int switchRecurring_SessionListItem = 2131099696;
-			
-			// aapt resource value: 0x7f06000f
-			public const int textViewCongratulationsMessage = 2131099663;
-			
-			// aapt resource value: 0x7f06000e
-			public const int textViewCongratulationsTitle = 2131099662;
-			
-			// aapt resource value: 0x7f060010
-			public const int textViewDeleteSession = 2131099664;
-			
-			// aapt resource value: 0x7f060016
-			public const int textViewDuration = 2131099670;
-			
-			// aapt resource value: 0x7f060015
-			public const int textViewTime = 2131099669;
-			
-			// aapt resource value: 0x7f06003a
-			public const int textViewTimer = 2131099706;
-			
-			// aapt resource value: 0x7f060039
-			public const int textViewTimerTitle = 2131099705;
-			
-			// aapt resource value: 0x7f06000b
-			public const int up = 2131099659;
-			
-			// aapt resource value: 0x7f060036
-			public const int viewPager = 2131099702;
+			// aapt resource value: 0x7f07002d
+			public const int viewPager = 2131165229;
 			
 			static Id()
 			{
@@ -572,19 +547,16 @@ namespace Tomado
 			public const int NewSessionDialog = 2130903046;
 			
 			// aapt resource value: 0x7f030007
-			public const int Recurring = 2130903047;
+			public const int SessionListItem = 2130903047;
 			
 			// aapt resource value: 0x7f030008
-			public const int SessionListItem = 2130903048;
+			public const int Sessions = 2130903048;
 			
 			// aapt resource value: 0x7f030009
-			public const int Sessions = 2130903049;
+			public const int SwipeLayout = 2130903049;
 			
 			// aapt resource value: 0x7f03000a
-			public const int SwipeLayout = 2130903050;
-			
-			// aapt resource value: 0x7f03000b
-			public const int Timer = 2130903051;
+			public const int Timer = 2130903050;
 			
 			static Layout()
 			{
@@ -599,23 +571,26 @@ namespace Tomado
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f080001
-			public const int ApplicationName = 2131230721;
+			// aapt resource value: 0x7f050001
+			public const int ApplicationName = 2131034113;
 			
-			// aapt resource value: 0x7f080002
-			public const int ButtonText_pause = 2131230722;
+			// aapt resource value: 0x7f050003
+			public const int ButtonText_pause = 2131034115;
 			
-			// aapt resource value: 0x7f080003
-			public const int ButtonText_work = 2131230723;
+			// aapt resource value: 0x7f050004
+			public const int ButtonText_work = 2131034116;
 			
-			// aapt resource value: 0x7f080005
-			public const int DialogHeight = 2131230725;
+			// aapt resource value: 0x7f050006
+			public const int DialogHeight = 2131034118;
 			
-			// aapt resource value: 0x7f080004
-			public const int Finished = 2131230724;
+			// aapt resource value: 0x7f050005
+			public const int Finished = 2131034117;
 			
-			// aapt resource value: 0x7f080000
-			public const int PackageName = 2131230720;
+			// aapt resource value: 0x7f050000
+			public const int Hello = 2131034112;
+			
+			// aapt resource value: 0x7f050002
+			public const int PackageName = 2131034114;
 			
 			static String()
 			{

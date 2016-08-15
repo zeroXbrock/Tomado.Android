@@ -23,15 +23,10 @@
         android:id="@+id/editTextTime_NewSession"
         android:hint="Time"
         android:focusable="false" />
-    <Switch
+    <Tomado.RecurringView
+        android:id="@+id/RecurringView_NewSession"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/switchRecurring_NewSession"
-        android:text="Recurring" />
-    <include
-        layout="@layout/Recurring"
-        android:id="@+id/Layout_Recurring_NewSession"
-        android:visibility="gone" />
+        android:layout_height="wrap_content" />
     <LinearLayout
         android:orientation="horizontal"
         android:minWidth="25px"

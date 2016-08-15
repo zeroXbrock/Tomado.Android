@@ -41,7 +41,6 @@ namespace Tomado {
 		FloatingActionMenu newSessionMenu;
 		SwipeRefreshLayout swipeRefreshLayout;
 		View rootView;
-		View baseView;
 
 		//will be view instances
 		DatePickerDialogFragment dateDialog;
@@ -99,11 +98,7 @@ namespace Tomado {
 		public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			//return base.OnCreateView(inflater, container, savedInstanceState);
 
-			if (savedInstanceState != null){
-				//get sessions
-				var parcelable = savedInstanceState.GetParcelableArray("sessions");
-				//_sessions = parcelable.ToList<(IParcelable)>();
-
+			if (savedInstanceState != null){ //NA b/c app is non-rotatable
 				//get editIndex
 				editIndex = savedInstanceState.GetInt("editIndex");
 				title = savedInstanceState.GetString("title");
@@ -273,6 +268,7 @@ namespace Tomado {
 			ResetListViewAdapter(sessionIndex);
 
 			if (sessionIndex >= 0) {
+				//store last index used
 				lastSessionIndex = sessionIndex;
 			}
 			else {
@@ -291,6 +287,11 @@ namespace Tomado {
 			HideKeyboard();
 		}
 
+		/// <summary>
+		/// Updates title of session at given index with given title.
+		/// </summary>
+		/// <param name="sessionIndex"></param>
+		/// <param name="title"></param>
 		public void OnTitleSet(int sessionIndex, string title) {
 			if (title != "") {
 				DeleteSessionFromDatabase(_sessions[sessionIndex].ID);
@@ -309,8 +310,20 @@ namespace Tomado {
 			HideKeyboard();
 		}
 
-		public void OnSetRecurrence(Session session, List<WeekdayButton> weekdayButtons) {
-			ScheduleSessionNotification(session, weekdayButtons);
+		/// <summary>
+		/// Updates given session with new values from weekdayButtons.
+		/// </summary>
+		/// <param name="session"></param>
+		/// <param name="weekdayButtons"></param>
+		public void OnSetRecurrence(Session session, List<DayOfWeek> recurringDays) {
+			//make changes if the weekday lists are any different
+			if (session.RecurringDays == null || !recurringDays.SequenceEqual<DayOfWeek>(session.RecurringDays)) {
+				//if so, reset session recurrence
+				session.RecurringDays = recurringDays;
+
+				//schedule that notification
+				ScheduleSessionNotification(session, recurringDays);
+			}
 		}
 
 		public void OnShowDatePickerDialog(int sessionIndex) {
@@ -373,12 +386,12 @@ namespace Tomado {
 		/// </summary>
 		/// <param name="dateTime"></param>
 		/// <param name="title"></param>
-		public void OnAddNewSession(DateTime dateTime, string title, bool recurring) {
+		public void OnAddNewSession(DateTime dateTime, string title, List<DayOfWeek> recurringDays = null) {
 			//close fab menu button
 			newSessionMenu.Close(true);
 
 			//Add the session to _sessions list.
-			Session session = AddSession(1, dateTime, title, recurring);
+			Session session = AddSession(1, dateTime, title, recurringDays);
 
 			//reset the listview adapter
 			ResetListViewAdapter(editIndex);
@@ -403,9 +416,9 @@ namespace Tomado {
 		private void OnAddNewSession(Session session) {
 			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 			string title = session.Title;
-			bool recurring = session.Recurring;
+			var recurringDays = session.RecurringDays;
 
-			OnAddNewSession(dateTime, title, recurring);
+			OnAddNewSession(dateTime, title, recurringDays);
 		}
 
 		/// <summary>
@@ -534,9 +547,9 @@ namespace Tomado {
 		/// <param name="dateTime"></param>
 		/// <param name="title"></param>
 		/// <returns></returns>
-		private Session AddSession(int ID, DateTime dateTime, string title, bool recurring) {
+		private Session AddSession(int ID, DateTime dateTime, string title, List<DayOfWeek> recurringDays) {
 			//add the new session
-			Session session = new Session(ID, dateTime, title, recurring);
+			Session session = new Session(ID, dateTime, title, recurringDays);
 			_sessions.Add(session);
 
 			return session;
@@ -552,9 +565,9 @@ namespace Tomado {
 
 			int ID = session.ID;
 
-			bool recurring = session.Recurring;
+			List<DayOfWeek> recurringDays = session.RecurringDays;
 
-			return AddSession(ID, datetime, title, recurring);
+			return AddSession(ID, datetime, title, recurringDays);
 		}
 
 		/// <summary>
@@ -702,7 +715,7 @@ namespace Tomado {
 		/// Schedules a notification to launch in the future; to open a session from
 		/// </summary>
 		/// <param name="session"></param>
-		public void ScheduleSessionNotification(Session session, List<WeekdayButton> weekdayButtons = null) {			
+		public void ScheduleSessionNotification(Session session, List<DayOfWeek> recurringDays = null) {			
 			Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
 			
 			alarmIntent.PutExtra("ID", session.ID);
@@ -716,7 +729,7 @@ namespace Tomado {
 			DateTime now = DateTime.Now;
 			DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear+1, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 
-			if (session.Recurring && weekdayButtons != null) {
+			if (session.Recurring && recurringDays != null) {
 				//set recurring event
 
 				long ticksPerWeek = TimeSpan.TicksPerDay * 7;
@@ -728,28 +741,25 @@ namespace Tomado {
 				//ticks from midnight to time of event
 				long ticksFromMidnight = sessionDateTime.Ticks - sessionDate.Ticks;
 
-				foreach (var i in weekdayButtons) {
-					if (i.Toggled) {
-
-						//days from now until toggled weekday
-						int daysUntilEvent = 0;
-						while (sessionDate.DayOfWeek != i.DayOfWeek) {
-							sessionDate = sessionDate.AddDays(1);
-							daysUntilEvent++;
-						}
-
-						
-						//get calendar to set alarm
-						Java.Util.Calendar calendar = Java.Util.Calendar.Instance;
-						calendar.Set(Java.Util.CalendarField.HourOfDay, session.StartHour);
-						calendar.Set(Java.Util.CalendarField.Minute, session.StartMinute);
-						calendar.Add(Java.Util.CalendarField.DayOfMonth, daysUntilEvent);
-
-						//set alarm for this occurence
-						alarmManager.SetRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, 5000, pendingIntent);//actual interval: AlarmManager.IntervalDay * 7
-						
+				foreach (var i in recurringDays) {
+					//days from now until toggled weekday
+					int daysUntilEvent = 0;
+					while (sessionDate.DayOfWeek != i) {
+						sessionDate = sessionDate.AddDays(1);
+						daysUntilEvent++;
 					}
-				}				
+
+						
+					//get calendar to set alarm
+					Java.Util.Calendar calendar = Java.Util.Calendar.Instance;
+					calendar.Set(Java.Util.CalendarField.HourOfDay, session.StartHour);
+					calendar.Set(Java.Util.CalendarField.Minute, session.StartMinute);
+					calendar.Add(Java.Util.CalendarField.DayOfMonth, daysUntilEvent);
+
+					//set alarm for this occurence
+					alarmManager.SetRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, 5000, pendingIntent);//actual interval: AlarmManager.IntervalDay * 7
+						
+				}			
 			}
 			else {
 				//set non-recurring event for session date/time

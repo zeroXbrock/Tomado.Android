@@ -68,7 +68,7 @@ namespace Tomado {
 
 			if (fragmentSession == null) { //lone timer
 				Init(savedInstanceState);
-				fragmentSession = new Session(-1, DateTime.Now, "Task", false);
+				fragmentSession = new Session(-1, DateTime.Now, "Task", null);
 			}
 			else { //use info from session item
 				Bundle bundle = new Bundle();

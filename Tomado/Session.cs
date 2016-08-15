@@ -11,6 +11,7 @@ using Android.Views;
 using Android.Widget;
 
 using SQLite;
+using SQLiteNetExtensions.Attributes;
 
 namespace Tomado {
 	/// <summary>
@@ -22,13 +23,16 @@ namespace Tomado {
 
 		int startHour, startMinute, year, monthOfYear, dayOfMonth;
 
-		bool recurring;
-		
+		[Ignore]
+		[TextBlob("RecurringDaysBlob")]
+		public List<DayOfWeek> RecurringDays { get; set; }
+		public string RecurringDaysBlob { get; set; }
+
 		string title;
 
 		int pomodoros = 0;
 
-		public Session(int ID, int startHour, int startMinute, int year, int monthOfYear, int dayOfMonth, string title, bool recurring) {
+		public Session(int ID, int startHour, int startMinute, int year, int monthOfYear, int dayOfMonth, string title, List<DayOfWeek> recurringDays) {
 			this.ID = ID;
 			StartHour = startHour;
 			StartMinute = startMinute;
@@ -36,10 +40,10 @@ namespace Tomado {
 			MonthOfYear = monthOfYear;
 			DayOfMonth = dayOfMonth;
 			Title = title;
-			Recurring = recurring;
+			RecurringDays = recurringDays;
 		}
 
-		public Session(int ID, DateTime dateTime, string title, bool recurring) {
+		public Session(int ID, DateTime dateTime, string title, List<DayOfWeek> recurringDays) {
 			this.ID = ID;
 			StartHour = dateTime.Hour;
 			StartMinute = dateTime.Minute;
@@ -47,7 +51,7 @@ namespace Tomado {
 			MonthOfYear = dateTime.Month;
 			DayOfMonth = dateTime.Day;
 			Title = title;
-			Recurring = recurring;
+			RecurringDays = recurringDays;
 		}
 
 		public Session() { }
@@ -74,10 +78,10 @@ namespace Tomado {
 		}
 		public bool Recurring {
 			get {
-				return recurring;
-			}
-			set {
-				recurring = value;
+				if (RecurringDays != null)
+					return (RecurringDays.Count > 0);
+				else
+					return false;
 			}
 		}
 		

@@ -78,26 +78,10 @@
                 android:hint="Time"
                 android:focusableInTouchMode="false"
                 android:imeOptions="actionDone" />
-            <Switch
+            <Tomado.RecurringView
+                android:id="@+id/RecurringView_EditSession"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/switchRecurring_SessionListItem"
-                android:text="Recurring" />
-            <include
-                layout="@layout/Recurring"
-                android:id="@+id/Layout_Recurring_SessionListItem"
-                android:visibility="gone" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
-    <!--
-        <com.github.clans.fab.FloatingActionMenu
-            android:id="@+id/menuButton_EditSession"
-            fab:menu_icon="@drawable/ic_edit_white_24dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            fab:menu_fab_size="mini"
-            fab_colorNormal="@color/base_app_complementary_color"
-            fab:fab_shadowColor="#000"
-            android:layout_toRightOf="@+id/SessionListItemTextLayout" />
-	  -->
     </RelativeLayout>
 </LinearLayout>
