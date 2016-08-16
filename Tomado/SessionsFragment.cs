@@ -294,13 +294,14 @@ namespace Tomado {
 		/// <param name="title"></param>
 		public void OnTitleSet(int sessionIndex, string title) {
 			if (title != "") {
-				DeleteSessionFromDatabase(_sessions[sessionIndex].ID);
-
 				_sessions[sessionIndex].Title = title;
 
-				ResetListViewAdapter(sessionIndex);
+				DeleteSessionFromDatabase(_sessions[sessionIndex].ID).ContinueWith(t => {
+					
+					SaveSessionToDatabase(_sessions[sessionIndex]);
+				});
 
-				SaveSessionToDatabase(_sessions[sessionIndex]);
+				ResetListViewAdapter(sessionIndex);
 
 				//scroll to new item
 				listViewSessions.SetSelection(sessionIndex);
@@ -315,14 +316,22 @@ namespace Tomado {
 		/// </summary>
 		/// <param name="session"></param>
 		/// <param name="weekdayButtons"></param>
-		public void OnSetRecurrence(Session session, List<DayOfWeek> recurringDays) {
+		public void OnSetRecurrence(int sessionIndex, Session session, List<DayOfWeek> recurringDays) {
 			//make changes if the weekday lists are any different
 			if (session.RecurringDays == null || !recurringDays.SequenceEqual<DayOfWeek>(session.RecurringDays)) {
-				//if so, reset session recurrence
-				session.RecurringDays = recurringDays;
+				//delete old session from database
+				DeleteSessionFromDatabase(_sessions[sessionIndex].ID).ContinueWith(async t => {
+					//set recurrence on session
+					_sessions[sessionIndex].RecurringDays = recurringDays;
+
+					//save new session to database
+					await SaveSessionToDatabase(_sessions[sessionIndex]);
+				});
 
 				//schedule that notification
-				ScheduleSessionNotification(session, recurringDays);
+				ScheduleSessionNotification(_sessions[sessionIndex], recurringDays);
+
+				listViewSessions.SetSelection(sessionIndex);
 			}
 		}
 
@@ -611,25 +620,28 @@ namespace Tomado {
 		/// </summary>
 		/// <param name="pathToDatabase"></param>
 		/// <param name="session"></param>
-		private async void SaveSessionToDatabase(Session session) {
-			var result = await insertUpdateData(session);
+		private async Task<string> SaveSessionToDatabase(Session session) {
+			session.RecurringDaysCSV = session.ParseDaysToCSV(session.RecurringDays);
+			
+			return await insertUpdateData(session);
 		}
 
 		/// <summary>
 		/// Deletes a session from the class session list (& listview) and the database
 		/// </summary>
-		private async void DeleteSessionFromDatabase(Session session) {
+		private async Task<int> DeleteSessionFromDatabase(Session session) {
 			//remove session from database
-			await connection.DeleteAsync(session);
+			return await connection.DeleteAsync(session);
 		}
 
 		/// <summary>
 		/// Deletes session from the database and removes its notification.
 		/// </summary>
 		/// <param name="ID"></param>
-		private async void DeleteSessionFromDatabase(int ID) {
-			await connection.ExecuteScalarAsync<int>("DELETE FROM Session WHERE ID=" + ID + ";");
+		private async Task<int> DeleteSessionFromDatabase(int ID) {
 			CancelSessionNotification(ID);
+			
+			return await connection.ExecuteScalarAsync<int>("DELETE FROM Session WHERE ID=" + ID + ";");
 		}
 
 		/// <summary>
@@ -648,6 +660,7 @@ namespace Tomado {
 			try {
 				await records.ContinueWith(t => {
 					foreach (var s in records.Result) {
+						s.RecurringDays = s.ParseCSVToDays(s.RecurringDaysCSV);
 						AddSession(s);
 					}
 				});

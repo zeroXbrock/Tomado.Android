@@ -11,7 +11,6 @@ using Android.Views;
 using Android.Widget;
 
 using SQLite;
-using SQLiteNetExtensions.Attributes;
 
 namespace Tomado {
 	/// <summary>
@@ -23,10 +22,50 @@ namespace Tomado {
 
 		int startHour, startMinute, year, monthOfYear, dayOfMonth;
 
+		DayOfWeek[] weekdays = { DayOfWeek.Sunday, DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday };
+
+		public string RecurringDaysCSV {
+			get; set;
+		}
+
+		public List<DayOfWeek> ParseCSVToDays(string csv) {
+			List<DayOfWeek> days = new List<DayOfWeek>();
+
+			string pattern = @"(\w+)+";
+
+			if (csv != null && csv != "") {
+				string[] dayStrings = System.Text.RegularExpressions.Regex.Split(csv.Substring(0, csv.Length - 1), pattern);
+
+				foreach (var d in dayStrings) {
+					foreach (var w in weekdays) {
+						if (w.ToString() == d)
+							days.Add(w);
+					}
+				}
+			}
+
+			return days;
+		}
+
+		public string ParseDaysToCSV(List<DayOfWeek> days) {
+			string output = "";
+
+			if (days != null) {
+				foreach (var r in RecurringDays) {
+					foreach (var w in weekdays) {
+						if (w == r) {
+							output += "'" + w.ToString() + "'";
+							break;
+						}
+					}
+				}
+			}
+
+			return output;
+		}
+
 		[Ignore]
-		[TextBlob("RecurringDaysBlob")]
 		public List<DayOfWeek> RecurringDays { get; set; }
-		public string RecurringDaysBlob { get; set; }
 
 		string title;
 

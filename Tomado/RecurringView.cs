@@ -126,7 +126,8 @@ namespace Tomado {
 			//toggle buttons
 			foreach (var d in recurringDays){
 				for (int i = 0; i < toggledButtons.Length; i++) {
-					toggledButtons[i] = (weekdays[i] == d) ? true : false;
+					if (weekdays[i] == d)
+						toggledButtons[i] = true;
 				}
 			}
 		}

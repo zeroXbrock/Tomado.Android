@@ -70,7 +70,7 @@ namespace Tomado {
 		}
 
 		public interface SetRecurrenceListener {
-			void OnSetRecurrence(Session session, List<DayOfWeek> recurringDays);
+			void OnSetRecurrence(int sessionIndex, Session session, List<DayOfWeek> recurringDays);
 		}
 
 		/// <summary>
@@ -173,9 +173,6 @@ namespace Tomado {
 			//get recurring view instance
 			var recurringView = view.FindViewById<RecurringView>(Resource.Id.RecurringView_EditSession);
 
-			//set button animation
-			//editMenuButton.IconToggleAnimatorSet = CreateCustomAnimationMenuButton(view);
-
 			//set toggle states for weekdays
 			if (session.Recurring) {
 				recurringView.SetRecurringWeekdays(session.RecurringDays);
@@ -211,16 +208,16 @@ namespace Tomado {
 						toggled = false;
 
 						//always set title when closing edit view
-						string title = (editTextTitle.Text == "") ? editTextTitle.Hint : editTextTitle.Text;
+						string title =  editTextTitle.Text;
 
 						//fire title set event
 						titleSetListener.OnTitleSet(editSessionIndex, title);
 
-						//update edit index
+						//update recurrence list w/ current index
+						setRecurrenceListener.OnSetRecurrence(editSessionIndex, session, recurringView.GetRecurringWeekdays());
+						
+						//reset edit index
 						editSessionIndex = -1;
-
-						//update recurrence list
-						setRecurrenceListener.OnSetRecurrence(session, recurringView.GetRecurringWeekdays());
 
 						//change button icon
 						editMenuButton.SetImageResource(Resource.Drawable.ic_edit_white_24dp);
@@ -320,40 +317,5 @@ namespace Tomado {
 		public void BeforeTextChanged(ICharSequence s, int start, int count, int after) {
 
 		}
-
-		
-
-		
-
-		/*
-		private AnimatorSet CreateCustomAnimationMenuButton(View rootView) {
-			AnimatorSet set = new AnimatorSet();
-			FloatingActionMenu menu = rootView.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
-
-			ObjectAnimator scaleOutX = ObjectAnimator.OfFloat(menu.MenuIconView, "scaleX", 1.0f, 0.2f);
-			ObjectAnimator scaleOutY = ObjectAnimator.OfFloat(menu.MenuIconView, "scaleY", 1.0f, 0.2f);
-
-			ObjectAnimator scaleInX = ObjectAnimator.OfFloat(menu.MenuIconView, "scaleX", 0.2f, 1.0f);
-			ObjectAnimator scaleInY = ObjectAnimator.OfFloat(menu.MenuIconView, "scaleY", 0.2f, 1.0f);
-
-			scaleOutX.SetDuration(50);
-			scaleOutY.SetDuration(50);
-
-			scaleInX.SetDuration(150);
-			scaleInY.SetDuration(150);
-
-			scaleInX.AnimationStart += (object sender, EventArgs e) => {
-				menu.MenuIconView.SetImageResource(menu.IsOpened ? Resource.Drawable.ic_edit_white_24dp : Resource.Drawable.ic_check_white_24dp);
-			};
-
-			set.Play(scaleOutX).With(scaleOutY);
-			set.Play(scaleInX).With(scaleInY).After(scaleOutX);
-			set.SetInterpolator(new OvershootInterpolator(2));
-
-			menu.IconToggleAnimatorSet = set;
-
-			return set;
-		}
-		 */
 	}
 }
