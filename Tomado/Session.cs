@@ -93,7 +93,7 @@ namespace Tomado {
 			RecurringDays = recurringDays;
 		}
 
-		public Session() { }
+		public Session() { Title = "New Task"; }
 
 		public int StartHour {
 			get { return startHour; }
