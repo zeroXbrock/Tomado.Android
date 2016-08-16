@@ -58,7 +58,7 @@ namespace Tomado {
 			durationHours = durationInTicks / TimeSpan.TicksPerHour;
 			durationMinutes = (durationInTicks - (durationHours * TimeSpan.TicksPerHour)) / TimeSpan.TicksPerMinute;
 
-			Session freeTimeSession = new Session(1, time, "New Session", false);
+			Session freeTimeSession = new Session(1, time, "New Session", null);
 			
 			textViewTime.Text = time.ToShortTimeString();
 			textViewDuration.Text = durationHours + " hours and " + durationMinutes + " minutes";

@@ -17,23 +17,22 @@ namespace Tomado {
 	/// <summary>
 	/// Fragment that contains dialogs for user to create a new Session.
 	/// </summary>
-	public class NewSessionFragment :  Android.Support.V4.App.DialogFragment, DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener {
+	public class NewSessionFragment :  Android.Support.V4.App.DialogFragment, DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener, RecurringView.ButtonClickListener {
 		private GetNewSessionListener onGetNewSessionListener;
 		
 		//view instances
 		Button saveButton, cancelButton;
 		EditText timeEditText, dateEditText, titleEditText;
-		Switch recurringSwitch;
-		LinearLayout recurringLayout;
+		RecurringView recurringView;
 
 		//session vars
 		int _year, _month, _day, _hour, _minute;
 		DateTime sessionDateTime = DateTime.Now;
 		string _title;
-		bool recurring;
+		List<DayOfWeek> recurringDays = new List<DayOfWeek>();
 		
 		public interface GetNewSessionListener{
-			void OnAddNewSession(DateTime dateTime, string title, bool recurring);
+			void OnAddNewSession(DateTime dateTime, string title, List<DayOfWeek> recurringDays);
 		}
 
 		public override void OnActivityCreated(Bundle savedInstanceState) {
@@ -69,18 +68,7 @@ namespace Tomado {
 			timeEditText = view.FindViewById<EditText>(Resource.Id.editTextTime_NewSession);
 			dateEditText = view.FindViewById<EditText>(Resource.Id.editTextDate_NewSession);
 			titleEditText = view.FindViewById<EditText>(Resource.Id.editTextTitle_NewSession);
-			recurringSwitch = view.FindViewById<Switch>(Resource.Id.switchRecurring_NewSession);
-			recurringLayout = view.FindViewById<LinearLayout>(Resource.Id.Layout_Recurring_NewSession);
-			
-			//TODO: This weekday button code should really be encapsulated into another fragment since it's being used identically elsewhere (SessionAdapter)
-			List<WeekdayButton> weekdayButtons = new List<WeekdayButton>();
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonSunday_Recurring), DayOfWeek.Sunday));
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonMonday_Recurring), DayOfWeek.Monday));
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonTuesday_Recurring), DayOfWeek.Tuesday));
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonWednesday_Recurring), DayOfWeek.Wednesday));
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonThursday_Recurring), DayOfWeek.Thursday));
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonFriday_Recurring), DayOfWeek.Friday));
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonSaturday_Recurring), DayOfWeek.Saturday));
+			recurringView = view.FindViewById<RecurringView>(Resource.Id.RecurringView_NewSession);
 						
 			//set default values
 			SetDefaultTimeValues();
@@ -93,10 +81,9 @@ namespace Tomado {
 				//get info to save
 				sessionDateTime = new DateTime(_year, _month, _day, _hour, _minute, 0);
 				_title = titleEditText.Text;
-				recurring = recurringSwitch.Checked;
 
 				//send data out
-				onGetNewSessionListener.OnAddNewSession(sessionDateTime, _title, recurring);
+				onGetNewSessionListener.OnAddNewSession(sessionDateTime, _title, recurringView.GetRecurringWeekdays());
 
 				//close fragment
 				Dismiss();
@@ -117,19 +104,7 @@ namespace Tomado {
 				dialog.Show(FragmentManager, null);
 			};
 
-			recurringSwitch.Click += delegate {
-				recurringLayout.Visibility = recurringSwitch.Checked ? ViewStates.Visible : ViewStates.Gone;
-				recurring = recurringSwitch.Checked;
-			};
-
-			//set weekday button clicks
-			foreach (var b in weekdayButtons) {
-				b.Button.Click += delegate {
-					Log.Debug("weekday", b.Button.Text);
-					b.Toggled = !b.Toggled;
-					Log.Debug("weekday toggle", b.Toggled.ToString());
-				};
-			}
+			recurringView.ButtonClickListenerInstance = this;
 
 			return view;
 		}
@@ -149,6 +124,9 @@ namespace Tomado {
 			_minute = minute;
 
 			UpdateDateTimeInfo();
+		}
+
+		public void OnButtonClick(int index) {
 		}
 
 		//populate the date/time vars w/ default values

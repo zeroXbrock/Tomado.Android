@@ -28,7 +28,6 @@ namespace Tomado {
 	public class SessionAdapter : BaseAdapter<Session>, Android.Text.ITextWatcher {
 		List<Session> sessions;
 		Activity context;
-		DeleteSessionListener deleteSessionListener;
 		SessionClickListener sessionClickListener;
 		ShowDeleteSessionDialogListener showDeleteSessionDialogListener;
 		TimePickerDialog.IOnTimeSetListener timeSetListener; 
@@ -71,7 +70,7 @@ namespace Tomado {
 		}
 
 		public interface SetRecurrenceListener {
-			void OnSetRecurrence(Session session, List<WeekdayButton> weekdayButtons);
+			void OnSetRecurrence(int sessionIndex, Session session, List<DayOfWeek> recurringDays);
 		}
 
 		/// <summary>
@@ -146,10 +145,6 @@ namespace Tomado {
 			ViewGroup editLayout = view.FindViewById<LinearLayout>(Resource.Id.EditSessionLayout);
 			editLayout.Visibility = ViewStates.Gone;
 
-			//get switch and recurring layout
-			Switch recurringSwitch = view.FindViewById<Switch>(Resource.Id.switchRecurring_SessionListItem);
-			var recurringLayout = view.FindViewById<LinearLayout>(Resource.Id.Layout_Recurring_SessionListItem);
-
 			//get session for this list item
 			Session session = sessions[position];
 			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear + 1, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
@@ -162,16 +157,6 @@ namespace Tomado {
 			var editTextTitle = view.FindViewById<EditText>(Resource.Id.editText_Title_EditSession);
 			var editTextDate = view.FindViewById<EditText>(Resource.Id.editText_Date_EditSession);
 			var editTextTime = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
-
-			//get weekday buttons; store in a list; Sunday -> Saturday
-			List<WeekdayButton> weekdayButtons = new List<WeekdayButton>();
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonSunday_Recurring), DayOfWeek.Sunday));
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonMonday_Recurring), DayOfWeek.Monday));
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonTuesday_Recurring), DayOfWeek.Tuesday));
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonWednesday_Recurring), DayOfWeek.Wednesday));
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonThursday_Recurring), DayOfWeek.Thursday));
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonFriday_Recurring), DayOfWeek.Friday));
-			weekdayButtons.Add(new WeekdayButton(view.FindViewById<Button>(Resource.Id.buttonSaturday_Recurring), DayOfWeek.Saturday));
 			
 			//set text views: title and time/date
 			titleTextView.Text = session.Title;
@@ -185,9 +170,14 @@ namespace Tomado {
 			//keep track of toggle state
 			bool toggled = false;
 
-			//set button animation
-			//editMenuButton.IconToggleAnimatorSet = CreateCustomAnimationMenuButton(view);
-			
+			//get recurring view instance
+			var recurringView = view.FindViewById<RecurringView>(Resource.Id.RecurringView_EditSession);
+
+			//set toggle states for weekdays
+			if (session.Recurring) {
+				recurringView.SetRecurringWeekdays(session.RecurringDays);
+			}
+
 			//set toggle action
 			if (!editMenuButton.HasOnClickListeners) {
 				editMenuButton.Click += delegate {
@@ -218,16 +208,16 @@ namespace Tomado {
 						toggled = false;
 
 						//always set title when closing edit view
-						string title = (editTextTitle.Text == "") ? editTextTitle.Hint : editTextTitle.Text;
+						string title =  editTextTitle.Text;
 
 						//fire title set event
 						titleSetListener.OnTitleSet(editSessionIndex, title);
 
-						//update edit index
+						//update recurrence list w/ current index
+						setRecurrenceListener.OnSetRecurrence(editSessionIndex, session, recurringView.GetRecurringWeekdays());
+						
+						//reset edit index
 						editSessionIndex = -1;
-
-						//update recurrence list
-						setRecurrenceListener.OnSetRecurrence(session, weekdayButtons);
 
 						//change button icon
 						editMenuButton.SetImageResource(Resource.Drawable.ic_edit_white_24dp);
@@ -239,15 +229,6 @@ namespace Tomado {
 				};
 			}
 
-			//set weekday button clicks
-			foreach (var b in weekdayButtons) {
-				b.Button.Click += delegate {
-					Log.Debug("weekday", b.Button.Text);
-					b.Toggled = !b.Toggled;
-					Log.Debug("weekday toggle", b.Toggled.ToString());
-				};
-			}
-
 			if (!view.HasOnClickListeners) {
 				view.LongClick += delegate {
 					//show 'delete session' dialog
@@ -255,18 +236,11 @@ namespace Tomado {
 				};
 			}
 
-			recurringSwitch.Click += delegate {
-				recurringLayout.Visibility = recurringSwitch.Checked ? ViewStates.Visible : ViewStates.Gone;
-				session.Recurring = recurringSwitch.Checked;
-			};
-
-			recurringSwitch.Checked = session.Recurring;
-			recurringLayout.Visibility = (session.Recurring) ? ViewStates.Visible : ViewStates.Gone;
-
 			var sessionLayout = view.FindViewById<LinearLayout>(Resource.Id.SessionsListItemLayout);
 			if (!sessionLayout.HasOnClickListeners) {
 				sessionLayout.Click += delegate {
-					sessionClickListener.OnSessionClick(session);
+					if (!toggled)
+						sessionClickListener.OnSessionClick(session);
 				};
 			}
 
@@ -288,7 +262,6 @@ namespace Tomado {
 			};
 			editTextTitle.AddTextChangedListener(this);
 
-			
 			//don't open any dialogs if index is <0; that means nothing is being edited
 			if (editSessionIndex == -1)
 				toggled = false;
@@ -344,38 +317,5 @@ namespace Tomado {
 		public void BeforeTextChanged(ICharSequence s, int start, int count, int after) {
 
 		}
-
-		
-
-		/*
-		private AnimatorSet CreateCustomAnimationMenuButton(View rootView) {
-			AnimatorSet set = new AnimatorSet();
-			FloatingActionMenu menu = rootView.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
-
-			ObjectAnimator scaleOutX = ObjectAnimator.OfFloat(menu.MenuIconView, "scaleX", 1.0f, 0.2f);
-			ObjectAnimator scaleOutY = ObjectAnimator.OfFloat(menu.MenuIconView, "scaleY", 1.0f, 0.2f);
-
-			ObjectAnimator scaleInX = ObjectAnimator.OfFloat(menu.MenuIconView, "scaleX", 0.2f, 1.0f);
-			ObjectAnimator scaleInY = ObjectAnimator.OfFloat(menu.MenuIconView, "scaleY", 0.2f, 1.0f);
-
-			scaleOutX.SetDuration(50);
-			scaleOutY.SetDuration(50);
-
-			scaleInX.SetDuration(150);
-			scaleInY.SetDuration(150);
-
-			scaleInX.AnimationStart += (object sender, EventArgs e) => {
-				menu.MenuIconView.SetImageResource(menu.IsOpened ? Resource.Drawable.ic_edit_white_24dp : Resource.Drawable.ic_check_white_24dp);
-			};
-
-			set.Play(scaleOutX).With(scaleOutY);
-			set.Play(scaleInX).With(scaleInY).After(scaleOutX);
-			set.SetInterpolator(new OvershootInterpolator(2));
-
-			menu.IconToggleAnimatorSet = set;
-
-			return set;
-		}
-		 */
 	}
 }
