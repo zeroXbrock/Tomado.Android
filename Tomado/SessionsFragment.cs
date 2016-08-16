@@ -324,11 +324,11 @@ namespace Tomado {
 		public void OnSetRecurrence(int sessionIndex, Session session, List<DayOfWeek> recurringDays) {
 			//make changes if the weekday lists are any different
 			if (session.RecurringDays == null || !recurringDays.SequenceEqual<DayOfWeek>(session.RecurringDays)) {
+				//set recurrence on session
+				_sessions[sessionIndex].RecurringDays = recurringDays;
+				
 				//delete old session from database
 				DeleteSessionFromDatabase(_sessions[sessionIndex].ID).ContinueWith(async t => {
-					//set recurrence on session
-					_sessions[sessionIndex].RecurringDays = recurringDays;
-
 					//save new session to database
 					await SaveSessionToDatabase(_sessions[sessionIndex]);
 				});
