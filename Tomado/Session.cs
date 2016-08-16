@@ -137,5 +137,18 @@ namespace Tomado {
 			get { return title; }
 			set { title = value; }
 		}
+
+		public static bool IdenticalSessions(Session session1, Session session2) {
+			if (session1.Title == session2.Title &&
+				session1.Year == session2.Year &&
+				session1.MonthOfYear == session2.MonthOfYear &&
+				session1.DayOfMonth == session2.DayOfMonth &&
+				session1.StartHour == session2.StartHour &&
+				session1.StartMinute == session2.StartMinute &&
+				session1.RecurringDays == session2.RecurringDays) {
+				return true;
+			}
+			else return false;
+		}
 	}
 }

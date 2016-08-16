@@ -188,7 +188,7 @@ namespace Tomado {
 		private void AddFooter(LayoutInflater inflater) {
 			//get projected height
 			
-			int height = newSessionMenu.MeasuredHeight * 2; //being lazy for now
+			int height = newSessionMenu.MeasuredHeight * 3; //being lazy for now
 
 			//inflate the footer
 			LinearLayout footer = (LinearLayout)inflater.Inflate(Resource.Layout.ListViewFooter, listViewSessions, false);
@@ -261,6 +261,7 @@ namespace Tomado {
 		}
 		int lastSessionIndex = -1;
 		int lastSessionID = -1;
+		Session lastSession;
 
 		public void OnClickEditButton(int sessionIndex) {
 			//use editindex to check for recently added freetime
@@ -268,8 +269,12 @@ namespace Tomado {
 			ResetListViewAdapter(sessionIndex);
 
 			if (sessionIndex >= 0) {
-				//store last index used
+				//store last index used as well as the original session; to check for any changes to it
 				lastSessionIndex = sessionIndex;
+				lastSession = new Session(_sessions[sessionIndex].ID, 
+					_sessions[sessionIndex].StartHour, _sessions[sessionIndex].StartMinute,
+					_sessions[sessionIndex].Year, _sessions[sessionIndex].MonthOfYear, _sessions[sessionIndex].DayOfMonth,
+					_sessions[sessionIndex].Title, _sessions[sessionIndex].RecurringDays);
 			}
 			else {
 				//update notification info on close edit view
@@ -728,59 +733,61 @@ namespace Tomado {
 		/// Schedules a notification to launch in the future; to open a session from
 		/// </summary>
 		/// <param name="session"></param>
-		public void ScheduleSessionNotification(Session session, List<DayOfWeek> recurringDays = null) {			
-			Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
-			
-			alarmIntent.PutExtra("ID", session.ID);
-			alarmIntent.PutExtra("title", "Tomado");
-			alarmIntent.PutExtra("content", session.Title);
+		public void ScheduleSessionNotification(Session session, List<DayOfWeek> recurringDays = null) {
+			if (!Session.IdenticalSessions(session, lastSession)) {
+				Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
 
-			//makes new notification or updates pre-existing one
-			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 1, alarmIntent, PendingIntentFlags.UpdateCurrent); //ID:1 for session notifications
-			AlarmManager alarmManager = (AlarmManager)Activity.GetSystemService(Context.AlarmService);
-			
-			DateTime now = DateTime.Now;
-			DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear+1, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
+				alarmIntent.PutExtra("ID", session.ID);
+				alarmIntent.PutExtra("title", "Tomado");
+				alarmIntent.PutExtra("content", session.Title);
 
-			if (session.Recurring && recurringDays != null) {
-				//set recurring event
+				//makes new notification or updates pre-existing one
+				PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 1, alarmIntent, PendingIntentFlags.UpdateCurrent); //ID:1 for session notifications
+				AlarmManager alarmManager = (AlarmManager)Activity.GetSystemService(Context.AlarmService);
 
-				long ticksPerWeek = TimeSpan.TicksPerDay * 7;
-				long millisPerWeek = ticksPerWeek / TimeSpan.TicksPerMillisecond;
+				DateTime now = DateTime.Now;
+				DateTime sessionDateTime = new DateTime(session.Year, session.MonthOfYear + 1, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 
-				//strictly the date of the session; at midnight
-				DateTime sessionDate = new DateTime(sessionDateTime.Year, sessionDateTime.Month, sessionDateTime.Day, 0, 0, 0);
+				if (session.Recurring && recurringDays != null) {
+					//set recurring event
 
-				//ticks from midnight to time of event
-				long ticksFromMidnight = sessionDateTime.Ticks - sessionDate.Ticks;
+					long ticksPerWeek = TimeSpan.TicksPerDay * 7;
+					long millisPerWeek = ticksPerWeek / TimeSpan.TicksPerMillisecond;
 
-				foreach (var i in recurringDays) {
-					//days from now until toggled weekday
-					int daysUntilEvent = 0;
-					while (sessionDate.DayOfWeek != i) {
-						sessionDate = sessionDate.AddDays(1);
-						daysUntilEvent++;
+					//strictly the date of the session; at midnight
+					DateTime sessionDate = new DateTime(sessionDateTime.Year, sessionDateTime.Month, sessionDateTime.Day, 0, 0, 0);
+
+					//ticks from midnight to time of event
+					long ticksFromMidnight = sessionDateTime.Ticks - sessionDate.Ticks;
+
+					foreach (var i in recurringDays) {
+						//days from now until toggled weekday
+						int daysUntilEvent = 0;
+						while (sessionDate.DayOfWeek != i) {
+							sessionDate = sessionDate.AddDays(1);
+							daysUntilEvent++;
+						}
+
+
+						//get calendar to set alarm
+						Java.Util.Calendar calendar = Java.Util.Calendar.Instance;
+						calendar.Set(Java.Util.CalendarField.HourOfDay, session.StartHour);
+						calendar.Set(Java.Util.CalendarField.Minute, session.StartMinute);
+						calendar.Add(Java.Util.CalendarField.DayOfMonth, daysUntilEvent);
+
+						//set alarm for this occurence
+						alarmManager.SetRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, 5000, pendingIntent);//actual interval: AlarmManager.IntervalDay * 7
+
 					}
+				}
+				else {
+					//set non-recurring event for session date/time
 
-						
-					//get calendar to set alarm
-					Java.Util.Calendar calendar = Java.Util.Calendar.Instance;
-					calendar.Set(Java.Util.CalendarField.HourOfDay, session.StartHour);
-					calendar.Set(Java.Util.CalendarField.Minute, session.StartMinute);
-					calendar.Add(Java.Util.CalendarField.DayOfMonth, daysUntilEvent);
+					long startTicks = sessionDateTime.Ticks - now.Ticks;
+					long startMillis = startTicks / TimeSpan.TicksPerMillisecond;
 
-					//set alarm for this occurence
-					alarmManager.SetRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, 5000, pendingIntent);//actual interval: AlarmManager.IntervalDay * 7
-						
-				}			
-			}
-			else {
-				//set non-recurring event for session date/time
-
-				long startTicks = sessionDateTime.Ticks - now.Ticks;
-				long startMillis = startTicks / TimeSpan.TicksPerMillisecond;
-
-				alarmManager.SetExact(AlarmType.RtcWakeup, Java.Lang.JavaSystem.CurrentTimeMillis() + startMillis, pendingIntent);
+					alarmManager.SetExact(AlarmType.RtcWakeup, Java.Lang.JavaSystem.CurrentTimeMillis() + startMillis, pendingIntent);
+				}
 			}
 		}
 		
