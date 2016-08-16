@@ -105,7 +105,7 @@ namespace Tomado {
 
 			//iterate through items to find selected events
 			while (cursor.MoveToNext()) {
-				//start & end date define period to look in for events
+				//start & end date define calendar event periods
 				DateTime sDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds((double)cursor.GetLong(2)).ToLocalTime();//index 2 is start date; 3 is end date
 				DateTime eDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds((double)cursor.GetLong(3)).ToLocalTime();
 
@@ -118,17 +118,16 @@ namespace Tomado {
 						FreeTime freeTimeChunk = new FreeTime() { Start = start };
 						freeTimeChunk.End = sDate;
 						freetime.Add(freeTimeChunk);
-
-						//reset start for next iteration
-						start = eDate;
 					}
+					//reset start to end date of last event for next iteration
+					start = eDate;
 				}
 				// after last event, add free time from end of event until midnight, as long as event ends before midnight
 				else if (eDate >= now && sDate < tomorrow && eDate < tomorrow) {
 					freetime.Add(new FreeTime() { Start = eDate, End = tomorrow });
 				}
 			}
-
+			//if we have no events today, add a freetime chunk from now to midnight
 			if (selectedEventsCursor.Count == 0) {
 				freetime.Add(new FreeTime() { Start = start, End = tomorrow });
 			}
