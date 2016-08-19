@@ -25,6 +25,7 @@ namespace Tomado {
 		NotificationManager notificationManager;
 		Notification.Builder builder;
 		Notification timerNotification;
+		ProgressCircleView progressCircle;
 
 		//listener instance to send events
 		TimerFinishListener timerFinishListener;
@@ -65,6 +66,7 @@ namespace Tomado {
 			pomodorosTextView = rootView.FindViewById<TextView>(Resource.Id.TextView_SessionCount);
 			workButton = rootView.FindViewById<ImageButton>(Resource.Id.buttonWork);
 			finishButton = rootView.FindViewById<ImageButton>(Resource.Id.buttonFinish);
+			progressCircle = rootView.FindViewById<ProgressCircleView>(Resource.Id.progressCircle_Timer);
 
 			if (fragmentSession == null) { //lone timer
 				Init(savedInstanceState);
@@ -105,6 +107,8 @@ namespace Tomado {
 						isPaused = false;
 
 						StartTimer(duration);
+
+						progressCircle.StartTimerAnimation(duration / 1000, 0f);
 					}
 					else if (!isTimerRunning) {
 						//new session (continuation of work)
@@ -118,6 +122,8 @@ namespace Tomado {
 						UpdateTimer();
 
 						StartTimer(duration);
+
+						progressCircle.StartTimerAnimation(duration / 1000, 0f);
 					}
 					else {
 						//pause
@@ -208,6 +214,9 @@ namespace Tomado {
 		/// <param name="bundle">Bundle received from a fragment method override, typically OnCreate.</param>
 		private void Init(Bundle bundle) {
 			interval = 500; //interval set to 500 to prevent last-second "error" with CountDownTimer
+
+			progressCircle.CircleSize = 800;
+
 			if (bundle == null) { // just started app
 				SetFragmentSession(new Session() { });
 

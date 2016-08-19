@@ -11,20 +11,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="0"
-		android:layout_alignParentRight="true"
-		android:padding="12dp"/>
+        android:layout_alignParentRight="true"
+        android:padding="12dp" />
 <!--TextView LinearLayout section begin-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="50dp">
+        android:layout_marginTop="50dp"
+		android:layout_centerInParent="true">
         <TextView
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textViewTimerTitle"
-            android:padding="48dp"
+            android:paddingBottom="12dp"
             android:text="title"
             android:layout_gravity="center_horizontal" />
         <TextView
@@ -36,6 +37,11 @@
             android:layout_gravity="center_horizontal" />
     </LinearLayout>
 <!--TextView LinearLayout section end-->
+  <Tomado.ProgressCircleView
+        android:id="@+id/progressCircle_Timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
 <!--Button RelativeLayout section begin-->
     <RelativeLayout
         android:minWidth="25px"

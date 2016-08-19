@@ -49,12 +49,12 @@ namespace Tomado {
 		public static class TimerLengths {
 			private const int minuteInMillis = 1000 * 60;
 			public const double 
-				/*
-				Work =		25 * minuteInMillis, 
-				ShortBreak = 5 * minuteInMillis, 
-				LongBreak = 10 * minuteInMillis;
-				 */
-				Work = 4000,
+				Work = 25 * minuteInMillis, 
+				
+				//ShortBreak = 5 * minuteInMillis, 
+				//LongBreak = 10 * minuteInMillis;
+				//Work = 4000,
+
 				ShortBreak = 2000,
 				LongBreak = 3000;
 		}

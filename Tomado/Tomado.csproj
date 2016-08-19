@@ -74,6 +74,7 @@
     <Compile Include="FreeTimeAdapter.cs" />
     <Compile Include="FreeTimeFragment.cs" />
     <Compile Include="NewSessionFragment.cs" />
+    <Compile Include="ProgressCircleView.cs" />
     <Compile Include="Session.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="SessionAdapter.cs" />
