@@ -293,11 +293,11 @@ namespace Tomado
 		public partial class Drawable
 		{
 			
-			// aapt resource value: 0x7f02000d
-			public const int base_app_color_drawable = 2130837517;
+			// aapt resource value: 0x7f02000f
+			public const int base_app_color_drawable = 2130837519;
 			
-			// aapt resource value: 0x7f02000e
-			public const int base_app_complementary_color_drawable = 2130837518;
+			// aapt resource value: 0x7f020010
+			public const int base_app_complementary_color_drawable = 2130837520;
 			
 			// aapt resource value: 0x7f020000
 			public const int fab_add = 2130837504;
@@ -327,16 +327,22 @@ namespace Tomado
 			public const int ic_pause_circle_filled_white_24dp = 2130837512;
 			
 			// aapt resource value: 0x7f020009
-			public const int ic_play_circle_filled_white_24dp = 2130837513;
+			public const int ic_pause_white_24dp = 2130837513;
 			
 			// aapt resource value: 0x7f02000a
-			public const int ic_play_circle_outline_white_24dp = 2130837514;
+			public const int ic_play_arrow_white_24dp = 2130837514;
 			
 			// aapt resource value: 0x7f02000b
-			public const int ic_search_white_24dp = 2130837515;
+			public const int ic_play_circle_filled_white_24dp = 2130837515;
 			
 			// aapt resource value: 0x7f02000c
-			public const int Icon = 2130837516;
+			public const int ic_play_circle_outline_white_24dp = 2130837516;
+			
+			// aapt resource value: 0x7f02000d
+			public const int ic_search_white_24dp = 2130837517;
+			
+			// aapt resource value: 0x7f02000e
+			public const int Icon = 2130837518;
 			
 			static Drawable()
 			{
@@ -381,8 +387,8 @@ namespace Tomado
 			// aapt resource value: 0x7f06001d
 			public const int buttonCancel_NewSession = 2131099677;
 			
-			// aapt resource value: 0x7f060035
-			public const int buttonFinish = 2131099701;
+			// aapt resource value: 0x7f060034
+			public const int buttonFinish = 2131099700;
 			
 			// aapt resource value: 0x7f060012
 			public const int buttonNo_DeleteSession = 2131099666;
@@ -396,8 +402,8 @@ namespace Tomado
 			// aapt resource value: 0x7f06001e
 			public const int buttonSave_NewSession = 2131099678;
 			
-			// aapt resource value: 0x7f060034
-			public const int buttonWork = 2131099700;
+			// aapt resource value: 0x7f060033
+			public const int buttonWork = 2131099699;
 			
 			// aapt resource value: 0x7f060011
 			public const int buttonYes_DeleteSession = 2131099665;
@@ -476,9 +482,6 @@ namespace Tomado
 			
 			// aapt resource value: 0x7f060032
 			public const int progressCircle_Timer = 2131099698;
-			
-			// aapt resource value: 0x7f060033
-			public const int relativeLayout1 = 2131099699;
 			
 			// aapt resource value: 0x7f060004
 			public const int right = 2131099652;

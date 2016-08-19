@@ -5,10 +5,12 @@ using System.Text;
 
 using Android.App;
 using Android.Content;
+using Android.Graphics;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using Clans.Fab;
 
 namespace Tomado {
 
@@ -18,7 +20,7 @@ namespace Tomado {
 	public class TimerFragment : Android.Support.V4.App.Fragment {
 		//view instances
 		TextView timerTextView, titleTextView, pomodorosTextView;
-		ImageButton workButton, finishButton;
+		FloatingActionButton workButton, finishButton;
 
 		//notification vars
 		const int timerNotificationId = 0;
@@ -64,8 +66,8 @@ namespace Tomado {
 			timerTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimer);
 			titleTextView = rootView.FindViewById<TextView>(Resource.Id.textViewTimerTitle);
 			pomodorosTextView = rootView.FindViewById<TextView>(Resource.Id.TextView_SessionCount);
-			workButton = rootView.FindViewById<ImageButton>(Resource.Id.buttonWork);
-			finishButton = rootView.FindViewById<ImageButton>(Resource.Id.buttonFinish);
+			workButton = rootView.FindViewById<FloatingActionButton>(Resource.Id.buttonWork);
+			finishButton = rootView.FindViewById<FloatingActionButton>(Resource.Id.buttonFinish);
 			progressCircle = rootView.FindViewById<ProgressCircleView>(Resource.Id.progressCircle_Timer);
 
 			if (fragmentSession == null) { //lone timer
@@ -100,7 +102,7 @@ namespace Tomado {
 					if (isPaused) {
 						//resume timer
 
-						workButton.SetImageResource(Resource.Drawable.ic_pause_circle_filled_white_24dp);
+						workButton.SetImageResource(Resource.Drawable.ic_pause_white_24dp);
 
 						duration = remainingTimeInMillis;
 
@@ -108,12 +110,15 @@ namespace Tomado {
 
 						StartTimer(duration);
 
-						progressCircle.StartTimerAnimation(duration / 1000, 0f);
+						if (progressCircle.IsAnimationPaused)
+							progressCircle.ResumeTimerAnimation();
+						else
+							progressCircle.StartTimerAnimation(duration / 1000, 0f);
 					}
 					else if (!isTimerRunning) {
 						//new session (continuation of work)
 
-						workButton.SetImageResource(Resource.Drawable.ic_pause_circle_filled_white_24dp);
+						workButton.SetImageResource(Resource.Drawable.ic_pause_white_24dp);
 
 
 						if (lastTimerType != TimerType.Work)
@@ -123,15 +128,19 @@ namespace Tomado {
 
 						StartTimer(duration);
 
+						progressCircle.CancelTimerAnimation();
+
 						progressCircle.StartTimerAnimation(duration / 1000, 0f);
 					}
 					else {
 						//pause
-						workButton.SetImageResource(Resource.Drawable.ic_play_circle_filled_white_24dp);
+						workButton.SetImageResource(Resource.Drawable.ic_play_arrow_white_24dp);
 
 						isPaused = true;
 
 						CancelTimer();
+
+						progressCircle.PauseTimerAnimation();
 					}
 					pomodorosTextView.Text = fragmentSession.Pomodoros.ToString();
 				};
@@ -153,6 +162,8 @@ namespace Tomado {
 					//Load up the blank task
 					ResetTimer();
 					timerTextView.Text = GetClockTimeLeft(CTimer.TimerLengths.Work);
+
+					progressCircle.CancelTimerAnimation();
 				};
 			}
 			#endregion
@@ -434,7 +445,7 @@ namespace Tomado {
 
 			UpdateTimerNotification("Finished", true);
 
-			workButton.SetImageResource(Resource.Drawable.ic_play_circle_filled_white_24dp);
+			workButton.SetImageResource(Resource.Drawable.ic_play_arrow_white_24dp);
 		}
 
 		public void OnNewTimer(Session session) {

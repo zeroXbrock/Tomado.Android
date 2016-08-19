@@ -15,11 +15,15 @@ using Android.Widget;
 using Android.Util;
 
 namespace Tomado {
-	class ProgressCircleView : View, ValueAnimator.IAnimatorUpdateListener, ValueAnimator.IAnimatorListener {
+	public class ProgressCircleView : View, ValueAnimator.IAnimatorUpdateListener, ValueAnimator.IAnimatorListener {
 		Context _context;
 		ValueAnimator animation;
 		float progressPercentage, intervalPercentage, additionalPercentage;
 		int updates = 0;
+
+		public bool IsAnimationRunning { get { return animation.IsRunning; } }
+		public bool IsAnimationPaused { get { return animation.IsPaused; } }
+		public bool IsAnimationStarted { get { return animation.IsStarted; } }
 
 		const int UPDATES_START = 1;
 
@@ -50,11 +54,11 @@ namespace Tomado {
 			this._context = context;
 
 			ProgressPaint = new Paint();
-			ProgressPaint.Color = Color.Green;
+			ProgressPaint.Color = Resources.GetColor(Resource.Color.base_app_complementary_color);
 
 			ProgressPaint.AntiAlias = true;
 			ProgressPaint.SetStyle(Paint.Style.Stroke);
-			ProgressPaint.StrokeWidth = 10;
+			ProgressPaint.StrokeWidth = 12;
 
 			animation = ValueAnimator.OfInt(0, 100);//"animate" this value from 0-100
 			animation.SetDuration(1000);
@@ -190,6 +194,18 @@ namespace Tomado {
 			animation.Start();
 
 			Log.Debug("progressPercentage_StartTimerAnimation", progressPercentage.ToString());
+		}
+
+		public void CancelTimerAnimation() {
+			animation.Cancel();
+		}
+
+		public void PauseTimerAnimation() {
+			animation.Pause();
+		}
+
+		public void ResumeTimerAnimation() {
+			animation.Resume();
 		}
 
 		public void ResetAnimationVars() {
