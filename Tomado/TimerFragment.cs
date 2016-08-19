@@ -98,11 +98,15 @@ namespace Tomado {
 						firstRun = false;
 
 						fragmentSession.Pomodoros++;
+
+						finishButton.Visibility = ViewStates.Visible;
 					}
 					if (isPaused) {
 						//resume timer
 
 						workButton.SetImageResource(Resource.Drawable.ic_pause_white_24dp);
+
+						finishButton.Visibility = ViewStates.Visible;
 
 						duration = remainingTimeInMillis;
 
@@ -120,6 +124,7 @@ namespace Tomado {
 
 						workButton.SetImageResource(Resource.Drawable.ic_pause_white_24dp);
 
+						finishButton.Visibility = ViewStates.Visible;
 
 						if (lastTimerType != TimerType.Work)
 							fragmentSession.Pomodoros++;
@@ -164,6 +169,8 @@ namespace Tomado {
 					timerTextView.Text = GetClockTimeLeft(CTimer.TimerLengths.Work);
 
 					progressCircle.CancelTimerAnimation();
+
+					finishButton.Visibility = ViewStates.Gone;
 				};
 			}
 			#endregion
@@ -227,6 +234,8 @@ namespace Tomado {
 			interval = 500; //interval set to 500 to prevent last-second "error" with CountDownTimer
 
 			progressCircle.CircleSize = 800;
+
+			finishButton.Visibility = ViewStates.Gone;
 
 			if (bundle == null) { // just started app
 				SetFragmentSession(new Session() { });
