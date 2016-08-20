@@ -734,7 +734,7 @@ namespace Tomado {
 		/// </summary>
 		/// <param name="session"></param>
 		public void ScheduleSessionNotification(Session session, List<DayOfWeek> recurringDays = null) {
-			if (!Session.IdenticalSessions(session, lastSession)) {
+			if (lastSession == null || !Session.IdenticalSessions(session, lastSession)) {
 				Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
 
 				alarmIntent.PutExtra("ID", session.ID);
@@ -761,6 +761,8 @@ namespace Tomado {
 					long ticksFromMidnight = sessionDateTime.Ticks - sessionDate.Ticks;
 
 					foreach (var i in recurringDays) {
+						sessionDate = new DateTime(sessionDateTime.Year, sessionDateTime.Month, sessionDateTime.Day, 0, 0, 0);
+
 						//days from now until toggled weekday
 						int daysUntilEvent = 0;
 						while (sessionDate.DayOfWeek != i) {
@@ -775,9 +777,10 @@ namespace Tomado {
 						calendar.Set(Java.Util.CalendarField.Minute, session.StartMinute);
 						calendar.Add(Java.Util.CalendarField.DayOfMonth, daysUntilEvent);
 
-						//set alarm for this occurence
-						alarmManager.SetRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, 5000, pendingIntent);//actual interval: AlarmManager.IntervalDay * 7
+						long alarmInterval = AlarmManager.IntervalDay * 7;
 
+						//set alarm for this occurence
+						alarmManager.SetRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, alarmInterval, pendingIntent);
 					}
 				}
 				else {
