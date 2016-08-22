@@ -151,6 +151,7 @@ namespace Tomado {
 
 			//get textviews
 			var titleTextView = view.FindViewById<TextView>(Resource.Id.evTitle);
+			var dateTextView = view.FindViewById<TextView>(Resource.Id.evDate);
 			var timeTextView = view.FindViewById<TextView>(Resource.Id.evTime);
 			
 			//get edittextviews
@@ -161,7 +162,8 @@ namespace Tomado {
 			//set text views: title and time/date
 			titleTextView.Text = session.Title;
 
-			timeTextView.Text = (dateTime.ToShortTimeString() + "\n" + dateTime.ToShortDateString());
+			timeTextView.Text = dateTime.ToShortTimeString();
+			dateTextView.Text = ToDateClause(dateTime, session.RecurringDays);
 
 			//get menu (toggle edit view) button
 			//FloatingActionMenu editMenuButton = view.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
@@ -316,6 +318,24 @@ namespace Tomado {
 		}
 		public void BeforeTextChanged(ICharSequence s, int start, int count, int after) {
 
+		}
+
+		string ToDateClause(DateTime startDateTime, List<DayOfWeek> recurringDays) {
+			//returns clause like <weekday(s)> at <time>
+			
+			string days = "";
+			string clause = "";
+
+			//create days string w/ commas
+			for (int i = 0; i < recurringDays.Count; i++) {
+				days += recurringDays[i].ToString();
+				if (i < recurringDays.Count - 1)
+					days += ", ";
+			}
+
+			clause = days + " after " + startDateTime.ToShortDateString();
+
+			return clause;
 		}
 	}
 }

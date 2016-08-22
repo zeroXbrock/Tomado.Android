@@ -28,9 +28,15 @@
                     android:textSize="16dip" />
                 <TextView
                     android:text="Text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/evTime"
+                    android:textSize="14dp" />
+                <TextView
+                    android:text="Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/evDate"
                     android:textSize="12dip" />
             </LinearLayout>
             <ImageButton
