@@ -153,6 +153,8 @@ namespace Tomado {
 
 			if (!finishButton.HasOnClickListeners) {
 				finishButton.Click += delegate {
+					finishButton.Visibility = ViewStates.Gone;
+					
 					//stop timer
 					CancelTimer();
 					
@@ -169,8 +171,6 @@ namespace Tomado {
 					timerTextView.Text = GetClockTimeLeft(CTimer.TimerLengths.Work);
 
 					progressCircle.CancelTimerAnimation();
-
-					finishButton.Visibility = ViewStates.Gone;
 				};
 			}
 			#endregion
