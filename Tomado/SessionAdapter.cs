@@ -394,13 +394,14 @@ namespace Tomado {
 			string days = "";
 			string clause = "";
 
-			//create days string w/ commas
-			for (int i = 0; i < recurringDays.Count; i++) {
-				days += recurringDays[i].ToString();
-				if (i < recurringDays.Count - 1)
-					days += ", ";
+			if (recurringDays != null) {
+				//create days string w/ commas
+				for (int i = 0; i < recurringDays.Count; i++) {
+					days += recurringDays[i].ToString();
+					if (i < recurringDays.Count - 1)
+						days += ", ";
+				}
 			}
-
 			clause = days + " after " + startDateTime.ToShortDateString();
 
 			return clause;

@@ -48,7 +48,6 @@ namespace Tomado {
 
 		//keep track of item being edited
 		int editIndex = -1;
-		float editSessionY;
 		string title = "";
 
 		//listener to send click event back to activity
@@ -272,9 +271,6 @@ namespace Tomado {
 					_sessions[sessionIndex].Year, _sessions[sessionIndex].MonthOfYear, _sessions[sessionIndex].DayOfMonth,
 					_sessions[sessionIndex].Title, _sessions[sessionIndex].RecurringDays);
 
-				//used for primitive method
-				editSessionY = 800;
-
 				listViewState = listViewSessions.OnSaveInstanceState();
 			}
 			else {
@@ -293,11 +289,6 @@ namespace Tomado {
 
 			//close KB
 			HideKeyboard();
-		}
-
-		void AdjustListViewScroll() {
-			//listViewSessions.SetSelection(lastSessionIndex);
-			listViewSessions.SetSelectionFromTop(lastSessionIndex, (int)editSessionY);
 		}
 
 		/// <summary>
