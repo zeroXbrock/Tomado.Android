@@ -262,7 +262,7 @@ namespace Tomado {
 		public void OnClickEditButton(int sessionIndex) {
 			//use editindex to check for recently added freetime
 
-			ResetListViewAdapter(sessionIndex);
+			
 
 			if (sessionIndex >= 0) {
 				//store last index used as well as the original session; to check for any changes to it
@@ -272,7 +272,8 @@ namespace Tomado {
 					_sessions[sessionIndex].Year, _sessions[sessionIndex].MonthOfYear, _sessions[sessionIndex].DayOfMonth,
 					_sessions[sessionIndex].Title, _sessions[sessionIndex].RecurringDays);
 
-				editSessionY = listViewSessions.ScrollY;
+				//editSessionY = listViewSessions.ScrollY;
+				editSessionY = 800;
 			}
 			else {
 				//update notification info on close edit view
@@ -280,7 +281,9 @@ namespace Tomado {
 				if (!_sessions[editIndex].Recurring)
 					ScheduleSessionNotification(_sessions[editIndex]);
 			}
-			
+
+			ResetListViewAdapter(sessionIndex);
+
 			UpdateEditIndex(sessionIndex);
 
 			//close KB
