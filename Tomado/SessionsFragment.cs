@@ -19,6 +19,7 @@ using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Util;
 using Android.Views.InputMethods;
+using Android.Views.Animations;
 
 using Clans.Fab; //floating buttons
 
@@ -34,7 +35,7 @@ namespace Tomado {
 									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, SessionAdapter.ShowDeleteSessionDialogListener,
 									DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener,
 									SessionAdapter.ShowTimePickerDialogListener, SessionAdapter.ShowDatePickerDialogListener, SessionAdapter.TitleSetListener,
-									SessionAdapter.ClickEditButtonListener, SessionAdapter.SetRecurrenceListener {
+									SessionAdapter.ClickEditButtonListener, SessionAdapter.SetRecurrenceListener, Animation.IAnimationListener {
 		//view instances
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
@@ -272,6 +273,9 @@ namespace Tomado {
 					_sessions[sessionIndex].Title, _sessions[sessionIndex].RecurringDays);
 
 				listViewState = listViewSessions.OnSaveInstanceState();
+
+				//animate view
+
 			}
 			else {
 				//update notification info on close edit view
@@ -279,6 +283,10 @@ namespace Tomado {
 				if (!_sessions[editIndex].Recurring)
 					ScheduleSessionNotification(_sessions[editIndex]);
 			}
+
+			AnimateEditSessionView((ViewGroup)listViewSessions.GetChildAt(lastSessionIndex), 
+				((sessionIndex >= 0) ? ExpandCollapseAnimation.EXPAND : ExpandCollapseAnimation.COLLAPSE), 
+				lastSessionIndex);
 
 			ResetListViewAdapter(sessionIndex);
 
@@ -600,9 +608,32 @@ namespace Tomado {
 			mgr.HideSoftInputFromWindow(View.WindowToken, 0);
 		}
 
+		/// <summary>
+		/// Show the keyboard... TODO: Implement me!
+		/// </summary>
 		void ShowKeyboard() {
 
 		}
+
+		void AnimateEditSessionView(ViewGroup view, int type, int index) {
+			Animation anim = new ExpandCollapseAnimation(view, type);
+
+			anim.Duration = 1000;//testing value
+			listViewSessions.GetChildAt(index).StartAnimation(anim);
+
+			anim.SetAnimationListener(this);
+		}
+
+		public void OnAnimationStart(Animation animation){
+			Log.Debug("animation", "started motherfucker");
+		}
+		public void OnAnimationRepeat(Animation animation) {
+			Log.Debug("animation", "repeated motherfucker");
+		}
+		public void OnAnimationEnd(Animation animation) {
+			Log.Debug("animation", "ended motherfucker");
+		}
+		
 
 		#region database methods
 		/// <summary>

@@ -338,7 +338,7 @@ namespace Tomado {
 					//list adapter has been reset
 					//make edit layout visible
 					editLayout.Visibility = ViewStates.Visible;
-
+					
 					//make background green
 					view.SetBackgroundResource(Resource.Color.base_app_complementary_color);
 
