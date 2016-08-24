@@ -53,6 +53,9 @@ namespace Tomado {
 
 		//listener to send click event back to activity
 		SessionAdapter.SessionClickListener sessionClickListener;
+
+		//listview state info
+		IParcelable listViewState;
 				
 		//private sessions list for listview
 		List<Session> _sessions;
@@ -261,9 +264,6 @@ namespace Tomado {
 
 		public void OnClickEditButton(int sessionIndex) {
 			//use editindex to check for recently added freetime
-
-			
-
 			if (sessionIndex >= 0) {
 				//store last index used as well as the original session; to check for any changes to it
 				lastSessionIndex = sessionIndex;
@@ -272,8 +272,10 @@ namespace Tomado {
 					_sessions[sessionIndex].Year, _sessions[sessionIndex].MonthOfYear, _sessions[sessionIndex].DayOfMonth,
 					_sessions[sessionIndex].Title, _sessions[sessionIndex].RecurringDays);
 
-				//editSessionY = listViewSessions.ScrollY;
+				//used for primitive method
 				editSessionY = 800;
+
+				listViewState = listViewSessions.OnSaveInstanceState();
 			}
 			else {
 				//update notification info on close edit view
@@ -283,6 +285,9 @@ namespace Tomado {
 			}
 
 			ResetListViewAdapter(sessionIndex);
+
+			if (listViewState != null)
+				listViewSessions.OnRestoreInstanceState(listViewState);
 
 			UpdateEditIndex(sessionIndex);
 
@@ -537,8 +542,6 @@ namespace Tomado {
 		/// </summary>
 		private void ResetListViewAdapter(int editSessionIndex = -1) {
 			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, this, title, editSessionIndex);
-
-			AdjustListViewScroll();
 		}
 
 		private void CancelSessionNotification(int ID) {
