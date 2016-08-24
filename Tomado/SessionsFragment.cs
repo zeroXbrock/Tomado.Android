@@ -48,15 +48,19 @@ namespace Tomado {
 
 		//keep track of item being edited
 		int editIndex = -1;
+		float editSessionY;
 		string title = "";
 
 		//listener to send click event back to activity
 		SessionAdapter.SessionClickListener sessionClickListener;
-
-		
+				
 		//private sessions list for listview
 		List<Session> _sessions;
 
+		int lastSessionIndex = -1;
+		int lastSessionID = -1;
+		Session lastSession;
+		
 		//accessor
 		public List<Session> Sessions {
 			get { return _sessions; }
@@ -232,9 +236,6 @@ namespace Tomado {
 
 			//reset adapter & edit view on session in list
 			ResetListViewAdapter(editIndex);
-
-			//scroll to new item
-			listViewSessions.SetSelection(listViewSessions.Count - 1);
 		}
 
 		/// <summary>
@@ -255,13 +256,8 @@ namespace Tomado {
 
 			//reset adapter, open edit view on session in list
 			ResetListViewAdapter(editIndex);
-
-			//scroll to new item
-			listViewSessions.SetSelection(listViewSessions.Count - 1);
 		}
-		int lastSessionIndex = -1;
-		int lastSessionID = -1;
-		Session lastSession;
+		
 
 		public void OnClickEditButton(int sessionIndex) {
 			//use editindex to check for recently added freetime
@@ -275,6 +271,8 @@ namespace Tomado {
 					_sessions[sessionIndex].StartHour, _sessions[sessionIndex].StartMinute,
 					_sessions[sessionIndex].Year, _sessions[sessionIndex].MonthOfYear, _sessions[sessionIndex].DayOfMonth,
 					_sessions[sessionIndex].Title, _sessions[sessionIndex].RecurringDays);
+
+				editSessionY = listViewSessions.ScrollY;
 			}
 			else {
 				//update notification info on close edit view
@@ -282,14 +280,16 @@ namespace Tomado {
 				if (!_sessions[editIndex].Recurring)
 					ScheduleSessionNotification(_sessions[editIndex]);
 			}
-
-			//scroll to item being edited
-			listViewSessions.SetSelection(lastSessionIndex);
-
+			
 			UpdateEditIndex(sessionIndex);
 
 			//close KB
 			HideKeyboard();
+		}
+
+		void AdjustListViewScroll() {
+			//listViewSessions.SetSelection(lastSessionIndex);
+			listViewSessions.SetSelectionFromTop(lastSessionIndex, (int)editSessionY);
 		}
 
 		/// <summary>
@@ -307,9 +307,6 @@ namespace Tomado {
 				});
 
 				ResetListViewAdapter(sessionIndex);
-
-				//scroll to new item
-				listViewSessions.SetSelection(sessionIndex);
 			}
 			
 			//close KB
@@ -335,16 +332,11 @@ namespace Tomado {
 
 				//schedule that notification
 				ScheduleSessionNotification(_sessions[sessionIndex], recurringDays);
-
-				listViewSessions.SetSelection(sessionIndex);
 			}
 		}
 
 		public void OnShowDatePickerDialog(int sessionIndex) {
 			UpdateEditIndex(sessionIndex);
-
-			//refocus listview
-			listViewSessions.SetSelection(sessionIndex);
 
 			Session session = _sessions[sessionIndex];
 
@@ -359,9 +351,6 @@ namespace Tomado {
 
 		public void OnShowTimePickerDialog(int sessionIndex) {
 			UpdateEditIndex(sessionIndex);
-
-			//refocus listview
-			listViewSessions.SetSelection(sessionIndex);
 
 			Session session = _sessions[sessionIndex];
 
@@ -459,9 +448,6 @@ namespace Tomado {
 
 			//add the session
 			OnAddNewSession(session);
-
-			//scroll to new item
-			listViewSessions.SetSelection(listViewSessions.Count - 1);
 		}
 
 		/// <summary>
@@ -544,10 +530,12 @@ namespace Tomado {
 		}
 
 		/// <summary>
-		/// Populate class listview with sessions.
+		/// Populate class listview with sessions and re-scrolls the listview.
 		/// </summary>
 		private void ResetListViewAdapter(int editSessionIndex = -1) {
 			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, this, title, editSessionIndex);
+
+			AdjustListViewScroll();
 		}
 
 		private void CancelSessionNotification(int ID) {

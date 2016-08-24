@@ -134,46 +134,103 @@ namespace Tomado {
 			set;
 		}
 
-		public override View GetView(int position, View convertView, ViewGroup parent) {
-			View view = convertView;//reuse existing view if available
-			if (view == null) {
-			}//disregard recycling
+		class SessionViewHolder : Java.Lang.Object {
+			//get layout for edit view
+			public LinearLayout EditLayout { get; set; }
 
-			view = context.LayoutInflater.Inflate(Resource.Layout.SessionListItem, null);
+			//get textviews
+			public TextView TitleTextView { get; set; }
+			public TextView	TimeTextView  { get; set; }
+			public TextView DateTextView  { get; set; }
+
+			//get edittextviews
+			public EditText EditTextTitle { get; set; } 
+			public EditText EditTextDate  { get; set; }
+			public EditText EditTextTime  { get; set; }
+
+			//get menu (toggle edit view) button
+			public ImageButton EditMenuButton { get; set; }
+			
+			//get recurring view instance
+			public RecurringView RecurringView { get; set; }
+		}
+
+		public override View GetView(int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+			SessionViewHolder viewHolder = null;
+
+			if (view != null)
+				viewHolder = view.Tag as SessionViewHolder;
+
+			//reuse existing view if available
+			if (viewHolder == null) {
+				LayoutInflater inflater = (LayoutInflater)context.GetSystemService(Context.LayoutInflaterService);
+				view = inflater.Inflate(Resource.Layout.SessionListItem, null);
+
+				viewHolder = new SessionViewHolder();
+
+				//get layout for edit view
+				viewHolder.EditLayout = view.FindViewById<LinearLayout>(Resource.Id.EditSessionLayout);
+
+				//get textconvertViews
+				viewHolder.TitleTextView = view.FindViewById<TextView>(Resource.Id.evTitle);
+				viewHolder.DateTextView = view.FindViewById<TextView>(Resource.Id.evDate);
+				viewHolder.TimeTextView = view.FindViewById<TextView>(Resource.Id.evTime);
+
+				//get edittextviews
+				viewHolder.EditTextTitle = view.FindViewById<EditText>(Resource.Id.editText_Title_EditSession);
+				viewHolder.EditTextDate = view.FindViewById<EditText>(Resource.Id.editText_Date_EditSession);
+				viewHolder.EditTextTime = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
+
+				//get menu (toggle edit view) button
+				//FloatingActionMenu editMenuButton = view.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
+				viewHolder.EditMenuButton = view.FindViewById<ImageButton>(Resource.Id.imageButtonEditSession);
+
+				//get recurring view instance
+				viewHolder.RecurringView = view.FindViewById<RecurringView>(Resource.Id.RecurringView_EditSession);
+
+				view.Tag = viewHolder;
+			}
+
+			#region view instance definitions
 
 			//get layout for edit view
-			ViewGroup editLayout = view.FindViewById<LinearLayout>(Resource.Id.EditSessionLayout);
-			editLayout.Visibility = ViewStates.Gone;
+			ViewGroup editLayout = viewHolder.EditLayout;
+
+			//get textviews
+			var titleTextView = viewHolder.TitleTextView;
+			var dateTextView = viewHolder.DateTextView;
+			var timeTextView = viewHolder.TimeTextView;
+			
+			//get edittextviews
+			var editTextTitle = viewHolder.EditTextTitle;
+			var editTextDate = viewHolder.EditTextDate;
+			var editTextTime = viewHolder.EditTextTime;
+
+			//get menu (toggle edit view) button
+			//FloatingActionMenu editMenuButton = view.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
+			ImageButton editMenuButton = viewHolder.EditMenuButton;
+
+			//keep track of toggle state
+			bool toggled = false;
+
+			//get recurring view instance
+			var recurringView = viewHolder.RecurringView;
+
+			#endregion
 
 			//get session for this list item
 			Session session = sessions[position];
 			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear + 1, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 
-			//get textviews
-			var titleTextView = view.FindViewById<TextView>(Resource.Id.evTitle);
-			var dateTextView = view.FindViewById<TextView>(Resource.Id.evDate);
-			var timeTextView = view.FindViewById<TextView>(Resource.Id.evTime);
-			
-			//get edittextviews
-			var editTextTitle = view.FindViewById<EditText>(Resource.Id.editText_Title_EditSession);
-			var editTextDate = view.FindViewById<EditText>(Resource.Id.editText_Date_EditSession);
-			var editTextTime = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
-			
+			//all editLayouts gone by default
+			editLayout.Visibility = ViewStates.Gone;
+
 			//set text views: title and time/date
 			titleTextView.Text = session.Title;
 
 			timeTextView.Text = dateTime.ToShortTimeString();
 			dateTextView.Text = ToDateClause(dateTime, session.RecurringDays);
-
-			//get menu (toggle edit view) button
-			//FloatingActionMenu editMenuButton = view.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
-			ImageButton editMenuButton = view.FindViewById<ImageButton>(Resource.Id.imageButtonEditSession);
-			
-			//keep track of toggle state
-			bool toggled = false;
-
-			//get recurring view instance
-			var recurringView = view.FindViewById<RecurringView>(Resource.Id.RecurringView_EditSession);
 
 			//set toggle states for weekdays
 			if (session.Recurring) {
@@ -227,7 +284,16 @@ namespace Tomado {
 
 					//fire edit click event
 					openEditViewListener.OnClickEditButton(editSessionIndex);
+
 					
+					var animation = (editSessionIndex >= 0) ? new ExpandCollapseAnimation(editLayout, toggled ? ExpandCollapseAnimation.EXPAND : ExpandCollapseAnimation.COLLAPSE) : null;
+					if (animation != null) {
+						animation.Duration = 1000;
+						animation.Interpolator = new DecelerateInterpolator();
+					}
+					
+					if (editSessionIndex == position && animation != null)
+						view.StartAnimation(animation);
 				};
 			}
 
@@ -305,6 +371,8 @@ namespace Tomado {
 
 			editTextTime.Text = dateTime.ToShortTimeString();
 			editTextDate.Text = dateTime.ToShortDateString();
+
+			view.HasTransientState = true;
 
 			return view;
 		}
