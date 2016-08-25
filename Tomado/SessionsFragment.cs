@@ -60,6 +60,7 @@ namespace Tomado {
 		List<Session> _sessions;
 
 		int lastSessionIndex = -1;
+		float lastSessionItemY; //works the same way as lastSessionIndex but it saves the y-component of the view
 		int lastSessionID = -1;
 		Session lastSession;
 		
@@ -266,6 +267,8 @@ namespace Tomado {
 			if (sessionIndex > -1) {
 				//store last index used as well as the original session; to check for any changes to it
 				lastSessionIndex = sessionIndex;
+				lastSessionItemY = (listViewSessions.GetChildAt(sessionIndex)) == null ? 0 : listViewSessions.GetChildAt(sessionIndex).GetY();
+
 				lastSession = new Session(_sessions[sessionIndex].ID, 
 					_sessions[sessionIndex].StartHour, _sessions[sessionIndex].StartMinute,
 					_sessions[sessionIndex].Year, _sessions[sessionIndex].MonthOfYear, _sessions[sessionIndex].DayOfMonth,
@@ -538,11 +541,16 @@ namespace Tomado {
 		private void ResetListViewAdapter(int editSessionIndex = -1) {
 			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, this, title, editSessionIndex);
 
+			SetListViewSelection(editSessionIndex);
+		}
+
+		void SetListViewSelection(int editSessionIndex) {
 			if (editSessionIndex < 0)
-				listViewSessions.SetSelection(lastSessionIndex);
+				listViewSessions.SetSelectionFromTop(lastSessionIndex, (int)lastSessionItemY);
 			else
 				if (listViewSessions.LastVisiblePosition < lastSessionIndex || listViewSessions.FirstVisiblePosition > lastSessionIndex)//our desired view is under the screen or over the screen
-					listViewSessions.SetSelection(lastSessionIndex);
+					//listViewSessions.SetSelection(lastSessionIndex);
+					listViewSessions.SetSelectionFromTop(lastSessionIndex, (int)lastSessionItemY);
 		}
 
 		private void CancelSessionNotification(int ID) {
