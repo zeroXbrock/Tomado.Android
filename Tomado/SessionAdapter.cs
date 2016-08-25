@@ -16,6 +16,7 @@ using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Graphics.Drawables;
 using Android.Util;
+using Android.Views.Animations;
 
 using Clans.Fab;
 
@@ -25,7 +26,7 @@ namespace Tomado {
 	/// <summary>
 	/// Adapter to populate Sessions list.
 	/// </summary>
-	public class SessionAdapter : BaseAdapter<Session>, Android.Text.ITextWatcher {
+	public class SessionAdapter : BaseAdapter<Session>, Android.Text.ITextWatcher, Animator.IAnimatorListener {
 		List<Session> sessions;
 		Activity context;
 		SessionClickListener sessionClickListener;
@@ -39,6 +40,7 @@ namespace Tomado {
 		SetRecurrenceListener setRecurrenceListener;
 
 		int editSessionIndex = -1;//used to open edit view for a session in list
+		const int editAnimationDuration = 200;
 
 		/// <summary>
 		/// Interface to provide callback for deleting sessions.
@@ -241,9 +243,6 @@ namespace Tomado {
 			if (!editMenuButton.HasOnClickListeners) {
 				editMenuButton.Click += delegate {
 					if (!toggled) {
-						//show edit menu
-						editLayout.Visibility = ViewStates.Visible;
-
 						//change item background color
 						view.SetBackgroundResource(Resource.Color.base_app_complementary_color);
 
@@ -331,20 +330,27 @@ namespace Tomado {
 			editTextTitle.AddTextChangedListener(this);
 
 			//don't open any dialogs if index is <0; that means nothing is being edited
-			if (editSessionIndex == -1)
+			if (editSessionIndex <= -1)
 				toggled = false;
 			else //if we make an adapter with a non-neg editSessionIndex, open the edit dialog on that session
 				if (editSessionIndex == position) {
-					//list adapter has been reset
-					//make edit layout visible
 					editLayout.Visibility = ViewStates.Visible;
+					//list adapter has been reset
+					/*run animation:
+					 *	make edit view visible
+					 *	change background to base_app_complementary_color
+					 *	change icon to ic_check_white_24dp
+					*/
+					editLayout.Alpha = 0f;
+					editLayout.SetY(-220);
 					
-					//make background green
-					view.SetBackgroundResource(Resource.Color.base_app_complementary_color);
-
-					//set icon to check mark
-					editMenuButton.SetImageResource(Resource.Drawable.ic_check_white_24dp);
-
+					
+					editLayout.Animate()
+						.Alpha(1.0f)
+						.TranslationY(editLayout.Height)
+						.SetDuration(editAnimationDuration)
+						.SetInterpolator(new DecelerateInterpolator());
+					
 					//toggle, duh
 					toggled = true;
 
@@ -353,14 +359,16 @@ namespace Tomado {
 					editTextTitle.RequestFocusFromTouch();
 				}
 				else {
-					//close menu
-					editLayout.Visibility = ViewStates.Gone;
-
-					//make background red
-					view.SetBackgroundResource(Resource.Color.base_app_color);
-
-					//set icon to pencil
-					editMenuButton.SetImageResource(Resource.Drawable.ic_edit_white_24dp);
+					/*run animation:
+					 *	hide edit menu
+					 *	change background to base_app_color
+					 *	change icon to ic_edit_white_24dp
+					 */
+					editLayout.Animate()
+						.TranslationY(0f)
+						.Alpha(0f)
+						.SetDuration(editAnimationDuration);
+					 
 				}
 
 			//set edittextviews to reflect session info
@@ -387,6 +395,12 @@ namespace Tomado {
 		public void BeforeTextChanged(ICharSequence s, int start, int count, int after) {
 
 		}
+
+		//event handlers for edit view
+		public void OnAnimationStart(Animator animator) { }
+		public void OnAnimationRepeat(Animator animator) { }
+		public void OnAnimationEnd(Animator animator) { }
+		public void OnAnimationCancel(Animator animator) { }
 
 		string ToDateClause(DateTime startDateTime, List<DayOfWeek> recurringDays) {
 			//returns clause like <weekday(s)> at <time>

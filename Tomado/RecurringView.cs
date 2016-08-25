@@ -57,9 +57,9 @@ namespace Tomado {
 		void DrawWeekdayButtons(Canvas canvas) {
 			InitPositions();
 
-			var paintCircleUntoggled = new Paint() { Color = new Color(Context.GetColor(Resource.Color.base_app_complementary_color)), AntiAlias = true };
+			var paintCircleUntoggled = new Paint() { Color = Color.Transparent, AntiAlias = true };
 			var paintTextUntoggled = new Paint() { Color = Color.White, TextSize = radius, TextAlign = Paint.Align.Center };
-			
+
 			var paintCircleToggled = new Paint() { Color = Color.White, AntiAlias = true };
 			var paintTextToggled = new Paint() { Color = Color.Black, TextSize = radius, TextAlign = Paint.Align.Center };
 			
