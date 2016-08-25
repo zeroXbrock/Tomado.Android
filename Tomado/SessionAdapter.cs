@@ -243,9 +243,6 @@ namespace Tomado {
 			if (!editMenuButton.HasOnClickListeners) {
 				editMenuButton.Click += delegate {
 					if (!toggled) {
-						//change item background color
-						view.SetBackgroundResource(Resource.Color.base_app_complementary_color);
-
 						//toggle
 						toggled = true;
 
@@ -256,12 +253,6 @@ namespace Tomado {
 						editMenuButton.SetImageResource(Resource.Drawable.ic_check_white_24dp);
 					}
 					else {
-						//hide edit menu
-						editLayout.Visibility = ViewStates.Gone;
-
-						//change background back
-						view.SetBackgroundResource(Resource.Color.base_app_color);
-
 						//toggle
 						toggled = false;
 
@@ -283,16 +274,6 @@ namespace Tomado {
 
 					//fire edit click event
 					openEditViewListener.OnClickEditButton(editSessionIndex);
-
-					
-					var animation = (editSessionIndex >= 0) ? new ExpandCollapseAnimation(editLayout, toggled ? ExpandCollapseAnimation.EXPAND : ExpandCollapseAnimation.COLLAPSE) : null;
-					if (animation != null) {
-						animation.Duration = 1000;
-						animation.Interpolator = new DecelerateInterpolator();
-					}
-					
-					if (editSessionIndex == position && animation != null)
-						view.StartAnimation(animation);
 				};
 			}
 
@@ -333,23 +314,20 @@ namespace Tomado {
 			if (editSessionIndex <= -1)
 				toggled = false;
 			else //if we make an adapter with a non-neg editSessionIndex, open the edit dialog on that session
-				if (editSessionIndex == position) {
-					editLayout.Visibility = ViewStates.Visible;
-					//list adapter has been reset
-					/*run animation:
-					 *	make edit view visible
-					 *	change background to base_app_complementary_color
-					 *	change icon to ic_check_white_24dp
-					*/
-					editLayout.Alpha = 0f;
-					editLayout.SetY(-220);
+				if (editSessionIndex == position) {					
+					view.SetBackgroundResource(Resource.Color.base_app_complementary_color);
+					editMenuButton.SetImageResource(Resource.Drawable.ic_check_white_24dp);
+
+					view.HasTransientState = true;
 					
 					
-					editLayout.Animate()
-						.Alpha(1.0f)
-						.TranslationY(editLayout.Height)
-						.SetDuration(editAnimationDuration)
-						.SetInterpolator(new DecelerateInterpolator());
+
+					if (editLayout.Visibility == ViewStates.Gone) {
+						editLayout.Alpha = 0f;
+						editLayout.SetY(-220);
+						editLayout.Visibility = ViewStates.Visible;
+						EditViewAnimateOpen(editLayout);
+					}
 					
 					//toggle, duh
 					toggled = true;
@@ -364,11 +342,11 @@ namespace Tomado {
 					 *	change background to base_app_color
 					 *	change icon to ic_edit_white_24dp
 					 */
-					editLayout.Animate()
-						.TranslationY(0f)
-						.Alpha(0f)
-						.SetDuration(editAnimationDuration);
-					 
+					view.SetBackgroundResource(Resource.Color.base_app_color);
+					editMenuButton.SetImageResource(Resource.Drawable.ic_edit_white_24dp);
+
+					if (editLayout.Visibility == ViewStates.Visible)
+						EditViewAnimateClose(editLayout);
 				}
 
 			//set edittextviews to reflect session info
@@ -379,9 +357,7 @@ namespace Tomado {
 
 			editTextTime.Text = dateTime.ToShortTimeString();
 			editTextDate.Text = dateTime.ToShortDateString();
-
-			view.HasTransientState = true;
-
+			
 			return view;
 		}
 
@@ -394,6 +370,23 @@ namespace Tomado {
 		}
 		public void BeforeTextChanged(ICharSequence s, int start, int count, int after) {
 
+		}
+
+		//methods to handle edit view animations
+		void EditViewAnimateOpen(ViewGroup editLayout) {
+			editLayout.Animate()
+				.Alpha(1.0f)
+				.TranslationY(editLayout.Height)
+				.SetDuration(editAnimationDuration)
+				.SetInterpolator(new DecelerateInterpolator());
+		}
+
+		void EditViewAnimateClose(ViewGroup editLayout) {
+			editLayout.Animate()
+				.TranslationY(0f)
+				.Alpha(0f)
+				.SetDuration(editAnimationDuration)
+				.SetInterpolator(new AccelerateInterpolator());
 		}
 
 		//event handlers for edit view

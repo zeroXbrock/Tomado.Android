@@ -263,7 +263,7 @@ namespace Tomado {
 
 		public void OnClickEditButton(int sessionIndex) {
 			//use editindex to check for recently added freetime
-			if (sessionIndex >= 0) {
+			if (sessionIndex > -1) {
 				//store last index used as well as the original session; to check for any changes to it
 				lastSessionIndex = sessionIndex;
 				lastSession = new Session(_sessions[sessionIndex].ID, 
@@ -272,9 +272,6 @@ namespace Tomado {
 					_sessions[sessionIndex].Title, _sessions[sessionIndex].RecurringDays);
 
 				listViewState = listViewSessions.OnSaveInstanceState();
-
-				//animate view
-
 			}
 			else {
 				//update notification info on close edit view
@@ -400,6 +397,10 @@ namespace Tomado {
 
 			//reset the listview adapter
 			ResetListViewAdapter(editIndex);
+
+			//last item added should show up in list
+			lastSessionIndex = listViewSessions.Count - 1;
+			listViewSessions.SetSelection(lastSessionIndex);
 
 			//update the database
 			SaveSessionToDatabase(session);
@@ -536,6 +537,12 @@ namespace Tomado {
 		/// </summary>
 		private void ResetListViewAdapter(int editSessionIndex = -1) {
 			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, this, title, editSessionIndex);
+
+			if (editSessionIndex < 0)
+				listViewSessions.SetSelection(lastSessionIndex);
+			else
+				if (listViewSessions.LastVisiblePosition < lastSessionIndex || listViewSessions.FirstVisiblePosition > lastSessionIndex)//our desired view is under the screen or over the screen
+					listViewSessions.SetSelection(lastSessionIndex);
 		}
 
 		private void CancelSessionNotification(int ID) {

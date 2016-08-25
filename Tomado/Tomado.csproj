@@ -70,7 +70,6 @@
     <Compile Include="CTimer.cs" />
     <Compile Include="DatePickerDialogFragment.cs" />
     <Compile Include="DeleteSessionFragment.cs" />
-    <Compile Include="ExpandCollapseAnimation.cs" />
     <Compile Include="FragmentAdapter.cs" />
     <Compile Include="FreeTimeAdapter.cs" />
     <Compile Include="FreeTimeFragment.cs" />
