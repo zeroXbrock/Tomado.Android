@@ -16,6 +16,7 @@ using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Graphics.Drawables;
 using Android.Util;
+using Android.Views.Animations;
 
 using Clans.Fab;
 
@@ -25,7 +26,7 @@ namespace Tomado {
 	/// <summary>
 	/// Adapter to populate Sessions list.
 	/// </summary>
-	public class SessionAdapter : BaseAdapter<Session>, Android.Text.ITextWatcher {
+	public class SessionAdapter : BaseAdapter<Session>, Android.Text.ITextWatcher, Animator.IAnimatorListener, RecurringView.ButtonClickListener {
 		List<Session> sessions;
 		Activity context;
 		SessionClickListener sessionClickListener;
@@ -39,6 +40,7 @@ namespace Tomado {
 		SetRecurrenceListener setRecurrenceListener;
 
 		int editSessionIndex = -1;//used to open edit view for a session in list
+		const int editAnimationDuration = 200;
 
 		/// <summary>
 		/// Interface to provide callback for deleting sessions.
@@ -93,8 +95,9 @@ namespace Tomado {
 		}
 
 		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener, 
-			TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener, 
+			TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener,
 			TitleSetListener titleSetListener, ClickEditButtonListener openEditViewListener, SetRecurrenceListener setRecurrenceListener, string title, int editSessionIndex = -1) {
+
 			this.context = context;
 			this.sessions = sessions;
 			this.sessionClickListener = sessionClickListener;
@@ -134,46 +137,103 @@ namespace Tomado {
 			set;
 		}
 
-		public override View GetView(int position, View convertView, ViewGroup parent) {
-			View view = convertView;//reuse existing view if available
-			if (view == null) {
-			}//disregard recycling
+		class SessionViewHolder : Java.Lang.Object {
+			//get layout for edit view
+			public LinearLayout EditLayout { get; set; }
 
-			view = context.LayoutInflater.Inflate(Resource.Layout.SessionListItem, null);
+			//get textviews
+			public TextView TitleTextView { get; set; }
+			public TextView	TimeTextView  { get; set; }
+			public TextView DateTextView  { get; set; }
+
+			//get edittextviews
+			public EditText EditTextTitle { get; set; } 
+			public EditText EditTextDate  { get; set; }
+			public EditText EditTextTime  { get; set; }
+
+			//get menu (toggle edit view) button
+			public ImageButton EditMenuButton { get; set; }
+			
+			//get recurring view instance
+			public RecurringView RecurringView { get; set; }
+		}
+
+		public override View GetView(int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+			SessionViewHolder viewHolder = null;
+
+			if (view != null)
+				viewHolder = view.Tag as SessionViewHolder;
+
+			//reuse existing view if available
+			if (viewHolder == null) {
+				LayoutInflater inflater = (LayoutInflater)context.GetSystemService(Context.LayoutInflaterService);
+				view = inflater.Inflate(Resource.Layout.SessionListItem, null);
+
+				viewHolder = new SessionViewHolder();
+
+				//get layout for edit view
+				viewHolder.EditLayout = view.FindViewById<LinearLayout>(Resource.Id.EditSessionLayout);
+
+				//get textconvertViews
+				viewHolder.TitleTextView = view.FindViewById<TextView>(Resource.Id.evTitle);
+				viewHolder.DateTextView = view.FindViewById<TextView>(Resource.Id.evDate);
+				viewHolder.TimeTextView = view.FindViewById<TextView>(Resource.Id.evTime);
+
+				//get edittextviews
+				viewHolder.EditTextTitle = view.FindViewById<EditText>(Resource.Id.editText_Title_EditSession);
+				viewHolder.EditTextDate = view.FindViewById<EditText>(Resource.Id.editText_Date_EditSession);
+				viewHolder.EditTextTime = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
+
+				//get menu (toggle edit view) button
+				//FloatingActionMenu editMenuButton = view.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
+				viewHolder.EditMenuButton = view.FindViewById<ImageButton>(Resource.Id.imageButtonEditSession);
+
+				//get recurring view instance
+				viewHolder.RecurringView = view.FindViewById<RecurringView>(Resource.Id.RecurringView_EditSession);
+
+				view.Tag = viewHolder;
+			}
+
+			#region view instance definitions
 
 			//get layout for edit view
-			ViewGroup editLayout = view.FindViewById<LinearLayout>(Resource.Id.EditSessionLayout);
-			editLayout.Visibility = ViewStates.Gone;
+			ViewGroup editLayout = viewHolder.EditLayout;
+
+			//get textviews
+			var titleTextView = viewHolder.TitleTextView;
+			var dateTextView = viewHolder.DateTextView;
+			var timeTextView = viewHolder.TimeTextView;
+			
+			//get edittextviews
+			var editTextTitle = viewHolder.EditTextTitle;
+			var editTextDate = viewHolder.EditTextDate;
+			var editTextTime = viewHolder.EditTextTime;
+
+			//get menu (toggle edit view) button
+			//FloatingActionMenu editMenuButton = view.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
+			ImageButton editMenuButton = viewHolder.EditMenuButton;
+
+			//keep track of toggle state
+			bool toggled = false;
+
+			//get recurring view instance
+			var recurringView = viewHolder.RecurringView;
+
+			#endregion
 
 			//get session for this list item
 			Session session = sessions[position];
 			DateTime dateTime = new DateTime(session.Year, session.MonthOfYear + 1, session.DayOfMonth, session.StartHour, session.StartMinute, 0);
 
-			//get textviews
-			var titleTextView = view.FindViewById<TextView>(Resource.Id.evTitle);
-			var dateTextView = view.FindViewById<TextView>(Resource.Id.evDate);
-			var timeTextView = view.FindViewById<TextView>(Resource.Id.evTime);
-			
-			//get edittextviews
-			var editTextTitle = view.FindViewById<EditText>(Resource.Id.editText_Title_EditSession);
-			var editTextDate = view.FindViewById<EditText>(Resource.Id.editText_Date_EditSession);
-			var editTextTime = view.FindViewById<EditText>(Resource.Id.editText_Time_EditSession);
-			
+			//all editLayouts gone by default
+			editLayout.Visibility = ViewStates.Gone;
+
 			//set text views: title and time/date
 			titleTextView.Text = session.Title;
 
 			timeTextView.Text = dateTime.ToShortTimeString();
 			dateTextView.Text = ToDateClause(dateTime, session.RecurringDays);
-
-			//get menu (toggle edit view) button
-			//FloatingActionMenu editMenuButton = view.FindViewById<FloatingActionMenu>(Resource.Id.menuButton_EditSession);
-			ImageButton editMenuButton = view.FindViewById<ImageButton>(Resource.Id.imageButtonEditSession);
-			
-			//keep track of toggle state
-			bool toggled = false;
-
-			//get recurring view instance
-			var recurringView = view.FindViewById<RecurringView>(Resource.Id.RecurringView_EditSession);
 
 			//set toggle states for weekdays
 			if (session.Recurring) {
@@ -184,12 +244,6 @@ namespace Tomado {
 			if (!editMenuButton.HasOnClickListeners) {
 				editMenuButton.Click += delegate {
 					if (!toggled) {
-						//show edit menu
-						editLayout.Visibility = ViewStates.Visible;
-
-						//change item background color
-						view.SetBackgroundResource(Resource.Color.base_app_complementary_color);
-
 						//toggle
 						toggled = true;
 
@@ -200,12 +254,6 @@ namespace Tomado {
 						editMenuButton.SetImageResource(Resource.Drawable.ic_check_white_24dp);
 					}
 					else {
-						//hide edit menu
-						editLayout.Visibility = ViewStates.Gone;
-
-						//change background back
-						view.SetBackgroundResource(Resource.Color.base_app_color);
-
 						//toggle
 						toggled = false;
 
@@ -227,7 +275,6 @@ namespace Tomado {
 
 					//fire edit click event
 					openEditViewListener.OnClickEditButton(editSessionIndex);
-					
 				};
 			}
 
@@ -264,21 +311,23 @@ namespace Tomado {
 			};
 			editTextTitle.AddTextChangedListener(this);
 
+			//set weekday button listener
+			recurringView.SetOnButtonClickListener(this);
+
 			//don't open any dialogs if index is <0; that means nothing is being edited
-			if (editSessionIndex == -1)
+			if (editSessionIndex <= -1)
 				toggled = false;
 			else //if we make an adapter with a non-neg editSessionIndex, open the edit dialog on that session
-				if (editSessionIndex == position) {
-					//list adapter has been reset
-					//make edit layout visible
-					editLayout.Visibility = ViewStates.Visible;
-
-					//make background green
+				if (editSessionIndex == position) {					
 					view.SetBackgroundResource(Resource.Color.base_app_complementary_color);
-
-					//set icon to check mark
 					editMenuButton.SetImageResource(Resource.Drawable.ic_check_white_24dp);
 
+					view.HasTransientState = true;
+
+					if (editLayout.Visibility == ViewStates.Gone) {
+						EditViewAnimateOpen(editLayout);
+					}
+					
 					//toggle, duh
 					toggled = true;
 
@@ -287,14 +336,16 @@ namespace Tomado {
 					editTextTitle.RequestFocusFromTouch();
 				}
 				else {
-					//close menu
-					editLayout.Visibility = ViewStates.Gone;
-
-					//make background red
+					/*run animation:
+					 *	hide edit menu
+					 *	change background to base_app_color
+					 *	change icon to ic_edit_white_24dp
+					 */
 					view.SetBackgroundResource(Resource.Color.base_app_color);
-
-					//set icon to pencil
 					editMenuButton.SetImageResource(Resource.Drawable.ic_edit_white_24dp);
+
+					if (editLayout.Visibility == ViewStates.Visible)
+						EditViewAnimateClose(editLayout);
 				}
 
 			//set edittextviews to reflect session info
@@ -305,7 +356,7 @@ namespace Tomado {
 
 			editTextTime.Text = dateTime.ToShortTimeString();
 			editTextDate.Text = dateTime.ToShortDateString();
-
+			
 			return view;
 		}
 
@@ -320,19 +371,64 @@ namespace Tomado {
 
 		}
 
+		//methods to handle edit view animations
+		void EditViewAnimateOpen(ViewGroup editLayout) {
+			editLayout.Alpha = 0f;
+			editLayout.SetY(-220);
+			editLayout.Visibility = ViewStates.Visible;
+
+			editLayout.Animate()
+				.Alpha(1.0f)
+				.TranslationY(editLayout.Height)
+				.SetDuration(editAnimationDuration)
+				.SetInterpolator(new DecelerateInterpolator());
+		}
+
+		void EditViewAnimateClose(ViewGroup editLayout) {
+			editLayout.Animate()
+				.TranslationY(0f)
+				.Alpha(0f)
+				.SetDuration(editAnimationDuration)
+				.SetInterpolator(new AccelerateInterpolator());
+		}
+
+		//event handlers for edit view animations
+		public void OnAnimationStart(Animator animator) { }
+		public void OnAnimationRepeat(Animator animator) { }
+		public void OnAnimationEnd(Animator animator) { }
+		public void OnAnimationCancel(Animator animator) { }
+
+		//event handler for weekday buttons
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="index"></param>
+		public void OnButtonClick(int index, bool toggled) {
+			foreach (var d in sessions[editSessionIndex].RecurringDays) {
+				if (d == RecurringView.IndexToDay(index))
+					return;
+			}
+
+			if (toggled)
+				sessions[editSessionIndex].RecurringDays.Add(RecurringView.IndexToDay(index));
+			else
+				sessions[editSessionIndex].RecurringDays.Remove(RecurringView.IndexToDay(index));
+		}
+
 		string ToDateClause(DateTime startDateTime, List<DayOfWeek> recurringDays) {
 			//returns clause like <weekday(s)> at <time>
 			
 			string days = "";
 			string clause = "";
 
-			//create days string w/ commas
-			for (int i = 0; i < recurringDays.Count; i++) {
-				days += recurringDays[i].ToString();
-				if (i < recurringDays.Count - 1)
-					days += ", ";
+			if (recurringDays != null) {
+				//create days string w/ commas
+				for (int i = 0; i < recurringDays.Count; i++) {
+					days += recurringDays[i].ToString();
+					if (i < recurringDays.Count - 1)
+						days += ", ";
+				}
 			}
-
 			clause = days + " after " + startDateTime.ToShortDateString();
 
 			return clause;

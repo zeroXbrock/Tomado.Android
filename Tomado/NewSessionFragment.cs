@@ -17,7 +17,7 @@ namespace Tomado {
 	/// <summary>
 	/// Fragment that contains dialogs for user to create a new Session.
 	/// </summary>
-	public class NewSessionFragment :  Android.Support.V4.App.DialogFragment, DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener, RecurringView.ButtonClickListener {
+	public class NewSessionFragment :  Android.Support.V4.App.DialogFragment, DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener {
 		private GetNewSessionListener onGetNewSessionListener;
 		
 		//view instances
@@ -29,7 +29,6 @@ namespace Tomado {
 		int _year, _month, _day, _hour, _minute;
 		DateTime sessionDateTime = DateTime.Now;
 		string _title;
-		List<DayOfWeek> recurringDays = new List<DayOfWeek>();
 		
 		public interface GetNewSessionListener{
 			void OnAddNewSession(DateTime dateTime, string title, List<DayOfWeek> recurringDays);
@@ -104,8 +103,6 @@ namespace Tomado {
 				dialog.Show(FragmentManager, null);
 			};
 
-			recurringView.ButtonClickListenerInstance = this;
-
 			return view;
 		}
 
@@ -124,9 +121,6 @@ namespace Tomado {
 			_minute = minute;
 
 			UpdateDateTimeInfo();
-		}
-
-		public void OnButtonClick(int index) {
 		}
 
 		//populate the date/time vars w/ default values

@@ -53,10 +53,17 @@ namespace Tomado {
 		//listener to send click event back to activity
 		SessionAdapter.SessionClickListener sessionClickListener;
 
-		
+		//listview state info
+		IParcelable listViewState;
+				
 		//private sessions list for listview
 		List<Session> _sessions;
 
+		int lastSessionIndex = -1;
+		float lastSessionItemY; //works the same way as lastSessionIndex but it saves the y-component of the view
+		int lastSessionID = -1;
+		Session lastSession;
+		
 		//accessor
 		public List<Session> Sessions {
 			get { return _sessions; }
@@ -118,7 +125,7 @@ namespace Tomado {
 
 			//set listview mode to allow overscroll
 			listViewSessions.OverScrollMode = OverScrollMode.Always;
-
+			
 			//add footer to listview
 			AddFooter(inflater);
 
@@ -232,9 +239,6 @@ namespace Tomado {
 
 			//reset adapter & edit view on session in list
 			ResetListViewAdapter(editIndex);
-
-			//scroll to new item
-			listViewSessions.SetSelection(listViewSessions.Count - 1);
 		}
 
 		/// <summary>
@@ -255,26 +259,22 @@ namespace Tomado {
 
 			//reset adapter, open edit view on session in list
 			ResetListViewAdapter(editIndex);
-
-			//scroll to new item
-			listViewSessions.SetSelection(listViewSessions.Count - 1);
 		}
-		int lastSessionIndex = -1;
-		int lastSessionID = -1;
-		Session lastSession;
+		
 
 		public void OnClickEditButton(int sessionIndex) {
 			//use editindex to check for recently added freetime
-
-			ResetListViewAdapter(sessionIndex);
-
-			if (sessionIndex >= 0) {
+			if (sessionIndex > -1) {
 				//store last index used as well as the original session; to check for any changes to it
 				lastSessionIndex = sessionIndex;
+				lastSessionItemY = (listViewSessions.GetChildAt(sessionIndex)) == null ? 0 : listViewSessions.GetChildAt(sessionIndex).GetY();
+
 				lastSession = new Session(_sessions[sessionIndex].ID, 
 					_sessions[sessionIndex].StartHour, _sessions[sessionIndex].StartMinute,
 					_sessions[sessionIndex].Year, _sessions[sessionIndex].MonthOfYear, _sessions[sessionIndex].DayOfMonth,
 					_sessions[sessionIndex].Title, _sessions[sessionIndex].RecurringDays);
+
+				listViewState = listViewSessions.OnSaveInstanceState();
 			}
 			else {
 				//update notification info on close edit view
@@ -283,8 +283,10 @@ namespace Tomado {
 					ScheduleSessionNotification(_sessions[editIndex]);
 			}
 
-			//scroll to item being edited
-			listViewSessions.SetSelection(lastSessionIndex);
+			ResetListViewAdapter(sessionIndex);
+
+			if (listViewState != null)
+				listViewSessions.OnRestoreInstanceState(listViewState);
 
 			UpdateEditIndex(sessionIndex);
 
@@ -307,9 +309,6 @@ namespace Tomado {
 				});
 
 				ResetListViewAdapter(sessionIndex);
-
-				//scroll to new item
-				listViewSessions.SetSelection(sessionIndex);
 			}
 			
 			//close KB
@@ -335,16 +334,11 @@ namespace Tomado {
 
 				//schedule that notification
 				ScheduleSessionNotification(_sessions[sessionIndex], recurringDays);
-
-				listViewSessions.SetSelection(sessionIndex);
 			}
 		}
 
 		public void OnShowDatePickerDialog(int sessionIndex) {
 			UpdateEditIndex(sessionIndex);
-
-			//refocus listview
-			listViewSessions.SetSelection(sessionIndex);
 
 			Session session = _sessions[sessionIndex];
 
@@ -359,9 +353,6 @@ namespace Tomado {
 
 		public void OnShowTimePickerDialog(int sessionIndex) {
 			UpdateEditIndex(sessionIndex);
-
-			//refocus listview
-			listViewSessions.SetSelection(sessionIndex);
 
 			Session session = _sessions[sessionIndex];
 
@@ -409,6 +400,10 @@ namespace Tomado {
 
 			//reset the listview adapter
 			ResetListViewAdapter(editIndex);
+
+			//last item added should show up in list
+			lastSessionIndex = listViewSessions.Count - 1;
+			listViewSessions.SetSelection(lastSessionIndex);
 
 			//update the database
 			SaveSessionToDatabase(session);
@@ -459,9 +454,6 @@ namespace Tomado {
 
 			//add the session
 			OnAddNewSession(session);
-
-			//scroll to new item
-			listViewSessions.SetSelection(listViewSessions.Count - 1);
 		}
 
 		/// <summary>
@@ -470,6 +462,17 @@ namespace Tomado {
 		/// <param name="session"></param>
 		public void OnShowDeleteSessionDialog(Session session) {
 			ShowDeleteSessionDialog(session);
+		}
+
+		/// <summary>
+		/// Returns true if the edit view is on the screen; false otherwise.
+		/// </summary>
+		/// <returns></returns>
+		bool IsEditItemVisible() {
+			if (listViewSessions.FirstVisiblePosition < editIndex && editIndex < listViewSessions.LastVisiblePosition)
+				return true;
+			else
+				return false;
 		}
 		
 		/// <summary>
@@ -544,10 +547,21 @@ namespace Tomado {
 		}
 
 		/// <summary>
-		/// Populate class listview with sessions.
+		/// Populate class listview with sessions and re-scrolls the listview.
 		/// </summary>
 		private void ResetListViewAdapter(int editSessionIndex = -1) {
 			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, this, title, editSessionIndex);
+
+			SetListViewSelection(editSessionIndex);
+		}
+
+		void SetListViewSelection(int editSessionIndex) {
+			if (editSessionIndex < 0)
+				listViewSessions.SetSelectionFromTop(lastSessionIndex, (int)lastSessionItemY);
+			else
+				if (listViewSessions.LastVisiblePosition < lastSessionIndex || listViewSessions.FirstVisiblePosition > lastSessionIndex)//our desired view is under the screen or over the screen
+					//listViewSessions.SetSelection(lastSessionIndex);
+					listViewSessions.SetSelectionFromTop(lastSessionIndex, (int)lastSessionItemY);
 		}
 
 		private void CancelSessionNotification(int ID) {
@@ -615,9 +629,13 @@ namespace Tomado {
 			mgr.HideSoftInputFromWindow(View.WindowToken, 0);
 		}
 
+		/// <summary>
+		/// Show the keyboard... TODO: Implement me!
+		/// </summary>
 		void ShowKeyboard() {
 
 		}
+		
 
 		#region database methods
 		/// <summary>

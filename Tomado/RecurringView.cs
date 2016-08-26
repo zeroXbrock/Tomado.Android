@@ -15,7 +15,7 @@ using Android.Widget;
 namespace Tomado {
 	class RecurringView : View {
 		Context _context;
-		public ButtonClickListener ButtonClickListenerInstance { get; set; }
+		ButtonClickListener buttonClickListener;
 
 		public RecurringView(Context context) 
 			: base(context) {
@@ -31,7 +31,11 @@ namespace Tomado {
 		}
 
 		public interface ButtonClickListener{
-			void OnButtonClick(int index);
+			/// <summary>
+			/// Event fired when a weekday button is clicked.
+			/// </summary>
+			/// <param name="index">Index of button pressed: [0-6]</param>
+			void OnButtonClick(int index, bool toggled);
 		}
 
 		const int NUM_BUTTONS = 7;
@@ -40,6 +44,10 @@ namespace Tomado {
 		string[] weekdaysAbbrev = { "S", "M", "T", "W", "T", "F", "S" };
 		DayOfWeek[] weekdays = { DayOfWeek.Sunday, DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday };
 		bool[] toggledButtons = new bool[NUM_BUTTONS];
+
+		public void SetOnButtonClickListener(ButtonClickListener listener) {
+			this.buttonClickListener = listener;
+		}
 
 		void InitPositions() {
 			if (positions.Count == 0) {
@@ -57,9 +65,9 @@ namespace Tomado {
 		void DrawWeekdayButtons(Canvas canvas) {
 			InitPositions();
 
-			var paintCircleUntoggled = new Paint() { Color = new Color(Context.GetColor(Resource.Color.base_app_complementary_color)), AntiAlias = true };
+			var paintCircleUntoggled = new Paint() { Color = Color.Transparent, AntiAlias = true };
 			var paintTextUntoggled = new Paint() { Color = Color.White, TextSize = radius, TextAlign = Paint.Align.Center };
-			
+
 			var paintCircleToggled = new Paint() { Color = Color.White, AntiAlias = true };
 			var paintTextToggled = new Paint() { Color = Color.Black, TextSize = radius, TextAlign = Paint.Align.Center };
 			
@@ -88,8 +96,8 @@ namespace Tomado {
 		public override bool OnTouchEvent(MotionEvent e) {
 			int indexHit = IsInsideCircle(e.GetX(), e.GetY());
 			if (indexHit > -1) {
-				if (ButtonClickListenerInstance != null)
-					ButtonClickListenerInstance.OnButtonClick(indexHit);
+				if (buttonClickListener != null)
+					buttonClickListener.OnButtonClick(indexHit, !toggledButtons[indexHit]);
 				
 				toggledButtons[indexHit] = !toggledButtons[indexHit];
 
@@ -130,6 +138,15 @@ namespace Tomado {
 						toggledButtons[i] = true;
 				}
 			}
+		}
+
+		public static DayOfWeek IndexToDay(int index) {
+			DayOfWeek[] days = {DayOfWeek.Sunday, DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday};
+
+			if (index < 7 && index >= 0)
+				return days[index];
+			else
+				throw new Exception("Index must be between 0 and 6; inclusively");
 		}
 	}
 }
