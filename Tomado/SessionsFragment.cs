@@ -125,7 +125,7 @@ namespace Tomado {
 
 			//set listview mode to allow overscroll
 			listViewSessions.OverScrollMode = OverScrollMode.Always;
-
+			
 			//add footer to listview
 			AddFooter(inflater);
 
@@ -462,6 +462,17 @@ namespace Tomado {
 		/// <param name="session"></param>
 		public void OnShowDeleteSessionDialog(Session session) {
 			ShowDeleteSessionDialog(session);
+		}
+
+		/// <summary>
+		/// Returns true if the edit view is on the screen; false otherwise.
+		/// </summary>
+		/// <returns></returns>
+		bool IsEditItemVisible() {
+			if (listViewSessions.FirstVisiblePosition < editIndex && editIndex < listViewSessions.LastVisiblePosition)
+				return true;
+			else
+				return false;
 		}
 		
 		/// <summary>

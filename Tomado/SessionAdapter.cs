@@ -26,7 +26,7 @@ namespace Tomado {
 	/// <summary>
 	/// Adapter to populate Sessions list.
 	/// </summary>
-	public class SessionAdapter : BaseAdapter<Session>, Android.Text.ITextWatcher, Animator.IAnimatorListener {
+	public class SessionAdapter : BaseAdapter<Session>, Android.Text.ITextWatcher, Animator.IAnimatorListener, RecurringView.ButtonClickListener {
 		List<Session> sessions;
 		Activity context;
 		SessionClickListener sessionClickListener;
@@ -95,8 +95,9 @@ namespace Tomado {
 		}
 
 		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener, 
-			TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener, 
+			TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener,
 			TitleSetListener titleSetListener, ClickEditButtonListener openEditViewListener, SetRecurrenceListener setRecurrenceListener, string title, int editSessionIndex = -1) {
+
 			this.context = context;
 			this.sessions = sessions;
 			this.sessionClickListener = sessionClickListener;
@@ -310,6 +311,9 @@ namespace Tomado {
 			};
 			editTextTitle.AddTextChangedListener(this);
 
+			//set weekday button listener
+			recurringView.SetOnButtonClickListener(this);
+
 			//don't open any dialogs if index is <0; that means nothing is being edited
 			if (editSessionIndex <= -1)
 				toggled = false;
@@ -319,13 +323,8 @@ namespace Tomado {
 					editMenuButton.SetImageResource(Resource.Drawable.ic_check_white_24dp);
 
 					view.HasTransientState = true;
-					
-					
 
 					if (editLayout.Visibility == ViewStates.Gone) {
-						editLayout.Alpha = 0f;
-						editLayout.SetY(-220);
-						editLayout.Visibility = ViewStates.Visible;
 						EditViewAnimateOpen(editLayout);
 					}
 					
@@ -374,6 +373,10 @@ namespace Tomado {
 
 		//methods to handle edit view animations
 		void EditViewAnimateOpen(ViewGroup editLayout) {
+			editLayout.Alpha = 0f;
+			editLayout.SetY(-220);
+			editLayout.Visibility = ViewStates.Visible;
+
 			editLayout.Animate()
 				.Alpha(1.0f)
 				.TranslationY(editLayout.Height)
@@ -389,11 +392,28 @@ namespace Tomado {
 				.SetInterpolator(new AccelerateInterpolator());
 		}
 
-		//event handlers for edit view
+		//event handlers for edit view animations
 		public void OnAnimationStart(Animator animator) { }
 		public void OnAnimationRepeat(Animator animator) { }
 		public void OnAnimationEnd(Animator animator) { }
 		public void OnAnimationCancel(Animator animator) { }
+
+		//event handler for weekday buttons
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="index"></param>
+		public void OnButtonClick(int index, bool toggled) {
+			foreach (var d in sessions[editSessionIndex].RecurringDays) {
+				if (d == RecurringView.IndexToDay(index))
+					return;
+			}
+
+			if (toggled)
+				sessions[editSessionIndex].RecurringDays.Add(RecurringView.IndexToDay(index));
+			else
+				sessions[editSessionIndex].RecurringDays.Remove(RecurringView.IndexToDay(index));
+		}
 
 		string ToDateClause(DateTime startDateTime, List<DayOfWeek> recurringDays) {
 			//returns clause like <weekday(s)> at <time>
