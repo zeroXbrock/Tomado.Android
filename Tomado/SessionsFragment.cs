@@ -379,11 +379,14 @@ namespace Tomado {
 		/// <param name="position"></param>
 		/// <param name="ID"></param>
 		public void OnDeleteSession(Session session) {
+			//delete session from local list
 			DeleteSession(session);
-
+			//reset adapter to reflect updated data in listview
 			ResetListViewAdapter();
-
+			//obvi
 			DeleteSessionFromDatabase(session);
+			//delete session notification
+			CancelSessionNotification(session);
 		}
 
 		/// <summary>
@@ -477,6 +480,9 @@ namespace Tomado {
 			Toast.MakeText(Context, RecurringView.IndexToDay(index).ToString() + " " + toggled.ToString(), ToastLength.Short).Show();
 
 			//add or remove the selected day from our list
+			if (recurringDaysState == null)
+				recurringDaysState = new List<DayOfWeek>();
+
 			if (toggled)
 				recurringDaysState.Add(RecurringView.IndexToDay(index));
 			else
@@ -574,9 +580,12 @@ namespace Tomado {
 			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, this, this, title, editSessionIndex, recurringDaysState);
 
 			listViewSessions.OnRestoreInstanceState(state);
-			//SetListViewSelection(editSessionIndex);
 		}
 
+		/// <summary>
+		/// Sets the listview to select the item at the editSessionIndex
+		/// </summary>
+		/// <param name="editSessionIndex"></param>
 		void SetListViewSelection(int editSessionIndex) {
 			if (editSessionIndex < 0)
 				listViewSessions.SetSelectionFromTop(lastSessionIndex, (int)lastSessionItemY);
@@ -584,11 +593,6 @@ namespace Tomado {
 				if (listViewSessions.LastVisiblePosition < lastSessionIndex || listViewSessions.FirstVisiblePosition > lastSessionIndex)//our desired view is under the screen or over the screen
 					//listViewSessions.SetSelection(lastSessionIndex);
 					listViewSessions.SetSelectionFromTop(lastSessionIndex, (int)lastSessionItemY);
-		}
-
-		private void CancelSessionNotification(int ID) {
-			var manager = NotificationManager.FromContext(Context);
-			manager.Cancel(ID);
 		}
 
 		/// <summary>
@@ -604,6 +608,7 @@ namespace Tomado {
 
 			return session;
 		}
+
 		/// <summary>
 		/// Adds a session to the class sessions list and returns the session it created.
 		/// </summary>
@@ -621,7 +626,7 @@ namespace Tomado {
 		}
 
 		/// <summary>
-		/// Remove session from class sessions list
+		/// Remove session from class sessions list.
 		/// </summary>
 		/// <param name="session"></param>
 		void DeleteSession(Session session) {
@@ -637,6 +642,11 @@ namespace Tomado {
 			}
 		}
 
+		/// <summary>
+		/// Removes a session from the sessions list by ID.
+		/// </summary>
+		/// <param name="ID"></param>
+		/// <returns></returns>
 		bool DeleteSession(int ID) {
 			foreach (var s in _sessions) {
 				if (s.ID == ID) {
@@ -684,8 +694,6 @@ namespace Tomado {
 		/// </summary>
 		/// <param name="ID"></param>
 		private async Task<int> DeleteSessionFromDatabase(int ID) {
-			CancelSessionNotification(ID);
-			
 			return await connection.ExecuteScalarAsync<int>("DELETE FROM Session WHERE ID=" + ID + ";");
 		}
 
@@ -835,6 +843,18 @@ namespace Tomado {
 				}
 			}
 		}
-		
+
+		private void CancelSessionNotification(Session session) {
+			Intent alarmIntent = new Intent(Activity, typeof(AlarmReceiver));
+
+			alarmIntent.PutExtra("ID", session.ID);
+			alarmIntent.PutExtra("title", "Tomado");
+			alarmIntent.PutExtra("content", session.Title);
+
+			PendingIntent pendingIntent = PendingIntent.GetBroadcast(Activity, 1, alarmIntent, PendingIntentFlags.UpdateCurrent); //ID:1 for session notifications
+			AlarmManager alarmManager = (AlarmManager)Activity.GetSystemService(Context.AlarmService);
+
+			alarmManager.Cancel(pendingIntent);
+		}
 	}
 }
