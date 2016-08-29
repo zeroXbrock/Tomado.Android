@@ -272,7 +272,7 @@ namespace Tomado {
 				//store last index used as well as the original session; to check for any changes to it
 				lastSessionIndex = sessionIndex;
 				//keep track of y-position of session being edited
-				lastSessionItemY = (listViewSessions.GetChildAt(sessionIndex)) == null ? 0 : listViewSessions.GetChildAt(sessionIndex).GetY();
+				//lastSessionItemY = (listViewSessions.GetChildAt(sessionIndex)) == null ? 0 : listViewSessions.GetChildAt(sessionIndex).GetY();
 
 				lastSession = new Session(_sessions[sessionIndex].ID, 
 					_sessions[sessionIndex].StartHour, _sessions[sessionIndex].StartMinute,
@@ -569,9 +569,12 @@ namespace Tomado {
 		/// Populate class listview with sessions and re-scrolls the listview.
 		/// </summary>
 		private void ResetListViewAdapter(int editSessionIndex = -1) {
+			var state = listViewSessions.OnSaveInstanceState();
+
 			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, this, this, title, editSessionIndex, recurringDaysState);
 
-			SetListViewSelection(editSessionIndex);
+			listViewSessions.OnRestoreInstanceState(state);
+			//SetListViewSelection(editSessionIndex);
 		}
 
 		void SetListViewSelection(int editSessionIndex) {
