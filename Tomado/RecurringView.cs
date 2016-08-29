@@ -13,7 +13,7 @@ using Android.Views;
 using Android.Widget;
 
 namespace Tomado {
-	class RecurringView : View {
+	public class RecurringView : View {
 		Context _context;
 		ButtonClickListener buttonClickListener;
 

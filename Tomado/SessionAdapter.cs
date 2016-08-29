@@ -16,7 +16,6 @@ using Android.Support.V4.Content;
 using Android.Support.V4.View;
 using Android.Graphics.Drawables;
 using Android.Util;
-using Android.Views.Animations;
 
 using Clans.Fab;
 
@@ -38,10 +37,12 @@ namespace Tomado {
 		TitleSetListener titleSetListener;
 		ClickEditButtonListener openEditViewListener;
 		SetRecurrenceListener setRecurrenceListener;
+		RecurringView.ButtonClickListener recurringButtonClickListener;
 
 		int editSessionIndex = -1;//used to open edit view for a session in list
+		List<DayOfWeek> recurringDays;//used to hold weekday selections when adapter resets
 		const int editAnimationDuration = 200;
-
+		
 		/// <summary>
 		/// Interface to provide callback for deleting sessions.
 		/// </summary>
@@ -96,7 +97,8 @@ namespace Tomado {
 
 		public SessionAdapter(Activity context, List<Session> sessions, SessionClickListener sessionClickListener, ShowDeleteSessionDialogListener showDeleteSessionDialogListener, 
 			TimePickerDialog.IOnTimeSetListener timeSetListener, DatePickerDialog.IOnDateSetListener dateSetListener, ShowDatePickerDialogListener datePickerListener, ShowTimePickerDialogListener timePickerListener,
-			TitleSetListener titleSetListener, ClickEditButtonListener openEditViewListener, SetRecurrenceListener setRecurrenceListener, string title, int editSessionIndex = -1) {
+			TitleSetListener titleSetListener, ClickEditButtonListener openEditViewListener, SetRecurrenceListener setRecurrenceListener, RecurringView.ButtonClickListener recurringButtonClickListener, 
+			string title, int editSessionIndex = -1, List<DayOfWeek> recurringDays = null) {
 
 			this.context = context;
 			this.sessions = sessions;
@@ -111,6 +113,8 @@ namespace Tomado {
 			this.openEditViewListener = openEditViewListener;
 			this.setRecurrenceListener = setRecurrenceListener;
 			this.TitleText = title;
+			this.recurringButtonClickListener = recurringButtonClickListener;
+			this.recurringDays = recurringDays;
 		}
 
 		public override long GetItemId(int position) {
@@ -239,6 +243,8 @@ namespace Tomado {
 			if (session.Recurring) {
 				recurringView.SetRecurringWeekdays(session.RecurringDays);
 			}
+			if (recurringDays != null)//called if we're editing a session now; use what we got from the adapter
+				recurringView.SetRecurringWeekdays(recurringDays);
 
 			//set toggle action
 			if (!editMenuButton.HasOnClickListeners) {
@@ -404,15 +410,8 @@ namespace Tomado {
 		/// </summary>
 		/// <param name="index"></param>
 		public void OnButtonClick(int index, bool toggled) {
-			foreach (var d in sessions[editSessionIndex].RecurringDays) {
-				if (d == RecurringView.IndexToDay(index))
-					return;
-			}
-
-			if (toggled)
-				sessions[editSessionIndex].RecurringDays.Add(RecurringView.IndexToDay(index));
-			else
-				sessions[editSessionIndex].RecurringDays.Remove(RecurringView.IndexToDay(index));
+			//send the click back to the fragment since the adapter is going to be reset
+			recurringButtonClickListener.OnButtonClick(index, toggled);
 		}
 
 		string ToDateClause(DateTime startDateTime, List<DayOfWeek> recurringDays) {

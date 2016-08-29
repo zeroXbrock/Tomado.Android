@@ -34,7 +34,7 @@ namespace Tomado {
 									SessionAdapter.DeleteSessionListener, SessionAdapter.SessionClickListener, SessionAdapter.ShowDeleteSessionDialogListener,
 									DatePickerDialog.IOnDateSetListener, TimePickerDialog.IOnTimeSetListener,
 									SessionAdapter.ShowTimePickerDialogListener, SessionAdapter.ShowDatePickerDialogListener, SessionAdapter.TitleSetListener,
-									SessionAdapter.ClickEditButtonListener, SessionAdapter.SetRecurrenceListener {
+									SessionAdapter.ClickEditButtonListener, SessionAdapter.SetRecurrenceListener, RecurringView.ButtonClickListener {
 		//view instances
 		ListView listViewSessions;
 		FloatingActionButton newSessionButton, searchButton;
@@ -55,6 +55,9 @@ namespace Tomado {
 
 		//listview state info
 		IParcelable listViewState;
+
+		//weekday selection for edit view; used to keep track while adapter resets
+		List<DayOfWeek> recurringDaysState;
 				
 		//private sessions list for listview
 		List<Session> _sessions;
@@ -264,9 +267,11 @@ namespace Tomado {
 
 		public void OnClickEditButton(int sessionIndex) {
 			//use editindex to check for recently added freetime
-			if (sessionIndex > -1) {
+			
+			if (sessionIndex > -1) {//ITEM IS BEING EDITED
 				//store last index used as well as the original session; to check for any changes to it
 				lastSessionIndex = sessionIndex;
+				//keep track of y-position of session being edited
 				lastSessionItemY = (listViewSessions.GetChildAt(sessionIndex)) == null ? 0 : listViewSessions.GetChildAt(sessionIndex).GetY();
 
 				lastSession = new Session(_sessions[sessionIndex].ID, 
@@ -275,12 +280,16 @@ namespace Tomado {
 					_sessions[sessionIndex].Title, _sessions[sessionIndex].RecurringDays);
 
 				listViewState = listViewSessions.OnSaveInstanceState();
+
+				recurringDaysState = new List<DayOfWeek>();
 			}
-			else {
+			else {//ITEM IS NOT BEING EDITED; EDIT VIEW CLOSING
 				//update notification info on close edit view
 				//if it is recurring, it'll be set by the recurrence listener
 				if (!_sessions[editIndex].Recurring)
 					ScheduleSessionNotification(_sessions[editIndex]);
+
+				recurringDaysState = null;
 			}
 
 			ResetListViewAdapter(sessionIndex);
@@ -464,6 +473,16 @@ namespace Tomado {
 			ShowDeleteSessionDialog(session);
 		}
 
+		public void OnButtonClick(int index, bool toggled) {
+			Toast.MakeText(Context, RecurringView.IndexToDay(index).ToString() + " " + toggled.ToString(), ToastLength.Short).Show();
+
+			//add or remove the selected day from our list
+			if (toggled)
+				recurringDaysState.Add(RecurringView.IndexToDay(index));
+			else
+				recurringDaysState.Remove(RecurringView.IndexToDay(index));
+		}
+
 		/// <summary>
 		/// Returns true if the edit view is on the screen; false otherwise.
 		/// </summary>
@@ -550,7 +569,7 @@ namespace Tomado {
 		/// Populate class listview with sessions and re-scrolls the listview.
 		/// </summary>
 		private void ResetListViewAdapter(int editSessionIndex = -1) {
-			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, this, title, editSessionIndex);
+			listViewSessions.Adapter = new SessionAdapter(Activity, _sessions, this, this, this, this, this, this, this, this, this, this, title, editSessionIndex, recurringDaysState);
 
 			SetListViewSelection(editSessionIndex);
 		}
@@ -795,7 +814,9 @@ namespace Tomado {
 						calendar.Set(Java.Util.CalendarField.Minute, session.StartMinute);
 						calendar.Add(Java.Util.CalendarField.DayOfMonth, daysUntilEvent);
 
-						long alarmInterval = AlarmManager.IntervalDay * 7;
+
+						//long alarmInterval = AlarmManager.IntervalDay * 7;
+						long alarmInterval = 5000;
 
 						//set alarm for this occurence
 						alarmManager.SetRepeating(AlarmType.RtcWakeup, calendar.TimeInMillis, alarmInterval, pendingIntent);
