@@ -42,6 +42,7 @@ namespace Tomado {
 		int editSessionIndex = -1;//used to open edit view for a session in list
 		List<DayOfWeek> recurringDays;//used to hold weekday selections when adapter resets
 		const int editAnimationDuration = 200;
+		bool hasAnimated = false;//keeps track of whether the edit view has animated yet
 		
 		/// <summary>
 		/// Interface to provide callback for deleting sessions.
@@ -263,6 +264,8 @@ namespace Tomado {
 						//toggle
 						toggled = false;
 
+						hasAnimated = false;
+
 						//always set title when closing edit view
 						string title =  editTextTitle.Text;
 
@@ -330,7 +333,7 @@ namespace Tomado {
 
 					view.HasTransientState = true;
 
-					if (editLayout.Visibility == ViewStates.Gone) {
+					if (editLayout.Visibility == ViewStates.Gone && !hasAnimated) {
 						EditViewAnimateOpen(editLayout);
 					}
 					
@@ -350,8 +353,9 @@ namespace Tomado {
 					view.SetBackgroundResource(Resource.Color.base_app_color);
 					editMenuButton.SetImageResource(Resource.Drawable.ic_edit_white_24dp);
 
-					if (editLayout.Visibility == ViewStates.Visible)
+					if (editLayout.Visibility == ViewStates.Visible) {
 						EditViewAnimateClose(editLayout);
+					}
 				}
 
 			//set edittextviews to reflect session info
@@ -362,7 +366,10 @@ namespace Tomado {
 
 			editTextTime.Text = dateTime.ToShortTimeString();
 			editTextDate.Text = dateTime.ToShortDateString();
-			
+
+			if (hasAnimated && position == editSessionIndex)
+				editLayout.Visibility = ViewStates.Visible;
+
 			return view;
 		}
 
@@ -388,6 +395,8 @@ namespace Tomado {
 				.TranslationY(editLayout.Height)
 				.SetDuration(editAnimationDuration)
 				.SetInterpolator(new DecelerateInterpolator());
+
+			hasAnimated = true;
 		}
 
 		void EditViewAnimateClose(ViewGroup editLayout) {
