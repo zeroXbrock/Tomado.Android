@@ -28,6 +28,7 @@ namespace Tomado {
 		Notification.Builder builder;
 		Notification timerNotification;
 		ProgressCircleView progressCircle;
+		ImageView tomadoImageView;
 
 		//listener instance to send events
 		TimerFinishListener timerFinishListener;
@@ -69,6 +70,7 @@ namespace Tomado {
 			workButton = rootView.FindViewById<FloatingActionButton>(Resource.Id.buttonWork);
 			finishButton = rootView.FindViewById<FloatingActionButton>(Resource.Id.buttonFinish);
 			progressCircle = rootView.FindViewById<ProgressCircleView>(Resource.Id.progressCircle_Timer);
+			tomadoImageView = rootView.FindViewById<ImageView>(Resource.Id.ImageView_tomado);
 
 			if (fragmentSession == null) { //lone timer
 				Init(savedInstanceState);
@@ -147,7 +149,9 @@ namespace Tomado {
 
 						progressCircle.PauseTimerAnimation();
 					}
+
 					pomodorosTextView.Text = fragmentSession.Pomodoros.ToString();
+					
 				};
 			}
 
