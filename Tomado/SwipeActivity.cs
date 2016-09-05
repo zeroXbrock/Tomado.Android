@@ -23,8 +23,9 @@ namespace Tomado {
 		ViewPager viewPager;
 		TimerFragment timerFragment;
 		SessionsFragment sessionsFragment;
-		ActionBar actionBar;
+
 		IParcelable adapterState;
+		int currentPageIndex;
 
 		protected override void OnCreate(Bundle savedInstanceState) {
 			base.OnCreate(savedInstanceState);
@@ -62,6 +63,15 @@ namespace Tomado {
 			viewPager.Adapter.RestoreState(adapterState, ClassLoader);
 		}
 
+		public override void OnBackPressed() {
+			//go to first page if on a higher one when pressing back
+			//TODO: Get this working
+			if (currentPageIndex > 0)
+				SetVisibleFragment(currentPageIndex - 1);
+			else
+				base.OnBackPressed();
+		}
+
 		protected override void OnNewIntent(Intent intent) {
 			base.OnNewIntent(intent);
 
@@ -92,6 +102,7 @@ namespace Tomado {
 		/// <param name="position"></param>
 		public void SetVisibleFragment(int position) {
 			viewPager.SetCurrentItem(position, true);
+			currentPageIndex = position;
 		}
 
 		public void OnSessionClick(Session session) {

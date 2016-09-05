@@ -427,19 +427,24 @@ namespace Tomado {
 			//returns clause like <weekday(s)> at <time>
 			
 			string days = "";
-			string clause = "";
 
-			if (recurringDays != null) {
+			if (recurringDays != null && recurringDays.Count > 0) {
 				//create days string w/ commas
 				for (int i = 0; i < recurringDays.Count; i++) {
-					days += recurringDays[i].ToString();
+					days += RecurringView.IndexToShortDay(RecurringView.DayOfWeekToIndex(recurringDays[i]));
+
 					if (i < recurringDays.Count - 1)
 						days += ", ";
 				}
-			}
-			clause = days + " after " + startDateTime.ToShortDateString();
 
-			return clause;
+				return days;
+			}
+			else {
+				//find next weekday and display that
+				string weekday = startDateTime.DayOfWeek.ToString();
+				
+				return weekday;
+			}
 		}
 	}
 }

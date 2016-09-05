@@ -42,6 +42,7 @@ namespace Tomado {
 		int radius = 70;
 		List<Pair> positions = new List<Pair>();
 		string[] weekdaysAbbrev = { "S", "M", "T", "W", "T", "F", "S" };
+		
 		DayOfWeek[] weekdays = { DayOfWeek.Sunday, DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday };
 		bool[] toggledButtons = new bool[NUM_BUTTONS];
 
@@ -146,7 +147,31 @@ namespace Tomado {
 			if (index < 7 && index >= 0)
 				return days[index];
 			else
-				throw new Exception("Index must be between 0 and 6; inclusively");
+				throw new Exception("Index must be between 0 and 6, inclusively.");
+		}
+
+		public static string IndexToShortDay(int index) {
+			string[] days = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+
+			if (index < 7 && index >= 0)
+				return days[index];
+			else
+				throw new Exception("Index must be between 0 and 6, inclusively.");
+		}
+
+		/// <summary>
+		/// Returns an index (0-6) that corresponds to days of the week; Sun-Sat
+		/// </summary>
+		public static int DayOfWeekToIndex(DayOfWeek day) {
+			DayOfWeek[] days = {DayOfWeek.Sunday, DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday};
+			
+			int i = 0;
+
+			while (days[i] != day) {
+				i++;
+			}
+
+			return i;
 		}
 	}
 }
