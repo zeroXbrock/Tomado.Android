@@ -246,10 +246,10 @@ namespace Tomado {
 
 				//initialize timer vars
 				duration = (long)CTimer.TimerLengths.Work;
-				lastTimerType = TimerType.LongBreak;//set last type to long break so that we start on work //TODO: remove this line, probably
+				lastTimerType = TimerType.LongBreak;//set last type to long break so that we start on work
 
-				titleTextView.SetText(fragmentSession.Title, TextView.BufferType.Normal); //work is default
-				timerTextView.SetText(GetClockTimeLeft(duration), TextView.BufferType.Normal);
+				titleTextView.Text = fragmentSession.Title;
+				timerTextView.Text = GetClockTimeLeft(duration);
 			}
 			else {
 				SetClassTimerInfo(bundle);
@@ -452,7 +452,26 @@ namespace Tomado {
 		public void OnFinish() {
 			remainingTimeInMillis = 0;
 
-			timerTextView.SetText(lastTimerType.ToString() + " finished", TextView.BufferType.Normal);
+			string timerType = "";
+
+			switch (lastTimerType) {
+				case (TimerType.LongBreak):
+					timerType = "Long break";
+					break;
+				case (TimerType.Pause):
+					timerType = "Pause";
+					break;
+				case (TimerType.ShortBreak):
+					timerType = "Short break";
+					break;
+				case (TimerType.Work):
+					timerType = "Work";
+					break;
+				default:
+					break;
+			}
+
+			timerTextView.SetText(timerType + " finished", TextView.BufferType.Normal);
 
 			isTimerRunning = false;
 
