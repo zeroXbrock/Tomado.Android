@@ -9,6 +9,7 @@ using Android.Graphics;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
+using Android.Views.Animations;
 using Android.Widget;
 using Clans.Fab;
 
@@ -120,6 +121,8 @@ namespace Tomado {
 							progressCircle.ResumeTimerAnimation();
 						else
 							progressCircle.StartTimerAnimation(duration / 1000, 0f);
+
+						timerTextView.ClearAnimation();
 					}
 					else if (!isTimerRunning) {
 						//new session (continuation of work)
@@ -138,6 +141,8 @@ namespace Tomado {
 						progressCircle.CancelTimerAnimation();
 
 						progressCircle.StartTimerAnimation(duration / 1000, 0f);
+
+						timerTextView.ClearAnimation();
 					}
 					else {
 						//pause
@@ -146,6 +151,8 @@ namespace Tomado {
 						isPaused = true;
 
 						CancelTimer();
+
+						StartAnimationTimerPause(timerTextView);
 
 						progressCircle.PauseTimerAnimation();
 					}
@@ -315,6 +322,11 @@ namespace Tomado {
 
 		public override void OnSaveInstanceState(Bundle outState) {
 			base.OnSaveInstanceState(SetPersistentBundleInfo(outState));
+		}
+
+		void StartAnimationTimerPause(TextView timerTextView) {
+			Animation anim = AnimationUtils.LoadAnimation(Context, Resource.Animation.blink);
+			timerTextView.StartAnimation(anim);
 		}
 
 		/// <summary>
